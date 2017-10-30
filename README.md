@@ -1,4 +1,6 @@
-# cloudplayer api
+[![Build Status](https://travis-ci.org/Cloud-Player/api.svg?branch=master)](https://travis-ci.org/Cloud-Player/api)
+
+# Cloud Player API
 
 ## install
 ```

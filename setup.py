@@ -35,6 +35,7 @@ setup(
     entry_points={
         'console_scripts': [
             'api=cloudplayer.api.app:main',
+            'pytest=pytest:main [test]',
             'test=pytest:main [test]'
         ]
     }

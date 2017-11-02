@@ -1,0 +1,154 @@
+#%RAML 1.0
+title: cloudplayer API
+baseUri: https://api.cloud-player.io
+mediaType: application/json
+types:
+  Image:
+    type: object
+    properties:
+      small: string
+      medium: string
+      large: string
+  Provider:
+    type: enum
+      - yt
+      - sc
+      - cp
+  Credentials:
+    type: object
+    properties:
+      accessToken: string
+      refreshToken: string
+      expiration: int
+  Account:
+    type: object
+    properties:
+      id: string
+      title: string
+      image: Image
+      provider: Provider
+      credentials?: Credentials
+  Playback:
+    type: object
+    properties:
+      id: int
+      timestamp: int
+      progress: int
+      trackId: int
+      provider: Provider
+      next: int
+      status?:
+        type: enum
+          # history
+          - completed
+          - skipped
+          # queue
+          - current
+          - queued
+          - suggested
+  Playlist:
+    type: object
+    properties:
+      id: string
+      title: string
+      provider: Provider
+      public: boolean
+      image: Image
+      followerCount: int
+      account: Account
+      tracks: Track[]
+  Track:
+    type: object
+    properties:
+      id: string
+      provider: Provider
+      title: string
+      account: Account
+      playCount: int
+      likeCount: int
+      created: int
+      duration: int
+      image: Image
+  User:
+    type: object
+    properties:
+      id: string
+      accounts: Account[]
+      image: Image
+      created: int
+  History:
+    type: object
+    properties:
+      userId: string
+      playbacks: Playback[]
+  Queue:
+    type: object
+    properties:
+      userId: string
+      playbacks: Playback[]
+
+/account:
+  get:
+    uriParameters:
+      q?: string
+      userId?: string
+    200:
+      body: Account[]
+  /{id}:
+    get:
+      200:
+        body: Account
+
+/playlist:
+  get:
+    uriParameters:
+      q?: string
+      accountId?: string
+    200:
+      body: Playlist[]
+  post:
+    body:
+      application/json: Playlist
+    200:
+      body: Playlist
+
+  /{id}:
+    get:
+      body: Playlist
+    put:
+      body:
+        application/json: Playlist
+      200:
+        body: Playlist
+    delete:
+      204:
+
+/track:
+  get:
+    uriParameters:
+      q?: string
+      accountId?: string
+    200:
+      body: Track[]
+  /{id}:
+    get:
+      200:
+        body: Track
+
+/user:
+  /{id}:
+    get:
+      200:
+        body: User
+
+/history:
+  /{id}:
+    get:
+      200:
+        body: History
+
+/queue:
+  /{id}:
+    get:
+      200:
+        body: Queue

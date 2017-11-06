@@ -4,8 +4,6 @@ language: python
 python:
   - "3.6"
 install:
-  - python3.6 -m venv --upgrade .
-  - bin/pip install -e .
-  - bin/pip install -e .[test]
-  - bin/test
+  - pip install -e .
+  - pip install -e .[test]
 script: pytest

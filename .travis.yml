@@ -7,3 +7,16 @@ install:
   - pip install -e .
   - pip install -e .[test]
 script: pytest
+after_success:
+  - sudo apt-get update -q
+  - sudo apt-get install nodejs npm -y
+  - npm i -g raml2html
+  - mkdir gh-pages
+  - raml2html -i cloudplayer.raml -o gh-pages/index.html
+deploy:
+  provider: pages
+  skip_cleanup: true
+  github_token: $GITHUB_TOKEN
+  local_dir: gh-pages
+  on:
+    branch: master

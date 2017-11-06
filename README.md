@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/Cloud-Player/api.svg?branch=master)](https://travis-ci.org/Cloud-Player/api)
+[![API Documentation](https://img.shields.io/badge/RAML-valid-brightgreen.svg)](https://cloud-player.github.io/api)
 
 # Cloud Player API
 

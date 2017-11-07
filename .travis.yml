@@ -14,7 +14,9 @@ after_success:
   - mkdir gh-pages
   - raml2html -i cloudplayer.raml -o gh-pages/index.html
 before_deploy:
-  - zip -r latest src/*
+  - cd src
+  - zip -r latest *
+  - cd ..
   - mkdir -p aws_upload
   - mv latest.zip aws_upload/latest.zip
 deploy:

@@ -13,10 +13,38 @@ after_success:
   - npm i -g raml2html
   - mkdir gh-pages
   - raml2html -i cloudplayer.raml -o gh-pages/index.html
+before_deploy:
+  - cd src
+  - zip -r latest *
+  - mkdir -p aws_upload
+  - mv latest.zip ../aws_upload/latest.zip
 deploy:
-  provider: pages
+- provider: pages
   skip_cleanup: true
   github_token: $GITHUB_TOKEN
   local_dir: gh-pages
+  on:
+    branch: master
+- provider: s3
+  access_key_id: AKIAJ67LKMIUNNDOY4IA
+  secret_access_key:
+    secure: "O2QhZG2fnjxuuu6ZtbMvGYij9KAV4D7mUp+yiNV+iWcx1kuPEkn3pKVbOrxQfZIRA/jVXyN/G2j9v43qSwOyvTDiZOUee/DMBEsY4KU0Xh4bzc4lK/dD8BLQh2X4KnajHuK0shOl8w0cQeQAvp2xh+x1f8cSjWjUzvPVLj1cKgWMhyYsJhbRH7U2f5pjA1H9YJbLSNtXOGfMF+yZnw1T+gm2OSPcgX0oucoVgclavL0k8b49Y2O239NMYjpaBrS+zqniyjM8zpPru8jqX8+QMVk4zB1lT8v2w6PHOuLshKTvMS8LVp4q+gBfnm+XPXNWgqRk382LvHiEIuBPKnnLrV2g/npUDn3PJuwj3b1CEZjzb8M+22qSBmIvj3voWE95OTGnn2u5vDArAAOj4LUya7ai22UzevjZ2mJg6jHjMqeJDE1W5cdFnZd5QeRec0BkW2LEscLWoc8UE1AxaDMjqyxxV32/bZPuvrw7WB9BcnZlw7jYU9NekyvNC5VptOVf7YVUnuipEpda6MzHdO0wEuuyzyTBIpxo7k+OYJetXcMdRiqtfVpdD7BJyHxXPufBAzt0WM7bjBrsSbj6MgAGxvFjaDVym02P9gzXzUnLKMcwuMgFK0qwwPy2sBLPN8bBsxR83Vq+qCUB9HElRm0BviuvniGyl/3FVCjprLiIBC4="
+  bucket: cloud-player-api
+  region: eu-central-1
+  local_dir: aws_upload
+  skip_cleanup: true
+  on:
+    branch: master
+- provider: codedeploy
+  access_key_id: AKIAJ67LKMIUNNDOY4IA
+  secret_access_key:
+    secure: "O2QhZG2fnjxuuu6ZtbMvGYij9KAV4D7mUp+yiNV+iWcx1kuPEkn3pKVbOrxQfZIRA/jVXyN/G2j9v43qSwOyvTDiZOUee/DMBEsY4KU0Xh4bzc4lK/dD8BLQh2X4KnajHuK0shOl8w0cQeQAvp2xh+x1f8cSjWjUzvPVLj1cKgWMhyYsJhbRH7U2f5pjA1H9YJbLSNtXOGfMF+yZnw1T+gm2OSPcgX0oucoVgclavL0k8b49Y2O239NMYjpaBrS+zqniyjM8zpPru8jqX8+QMVk4zB1lT8v2w6PHOuLshKTvMS8LVp4q+gBfnm+XPXNWgqRk382LvHiEIuBPKnnLrV2g/npUDn3PJuwj3b1CEZjzb8M+22qSBmIvj3voWE95OTGnn2u5vDArAAOj4LUya7ai22UzevjZ2mJg6jHjMqeJDE1W5cdFnZd5QeRec0BkW2LEscLWoc8UE1AxaDMjqyxxV32/bZPuvrw7WB9BcnZlw7jYU9NekyvNC5VptOVf7YVUnuipEpda6MzHdO0wEuuyzyTBIpxo7k+OYJetXcMdRiqtfVpdD7BJyHxXPufBAzt0WM7bjBrsSbj6MgAGxvFjaDVym02P9gzXzUnLKMcwuMgFK0qwwPy2sBLPN8bBsxR83Vq+qCUB9HElRm0BviuvniGyl/3FVCjprLiIBC4="
+  deployment_group: DeployGroupCp
+  region: eu-central-1
+  bucket: cloud-player-api
+  key: latest.zip
+  bundle_type: zip
+  application: ApiCp
+  skip_cleanup: true
   on:
     branch: master

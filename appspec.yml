@@ -5,17 +5,14 @@ files:
     destination: /srv/cloudplayer
   - source: ./api.conf
     destination: /etc/supervisor/conf.d
+  - source: ./cloudplayer.conf
+    destination: /etc/nginx/sites-enabled
 permissions:
   - object: /srv/cloudplayer
     owner: cloudplayer
     group: cloudplayer
     type:
       - directory
-      - file
-  - object: /etc/supervisor/conf.d/api.conf
-    owner: root
-    group: root
-    type:
       - file
 hooks:
  BeforeInstall:

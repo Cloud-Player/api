@@ -16,7 +16,7 @@ after_success:
 before_deploy:
   - zip -r latest *
   - mkdir -p aws_upload
-  - mv latest.zip ../aws_upload/latest.zip
+  - mv latest.zip aws_upload/latest.zip
 deploy:
 - provider: pages
   skip_cleanup: true

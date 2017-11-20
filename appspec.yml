@@ -2,13 +2,13 @@ version: 0.0
 os: linux
 files:
   - source: .
-    destination: /var/www
+    destination: /srv/cloudplayer
   - source: ./supervisord.conf
     destination: /etc/supervisor/conf.d/api.conf
 permissions:
-  - object: /var/www/api
-    owner: www-data
-    group: www-data
+  - object: /srv/cloudplayer/api
+    owner: cloudplayer
+    group: cloudplayer
     type:
       - directory
       - file
@@ -25,7 +25,7 @@ hooks:
  AfterInstall:
    - location: scripts/install-as-user.sh
      timeout: 600
-     runas: www-data
+     runas: cloudplayer
  ApplicationStart:
    - location: scripts/run.sh
      timeout: 120

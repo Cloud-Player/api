@@ -1,7 +1,0 @@
-cloudplayer.api changes
-=======================
-
-0.0.1 (unreleased)
-------------------
-
-- Setup project

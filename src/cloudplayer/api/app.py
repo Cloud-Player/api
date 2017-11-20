@@ -19,7 +19,7 @@ from cloudplayer.api import handler
 
 def define_options():
     """Defines global configuration options"""
-    opt.define('config', type=str, default='config.py')
+    opt.define('config', type=str, default='dev.py')
     opt.define('port', type=int, default=8040)
     opt.parse_command_line()
     opt.define('connect_timeout', type=int, default=1, group='httpclient')

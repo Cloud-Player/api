@@ -3,10 +3,10 @@ os: linux
 files:
   - source: .
     destination: /srv/cloudplayer
-  - source: ./supervisord.conf
-    destination: /etc/supervisor/conf.d/api.conf
+  - source: ./api.conf
+    destination: /etc/supervisor/conf.d
 permissions:
-  - object: /srv/cloudplayer/api
+  - object: /srv/cloudplayer
     owner: cloudplayer
     group: cloudplayer
     type:

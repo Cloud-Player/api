@@ -6,12 +6,13 @@
 ## install
 ```
 python3 -m venv --upgrade --copies .
-bin/pip install -e .
+bin/pip3 install -e .
 ```
 
 ## develop
 ```
 bin/api
+open http://localhost:8040
 ```
 
 ## test

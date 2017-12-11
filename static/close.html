@@ -1,0 +1,7 @@
+<script>
+    function m(e) {
+        e.source.postMessage({}, e.origin);
+        window.close();
+    }
+    window.addEventListener("message", m, false);
+</script>

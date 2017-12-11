@@ -16,10 +16,11 @@ setup(
     namespace_packages=['cloudplayer'],
     setup_requires=['setuptools_git'],
     install_requires=[
-        'tornado',
+        'psycopg2',
         'pycurl',
         'PyJWT',
         'setuptools',
+        'sqlalchemy',
         'tornado'
     ],
     extras_require={

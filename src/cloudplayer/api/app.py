@@ -9,12 +9,18 @@ import signal
 import sys
 
 from tornado.log import app_log
+import redis
+import sqlalchemy as sql
+import sqlalchemy.orm
+import tornado.concurrent
 import tornado.httpclient
 import tornado.ioloop
 import tornado.options as opt
 import tornado.web
 
 from cloudplayer.api import handler
+from cloudplayer.api import google
+import cloudplayer.api.model
 
 
 def define_options():
@@ -25,18 +31,60 @@ def define_options():
     opt.define('connect_timeout', type=int, default=1, group='httpclient')
     opt.define('request_timeout', type=int, default=3, group='httpclient')
     opt.define('max_redirects', type=int, default=1, group='httpclient')
-    opt.define('debug', type=bool, group='server')
-    opt.define('xheaders', type=bool, group='server')
-    opt.define('static_path', type=str, group='server')
-    opt.define('allowed_origins', type=str, default='*')
+    opt.define('debug', type=bool, group='app')
+    opt.define('xheaders', type=bool, group='app')
+    opt.define('static_path', type=str, group='app')
+    opt.define('jwt_secret', type=str, group='app')
+    opt.define('google_oauth', type=dict, group='app')
+    opt.define('allowed_origins', type=list, group='app')
+    opt.define('num_executors', type=int, default=1, group='app')
+    opt.define('redis_host', type=str, default='localhost', group='app')
+    opt.define('redis_port', type=int, default=6379, group='app')
+    opt.define('postgres_host', type=str, default='localhost', group='app')
+    opt.define('postgres_port', type=int, default=5432, group='app')
+    opt.define('postgres_db', type=str, default='cloudplayer', group='app')
+    opt.define('postgres_user', type=str, default='api', group='app')
+    opt.define('postgres_password', type=str, default='password', group='app')
     opt.parse_config_file(opt.options.config)
 
 
-def make_app():
-    """Configure routes and application options"""
-    return tornado.web.Application([
-        (r'^/.*', handler.FallbackHandler),
-    ], **opt.options.group_dict('server'))
+class Application(tornado.web.Application):
+
+    def __init__(self):
+        handlers = [
+            (r'^/google$', google.LoginHandler),
+            (r'^/.*', handler.FallbackHandler)
+        ]
+        settings = opt.options.group_dict('app')
+
+        super(Application, self).__init__(handlers, **settings)
+
+        self.executor = tornado.concurrent.futures.ThreadPoolExecutor(
+            settings['num_executors'])
+
+        self.redis_pool = redis.ConnectionPool(
+            host=settings['redis_host'],
+            port=settings['redis_port'])
+
+        self.database = Database(
+            settings['postgres_user'],
+            settings['postgres_password'],
+            settings['postgres_host'],
+            settings['postgres_port'],
+            settings['postgres_db'])
+
+
+class Database(object):
+
+    def __init__(self, user, password, host, port, db):
+        url = 'postgresql://{}:{}@{}:{}/{}'.format(
+            user, password, host, port, db)
+        self.engine = sql.create_engine(url, client_encoding='utf8')
+        cloudplayer.api.model.Base.metadata.create_all(self.engine)
+        self.session_cls = sqlalchemy.orm.sessionmaker(bind=self.engine)
+
+    def create_session(self):
+        return self.session_cls()
 
 
 def configure_httpclient():
@@ -54,7 +102,7 @@ def main():
     """Main tornado application entry point"""
     define_options()
     configure_httpclient()
-    app = make_app()
+    app = Application()
     app.listen(opt.options.port)
     app_log.info('server listening at localhost:%s', opt.options.port)
     ioloop = tornado.ioloop.IOLoop.current()

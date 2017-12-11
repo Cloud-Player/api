@@ -14,25 +14,22 @@ types:
       - yt
       - sc
       - cp
-  Credentials:
-    type: object
-    properties:
-      accessToken: string
-      refreshToken: string
-      expiration: int
   Account:
     type: object
     properties:
       id: string
       title: string
       image: Image
+      created: datetime
       provider: Provider
-      credentials?: Credentials
+      accessToken?: string
+      refreshToken?: string
+      accessExpiration?: datetime
   Playback:
     type: object
     properties:
       id: int
-      timestamp: int
+      timestamp: datetime
       progress: int
       trackId: int
       provider: Provider
@@ -66,7 +63,7 @@ types:
       account: Account
       playCount: int
       likeCount: int
-      created: int
+      created: datetime
       duration: int
       image: Image
   User:
@@ -75,7 +72,7 @@ types:
       id: string
       accounts: Account[]
       image: Image
-      created: int
+      created: datetime
   History:
     type: object
     properties:

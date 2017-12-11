@@ -7,13 +7,34 @@
 """
 import json
 
+import jwt
+import jwt.exceptions
+
+from sqlalchemy.orm.session import make_transient_to_detached
+import tornado.gen
 import tornado.options as opt
 import tornado.web
+
+import cloudplayer.api.model
 
 
 class HTTPHandler(tornado.web.RequestHandler):
 
     SUPPORTED_METHODS = ('GET', 'POST', 'DELETE', 'PUT', 'OPTIONS')
+
+    def __init__(self, request, application):
+        super(HTTPHandler, self).__init__(request, application)
+        self.database_session = None
+
+    @property
+    def cache(self):
+        return redis.Redis(connection_pool=self.application.redis_pool)
+
+    @property
+    def db(self):
+        if not self.database_session:
+            self.database_session = self.application.database.create_session()
+        return self.database_session
 
     def set_default_headers(self):
         headers = [
@@ -48,18 +69,34 @@ class HTTPHandler(tornado.web.RequestHandler):
         self.write({'status_code': status_code, 'reason': reason})
 
     @tornado.gen.coroutine
+    def prepare(self):
+        user_jwt = self.get_cookie('USER', '')
+        try:
+            user_dict = jwt.decode(
+                user_jwt, self.settings['jwt_secret'], algorithms=['HS256'])
+            user = cloudplayer.api.model.User(id=user_dict['id'])
+            make_transient_to_detached(user)
+            user = self.db.merge(user, load=False)
+        except jwt.exceptions.InvalidTokenError:
+            user = cloudplayer.api.model.User()
+            self.db.add(user)
+            self.db.commit()
+            user_dict = dict(id=user.id)
+            user_jwt = jwt.encode(
+                user_dict, self.settings['jwt_secret'], algorithm='HS256')
+            self.set_cookie('USER', user_jwt, expires_days=1)
+        self.current_user = user
+
+    @tornado.gen.coroutine
     def options(self, *args, **kwargs):
         self.finish()
 
     @property
     def allowed_origin(self):
-        if not hasattr(HTTPHandler, '_allowed_origins'):
-            HTTPHandler._allowed_origins = (
-                opt.options.allowed_origins.replace(' ', '').split(','))
         proposed_origin = self.request.headers.get('Origin')
-        if proposed_origin in self._allowed_origins:
+        if proposed_origin in self.settings['allowed_origins']:
             return proposed_origin
-        return self._allowed_origins[0]
+        return self.settings['allowed_origins'][0]
 
     @property
     def allowed_methods(self):

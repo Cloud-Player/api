@@ -19,6 +19,3 @@ postgresql
 
 # disable default nginx site
 rm /etc/nginx/sites-enabled/default &> /dev/null || echo "default disabled"
-
-# run database initialization
-su postgres -c "psql -f scripts/init-database.sql"

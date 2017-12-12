@@ -15,23 +15,25 @@ permissions:
       - directory
       - file
 hooks:
- BeforeInstall:
-   - location: scripts/install-as-root.sh
-     timeout: 300
-     runas: root
  AfterInstall:
-   - location: scripts/install-as-user.sh
-     timeout: 600
-     runas: cloudplayer
+ - location: scripts/install-as-root.sh
+    timeout: 300
+    runas: root
+  - location: scripts/install-as-user.sh
+    timeout: 600
+    runas: cloudplayer
+  - location: scripts/init-database.sh
+    timeout: 100
+    runas: postgres
  ApplicationStart:
-   - location: scripts/run.sh
-     timeout: 120
-     runas: root
+  - location: scripts/run.sh
+    timeout: 120
+    runas: root
  ApplicationStop:
-   - location: scripts/stop.sh
-     timeout: 120
-     runas: root
+  - location: scripts/stop.sh
+    timeout: 120
+    runas: root
  ValidateService:
-   - location: scripts/validate.sh
-     timeout: 60
-     runas: root
+  - location: scripts/validate.sh
+    timeout: 60
+    runas: root

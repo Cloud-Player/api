@@ -149,3 +149,19 @@ types:
     get:
       200:
         body: Queue
+
+/google:
+  description: Authorization endpoint to login with google
+  get:
+    302:
+      description: Redirects to google oauth login prompt
+    200:
+      description: Callback endpoint that shows a popup closer
+
+/soundcloud:
+  description: Authorization endpoint to login with soundcloud
+  get:
+    302:
+      description: Redirects to soundcloud oauth login prompt
+    200:
+      description: Callback endpoint that shows a popup closer

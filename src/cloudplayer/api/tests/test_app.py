@@ -21,6 +21,7 @@ def test_http_handler_should_set_default_headers(http_client, base_url):
     response = yield http_client.fetch(base_url, raise_error=False)
     headers = dict(response.headers)
     assert headers.pop('Date')
+    assert headers.pop('Set-Cookie')
     assert headers == {
         'Access-Control-Allow-Credentials': 'true',
         'Access-Control-Allow-Headers': 'Accept, Content-Type, Origin',

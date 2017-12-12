@@ -18,8 +18,9 @@ import tornado.ioloop
 import tornado.options as opt
 import tornado.web
 
-from cloudplayer.api import handler
 from cloudplayer.api import google
+from cloudplayer.api import handler
+from cloudplayer.api import soundcloud
 import cloudplayer.api.model
 
 
@@ -36,6 +37,7 @@ def define_options():
     opt.define('static_path', type=str, group='app')
     opt.define('jwt_secret', type=str, group='app')
     opt.define('google_oauth', type=dict, group='app')
+    opt.define('soundcloud_oauth', type=dict, group='app')
     opt.define('allowed_origins', type=list, group='app')
     opt.define('num_executors', type=int, default=1, group='app')
     opt.define('redis_host', type=str, default='localhost', group='app')
@@ -53,6 +55,7 @@ class Application(tornado.web.Application):
     def __init__(self):
         handlers = [
             (r'^/google$', google.LoginHandler),
+            (r'^/soundcloud$', soundcloud.LoginHandler),
             (r'^/.*', handler.FallbackHandler)
         ]
         settings = opt.options.group_dict('app')

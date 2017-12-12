@@ -13,7 +13,7 @@ class Account(Base):
 
     __tablename__ = 'account'
 
-    id = sql.Column(sql.String(16), primary_key=True)
+    id = sql.Column(sql.String(32), primary_key=True)
 
     provider_id = sql.Column(
         sql.String(16), sql.ForeignKey('provider.id'), primary_key=True)
@@ -38,7 +38,7 @@ class Provider(Base):
 
     __tablename__ = 'provider'
 
-    id = sql.Column(sql.String(16), primary_key=True)
+    id = sql.Column(sql.String(12), primary_key=True)
 
 
 class User(Base):

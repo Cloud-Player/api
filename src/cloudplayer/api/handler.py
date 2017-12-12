@@ -5,16 +5,20 @@
     :copyright: (c) 2017 by the cloudplayer team
     :license: Apache-2.0, see LICENSE for details
 """
+import datetime
+import functools
 import json
 
+from sqlalchemy.orm.session import make_transient_to_detached
 import jwt
 import jwt.exceptions
-
-from sqlalchemy.orm.session import make_transient_to_detached
+import tornado.auth
+import tornado.escape
 import tornado.gen
 import tornado.options as opt
 import tornado.web
 
+from cloudplayer.api.model import Account, User, Provider
 import cloudplayer.api.model
 
 
@@ -74,11 +78,11 @@ class HTTPHandler(tornado.web.RequestHandler):
         try:
             user_dict = jwt.decode(
                 user_jwt, self.settings['jwt_secret'], algorithms=['HS256'])
-            user = cloudplayer.api.model.User(id=user_dict['id'])
+            user = User(id=user_dict['id'])
             make_transient_to_detached(user)
             user = self.db.merge(user, load=False)
         except jwt.exceptions.InvalidTokenError:
-            user = cloudplayer.api.model.User()
+            user = User()
             self.db.add(user)
             self.db.commit()
             user_dict = dict(id=user.id)
@@ -101,6 +105,98 @@ class HTTPHandler(tornado.web.RequestHandler):
     @property
     def allowed_methods(self):
         return ', '.join(self.SUPPORTED_METHODS)
+
+
+class LoginHandler(HTTPHandler, tornado.auth.OAuth2Mixin):
+
+    _OAUTH_NO_CALLBACKS = False
+    _OAUTH_VERSION = '1.0a'
+    _OAUTH_RESPONSE_TYPE = 'code'
+    _OAUTH_GRANT_TYPE = 'authorization_code'
+
+    _OAUTH_SCOPE_LIST = []
+    _OAUTH_EXTRA_PARAMS = {}
+
+    _OAUTH_AUTHORIZE_URL = NotImplemented
+    _OAUTH_ACCESS_TOKEN_URL = NotImplemented
+    _OAUTH_USERINFO_URL = NotImplemented
+    _OAUTH_SETTINGS_KEY = NotImplemented
+    _OAUTH_PROVIDER_ID = NotImplemented
+
+    @property
+    def _OAUTH_PROVIDER(self):
+        return self.settings[self._OAUTH_SETTINGS_KEY]
+
+    @tornado.auth._auth_return_future
+    def get_authenticated_user(self, redirect_uri, code, callback):
+        """Fetches the authenticated user data upon redirect"""
+        http = self.get_auth_http_client()
+        body = tornado.auth.urllib_parse.urlencode({
+            'redirect_uri': redirect_uri,
+            'code': code,
+            'client_id': self._OAUTH_PROVIDER['key'],
+            'client_secret': self._OAUTH_PROVIDER['secret'],
+            'grant_type': self._OAUTH_GRANT_TYPE})
+
+        http.fetch(
+            self._OAUTH_ACCESS_TOKEN_URL,
+            functools.partial(self._on_access_token, callback),
+            headers={'Content-Type': 'application/x-www-form-urlencoded'},
+            method='POST',
+            body=body)
+
+    def _on_access_token(self, future, response):
+        """Callback function for the exchange to the access token"""
+        if response.error:
+            future.set_exception(
+                tornado.auth.AuthError('{} auth error: {}'.format(
+                    self._OAUTH_PROVIDER_ID, response)))
+        else:
+            args = tornado.escape.json_decode(response.body)
+            future.set_result(args)
+
+    @tornado.gen.coroutine
+    def get(self):
+        if self.get_argument('code', False):
+            yield self.provider_callback()
+        else:
+            yield self.authorize_redirect(
+                redirect_uri=self._OAUTH_PROVIDER['redirect_uri'],
+                client_id=self._OAUTH_PROVIDER['key'],
+                scope=self._OAUTH_SCOPE_LIST,
+                response_type=self._OAUTH_RESPONSE_TYPE,
+                extra_params=self._OAUTH_EXTRA_PARAMS)
+
+    @tornado.gen.coroutine
+    def provider_callback(self):
+        access = yield self.get_authenticated_user(
+            redirect_uri=self._OAUTH_PROVIDER['redirect_uri'],
+            code=self.get_argument('code'))
+
+        user_info = yield self.oauth2_request(
+            self._OAUTH_USERINFO_URL,
+            access_token=access['access_token'])
+
+        account = self.db.query(
+            Account
+        ).filter(
+            Account.id == user_info['id']
+        ).filter(
+            Account.provider_id == self._OAUTH_PROVIDER_ID
+        ).one_or_none()
+
+        if not account:
+            expires_in = datetime.timedelta(seconds=access['expires_in'])
+            account = Account(
+                id=user_info['id'],
+                provider_id=self._OAUTH_PROVIDER_ID,
+                access_token=access['access_token'],
+                refresh_token=access['refresh_token'],
+                token_expiration=datetime.datetime.now() + expires_in)
+            self.db.add(account)
+            current_user = self.db.merge(self.current_user)
+            current_user.accounts.append(account)
+        self.db.commit()
 
 
 class FallbackHandler(HTTPHandler):

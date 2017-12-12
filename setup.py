@@ -29,6 +29,8 @@ setup(
             'mock',
             'pylint',
             'pytest-pep8',
+            'pytest-postgresql',
+            'pytest-redis',
             'pytest-timeout',
             'pytest-tornado',
             'pytest'

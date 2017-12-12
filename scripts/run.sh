@@ -1,4 +1,4 @@
 #!/bin/bash
 
-supervisorctl update api
+supervisorctl start api
 service nginx reload

@@ -19,6 +19,7 @@ setup(
         'psycopg2',
         'pycurl',
         'PyJWT',
+        'redis',
         'setuptools',
         'sqlalchemy',
         'tornado'

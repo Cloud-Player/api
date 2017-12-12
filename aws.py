@@ -1,3 +1,8 @@
+import sys
+import os.path
+__path__ = os.path.dirname(os.path.realpath(__file__))
+sys.path.insert(0, __path__)
+
 debug = False
 xheaders = True
 static_path = 'static'
@@ -14,3 +19,13 @@ google_oauth = {
     'key': 'key',
     'secret': 'secret',
     'redirect_uri': 'https://api.cloud-player.io/google'}
+
+soundcloud_oauth = {
+    'key': 'key',
+    'secret': 'secret',
+    'redirect_uri': 'https://api.cloud-player.io/soundcloud'}
+
+try:
+    from private import *
+except ImportError:
+    pass

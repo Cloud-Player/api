@@ -9,3 +9,4 @@ lib
 pip-selfcheck.json
 pyvenv.cfg
 aws_upload
+private.py

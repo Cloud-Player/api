@@ -31,7 +31,7 @@ class Account(Base):
 
     access_token = sql.Column(sql.String(256))
     refresh_token = sql.Column(sql.String(256))
-    token_expiration = sql.Column(sql.Interval)
+    token_expiration = sql.Column(sql.DateTime(timezone=True))
 
 
 class Provider(Base):

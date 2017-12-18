@@ -143,6 +143,47 @@ class HTTPHandler(tornado.web.RequestHandler):
         return ', '.join(self.SUPPORTED_METHODS)
 
 
+class EntityHandler(HTTPHandler):
+
+    __model__ = NotImplemented
+
+    SUPPORTED_METHODS = ['GET', 'PUT', 'PATCH', 'DELETE']
+
+    @classmethod
+    def update(entity, dict_):
+        for field, value in dict_.items():
+            if field in entity.__fields__:
+                setattr(entity, field, value)
+            else:
+                raise KeyError('invalid field %s' % field)
+
+    @tornado.gen.coroutine
+    def get(self, id):
+        entity = self.db.query(
+            self.__model__
+        ).filter(
+            self.__model__.id == id
+        ).one_or_none()
+
+        yield self.write(entity)
+
+    @tornado.gen.coroutine
+    def put(self, id):
+        entity = self.db.query(
+            self.__model__
+        ).filter(
+            self.__model__.id == id
+        ).one_or_none()
+
+        if entity is None:
+            raise tornado.web.HTTPError(404, 'entity not found')
+
+        self.update(entity, body_json)
+
+        self.db.commit()
+
+        yield self.write(entity)
+
 
 class AuthHandler(HTTPHandler, tornado.auth.OAuth2Mixin):
 

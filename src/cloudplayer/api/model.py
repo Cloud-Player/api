@@ -5,6 +5,8 @@
     :copyright: (c) 2017 by the cloudplayer team
     :license: GPL-3.0, see LICENSE for details
 """
+import json
+import datetime
 import pkg_resources
 
 from sqlalchemy.orm import relationship
@@ -52,6 +54,8 @@ class Account(Base):
     user_id = sql.Column(sql.Integer, sql.ForeignKey('user.id'))
     user = relationship('User', back_populates='accounts')
 
+    playlists = relationship('Playlist', back_populates='account')
+
     title = sql.Column(sql.String(64))
     image = sql.Column(sql.String(256))
 
@@ -62,6 +66,37 @@ class Account(Base):
     access_token = sql.Column(sql.String(256))
     refresh_token = sql.Column(sql.String(256))
     token_expiration = sql.Column(sql.DateTime(timezone=True))
+
+
+class Image(Base):
+
+    __tablename__ = 'image'
+    __fields__ = ['id', 'small', 'medium', 'large']
+
+    id = sql.Column(sql.String(32), primary_key=True)
+    small = sql.Column(sql.String(256))
+    medium = sql.Column(sql.String(256))
+    large = sql.Column(sql.String(256))
+
+
+class Playlist(Base):
+
+    __tablename__ = 'playlist'
+    __fields__ = ['id', 'title', 'public', 'follower_count', 'account_id']
+    __table_args__ = (
+        sql.ForeignKeyConstraint(
+            ['account_provider', 'account_id'],
+            ['account.provider_id', 'account.id']),)
+
+    id = sql.Column(sql.String(32), primary_key=True)
+
+    title = sql.Column(sql.String(512))
+    public = sql.Column(sql.Boolean)
+    follower_count = sql.Column(sql.Integer)
+
+    account_id = sql.Column(sql.String(32))
+    account_provider = sql.Column(sql.String(16))
+    account = relationship('Account', back_populates='playlists')
 
 
 class Provider(Base):

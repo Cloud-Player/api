@@ -30,7 +30,7 @@ types:
       id: int
       timestamp: datetime
       progress: int
-      trackId: int
+      track_id: int
       provider: Provider
       next: int
       status?:
@@ -50,7 +50,7 @@ types:
       provider: Provider
       public: boolean
       image: Image
-      followerCount: int
+      follower_count: int
       account: Account
       tracks: Track[]
   Track:
@@ -60,8 +60,8 @@ types:
       provider: Provider
       title: string
       account: Account
-      playCount: int
-      likeCount: int
+      play_count: int
+      like_count: int
       created: datetime
       duration: int
       image: Image
@@ -75,19 +75,19 @@ types:
   History:
     type: object
     properties:
-      userId: string
+      user_id: string
       playbacks: Playback[]
   Queue:
     type: object
     properties:
-      userId: string
+      user_id: string
       playbacks: Playback[]
 
 /account:
   get:
     uriParameters:
       q?: string
-      userId?: string
+      user_id?: string
     200:
       body: Account[]
   /{id}:
@@ -99,8 +99,8 @@ types:
   get:
     uriParameters:
       q?: string
-      accountId?: string
-      providerId: string
+      account_id?: string
+      provider_id: string
     200:
       body: Playlist[]
   post:
@@ -124,7 +124,7 @@ types:
   get:
     uriParameters:
       q?: string
-      accountId?: string
+      account_id?: string
     200:
       body: Track[]
   /{id}:

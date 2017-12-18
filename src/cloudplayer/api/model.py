@@ -25,8 +25,7 @@ class Encoder(json.JSONEncoder):
             return json.JSONEncoder.default(self, obj)
         except:
             if isinstance(obj, Base):
-                dict_ = {
-                    field_map[c]: getattr(obj, c) for c in obj.__fields__}
+                dict_ = {c: getattr(obj, c) for c in obj.__fields__}
                 if 'id' in dict_:  # TODO: There must be a better solution
                     dict_['id'] = str(dict_['id'])
                 return dict_

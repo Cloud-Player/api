@@ -33,6 +33,7 @@ class HTTPHandler(tornado.web.RequestHandler):
         self.http_client = tornado.httpclient.AsyncHTTPClient()
         self.database_session = None
         self._current_user = None
+        self._original_user = None
 
     @property
     def cache(self):
@@ -46,36 +47,38 @@ class HTTPHandler(tornado.web.RequestHandler):
 
     def get_current_user(self):
         try:
-            return jwt.decode(
+            user = jwt.decode(
                 self.get_cookie(self.settings['jwt_cookie'], ''),
                 self.settings['jwt_secret'],
                 algorithms=['HS256'])
+            self._original_user = user
         except jwt.exceptions.InvalidTokenError:
-            user = User()
-            self.db.add(user)
+            new_user = User()
+            self.db.add(new_user)
             self.db.commit()
-            claim = {p: None for p in self.settings['providers']}
-            claim['cloudplayer'] = user.id
-            return claim
+            user = {p: None for p in self.settings['providers']}
+            user['cloudplayer'] = new_user.id
+        return user
+
+    def set_user_cookie(self):
+        user_jwt = jwt.encode(
+            self._current_user,
+            self.settings['jwt_secret'],
+            algorithm='HS256')
+        super().set_cookie(
+            self.settings['jwt_cookie'],
+            user_jwt,
+            expires_days=self.settings['jwt_expiration'])
 
     @property
     def current_user(self):
         if self._current_user is None:
-            self.current_user = self.get_current_user()
+            self._current_user = self.get_current_user()
         return self._current_user
 
     @current_user.setter
-    def current_user(self, value):
-        if self._current_user != value:
-            user_jwt = jwt.encode(
-                value,
-                self.settings['jwt_secret'],
-                algorithm='HS256')
-            super().set_cookie(
-                self.settings['jwt_cookie'],
-                user_jwt,
-                expires_days=self.settings['jwt_expiration'])
-        self._current_user = value
+    def current_user(self, user):
+        self._current_user = user
 
     def set_default_headers(self):
         headers = [
@@ -110,6 +113,11 @@ class HTTPHandler(tornado.web.RequestHandler):
                     reason = getattr(exception, attr)
                     break
         self.write({'status_code': status_code, 'reason': reason})
+
+    def finish(self, chunk=None):
+        if self._original_user != self._current_user:
+            self.set_user_cookie()
+        super().finish(chunk=chunk)
 
     def fetch(self, provider, path, params={}, **kw):
         if provider == 'youtube':
@@ -272,7 +280,12 @@ class AuthHandler(HTTPHandler, tornado.auth.OAuth2Mixin):
             Account.provider_id == self._OAUTH_PROVIDER_ID
         ).one_or_none()
 
-        if not account:
+
+        if account:
+            self.current_user['cloudplayer'] = account.user_id
+            for a in account.user.accounts:
+                self.current_user[a.provider_id] = a.id
+        else:
             expires_in = datetime.timedelta(seconds=access.get('expires_in'))
             account = Account(
                 id=str(user_info['id']),
@@ -282,8 +295,11 @@ class AuthHandler(HTTPHandler, tornado.auth.OAuth2Mixin):
                 refresh_token=access.get('refresh_token'),
                 token_expiration=datetime.datetime.now() + expires_in)
             self.db.add(account)
+            self.current_user[self._OAUTH_PROVIDER_ID] = account.id
 
-        self.db.commit()
+            self.db.commit()
+
+        self.set_user_cookie()
 
 
 class FallbackHandler(HTTPHandler):

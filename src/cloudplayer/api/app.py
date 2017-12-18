@@ -5,6 +5,7 @@
     :copyright: (c) 2017 by the cloudplayer team
     :license: GPL-3.0, see LICENSE for details
 """
+import re
 import signal
 import sys
 
@@ -18,10 +19,11 @@ import tornado.ioloop
 import tornado.options as opt
 import tornado.web
 
-from cloudplayer.api import google
+from cloudplayer.api import auth
 from cloudplayer.api import handler
-from cloudplayer.api import soundcloud
-import cloudplayer.api.model
+from cloudplayer.api import model
+from cloudplayer.api import playlist
+from cloudplayer.api import user
 
 
 def define_options():
@@ -36,7 +38,7 @@ def define_options():
     opt.define('xheaders', type=bool, group='app')
     opt.define('static_path', type=str, group='app')
     opt.define('jwt_secret', type=str, group='app')
-    opt.define('google_oauth', type=dict, group='app')
+    opt.define('youtube_oauth', type=dict, group='app')
     opt.define('soundcloud_oauth', type=dict, group='app')
     opt.define('providers', type=list, group='app')
     opt.define('allowed_origins', type=list, group='app')
@@ -55,8 +57,10 @@ class Application(tornado.web.Application):
 
     def __init__(self):
         handlers = [
-            (r'^/google$', google.LoginHandler),
-            (r'^/soundcloud$', soundcloud.LoginHandler),
+            (r'^/youtube$', auth.Youtube),
+            (r'^/playlist$', playlist.Collection),
+            (r'^/soundcloud$', auth.Soundcloud),
+            (r'^/user/(me|[0-9]+)$', user.Entity),
             (r'^/.*', handler.FallbackHandler)
         ]
         settings = opt.options.group_dict('app')
@@ -84,7 +88,7 @@ class Database(object):
         url = 'postgresql://{}:{}@{}:{}/{}'.format(
             user, password, host, port, db)
         self.engine = sql.create_engine(url, client_encoding='utf8')
-        cloudplayer.api.model.Base.metadata.create_all(self.engine)
+        model.Base.metadata.create_all(self.engine)
         self.session_cls = sqlalchemy.orm.sessionmaker(bind=self.engine)
         self.populate_providers()
     def populate_providers(self):

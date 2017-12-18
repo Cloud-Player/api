@@ -20,10 +20,10 @@ allowed_origins = [
 
 jwt_secret = 'secret'
 
-google_oauth = {
+youtube_oauth = {
     'key': 'key',
     'secret': 'secret',
-    'redirect_uri': 'https://api.cloud-player.io/google'}
+    'redirect_uri': 'https://api.cloud-player.io/youtube'}
 
 soundcloud_oauth = {
     'key': 'key',

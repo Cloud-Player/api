@@ -10,10 +10,10 @@ types:
       medium: string
       large: string
   Provider:
-    type: enum
-      - yt
-      - sc
-      - cp
+    enum:
+      - cloudplayer
+      - soundcloud
+      - youtube
   Account:
     type: object
     properties:
@@ -101,6 +101,7 @@ types:
     uriParameters:
       q?: string
       accountId?: string
+      providerId: string
     200:
       body: Playlist[]
   post:
@@ -150,11 +151,11 @@ types:
       200:
         body: Queue
 
-/google:
-  description: Authorization endpoint to login with google
+/youtube:
+  description: Authorization endpoint to login with youtube
   get:
     302:
-      description: Redirects to google oauth login prompt
+      description: Redirects to youtube oauth login prompt
     200:
       description: Callback endpoint that shows a popup closer
 

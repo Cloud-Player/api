@@ -34,8 +34,6 @@ class Encoder(json.JSONEncoder):
                 return obj.isoformat()
             elif isinstance(obj, datetime.timedelta):
                 return obj.total_seconds()
-            else:
-                __import__('pdb').set_trace()
             return json.JSONEncoder.default(self, obj)
 
 

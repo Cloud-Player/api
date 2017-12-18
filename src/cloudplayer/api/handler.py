@@ -256,10 +256,13 @@ class AuthHandler(HTTPHandler, tornado.auth.OAuth2Mixin):
             redirect_uri=self._OAUTH_PROVIDER['redirect_uri'],
             code=self.get_argument('code'))
 
+        args = {'access_token': True}
+        args[self.OAUTH_TOKEN_PARAM] = access.get('access_token')
         user_info = yield self.oauth2_request(
-            self._OAUTH_USERINFO_URL,
-            access_token=True,
-            **{self.OAUTH_TOKEN_PARAM: access['access_token']})
+            self._OAUTH_USERINFO_URL, **args)
+
+        if not user_info:
+            raise tornado.web.HTTPError(503, 'invalid user info')
 
         account = self.db.query(
             Account
@@ -270,17 +273,16 @@ class AuthHandler(HTTPHandler, tornado.auth.OAuth2Mixin):
         ).one_or_none()
 
         if not account:
-            expires_in = datetime.timedelta(seconds=access['expires_in'])
+            expires_in = datetime.timedelta(seconds=access.get('expires_in'))
             account = Account(
                 id=str(user_info['id']),
-                user_id=self.current_user[self._OAUTH_PROVIDER_ID],
+                user_id=self.current_user['cloudplayer'],
                 provider_id=self._OAUTH_PROVIDER_ID,
-                access_token=access['access_token'],
-                refresh_token=access['refresh_token'],
+                access_token=access.get('access_token'),
+                refresh_token=access.get('refresh_token'),
                 token_expiration=datetime.datetime.now() + expires_in)
             self.db.add(account)
 
-        # TODO: -re-assign to user/accounts
         self.db.commit()
 
 

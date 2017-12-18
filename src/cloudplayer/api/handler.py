@@ -8,6 +8,7 @@
 import datetime
 import functools
 import json
+import traceback
 
 from sqlalchemy.orm.session import make_transient_to_detached
 import jwt
@@ -15,11 +16,12 @@ import jwt.exceptions
 import tornado.auth
 import tornado.escape
 import tornado.gen
+import tornado.httputil
 import tornado.options as opt
 import tornado.web
 
-import cloudplayer.api.model
 from cloudplayer.api.model import Account, User, Provider, Encoder
+import cloudplayer.api.auth
 
 
 class HTTPHandler(tornado.web.RequestHandler):
@@ -28,7 +30,9 @@ class HTTPHandler(tornado.web.RequestHandler):
 
     def __init__(self, request, application):
         super(HTTPHandler, self).__init__(request, application)
+        self.http_client = tornado.httpclient.AsyncHTTPClient()
         self.database_session = None
+        self._current_user = None
 
     @property
     def cache(self):
@@ -39,6 +43,39 @@ class HTTPHandler(tornado.web.RequestHandler):
         if not self.database_session:
             self.database_session = self.application.database.create_session()
         return self.database_session
+
+    def get_current_user(self):
+        try:
+            return jwt.decode(
+                self.get_cookie(self.settings['jwt_cookie'], ''),
+                self.settings['jwt_secret'],
+                algorithms=['HS256'])
+        except jwt.exceptions.InvalidTokenError:
+            user = User()
+            self.db.add(user)
+            self.db.commit()
+            claim = {p: None for p in self.settings['providers']}
+            claim['cloudplayer'] = user.id
+            return claim
+
+    @property
+    def current_user(self):
+        if self._current_user is None:
+            self.current_user = self.get_current_user()
+        return self._current_user
+
+    @current_user.setter
+    def current_user(self, value):
+        if self._current_user != value:
+            user_jwt = jwt.encode(
+                value,
+                self.settings['jwt_secret'],
+                algorithm='HS256')
+            super().set_cookie(
+                self.settings['jwt_cookie'],
+                user_jwt,
+                expires_days=self.settings['jwt_expiration'])
+        self._current_user = value
 
     def set_default_headers(self):
         headers = [
@@ -74,24 +111,21 @@ class HTTPHandler(tornado.web.RequestHandler):
                     break
         self.write({'status_code': status_code, 'reason': reason})
 
-    @tornado.gen.coroutine
-    def prepare(self):
-        user_jwt = self.get_cookie('USER', '')
+    def fetch(self, provider, path, params={}, **kw):
+        if provider == 'youtube':
+            auth_class = auth.Youtube
+        elif provider == 'soundcloud':
+            auth_class = auth.Soundcloud
+        url = '{}/{}'.format(auth_class.API_BASE_URL, path)
+        params[auth_class.OAUTH_TOKEN_PARAM] = self.current_user[provider]
+        uri = tornado.httputil.url_concat(url, params)
+        return self.http_client.fetch(uri)
+
+    def body_json(self):
         try:
-            user_dict = jwt.decode(
-                user_jwt, self.settings['jwt_secret'], algorithms=['HS256'])
-            user = User(id=user_dict['id'])
-            make_transient_to_detached(user)
-            user = self.db.merge(user, load=False)
-        except jwt.exceptions.InvalidTokenError:
-            user = User()
-            self.db.add(user)
-            self.db.commit()
-            user_dict = dict(id=user.id)
-            user_jwt = jwt.encode(
-                user_dict, self.settings['jwt_secret'], algorithm='HS256')
-            self.set_cookie('USER', user_jwt, expires_days=1)
-        self.current_user = user
+            return json.loads(self.request.body)
+        except ValueError as error:
+            raise tornado.web.HTTPError(400, error.message)
 
     @tornado.gen.coroutine
     def options(self, *args, **kwargs):
@@ -109,7 +143,8 @@ class HTTPHandler(tornado.web.RequestHandler):
         return ', '.join(self.SUPPORTED_METHODS)
 
 
-class LoginHandler(HTTPHandler, tornado.auth.OAuth2Mixin):
+
+class AuthHandler(HTTPHandler, tornado.auth.OAuth2Mixin):
 
     _OAUTH_NO_CALLBACKS = False
     _OAUTH_VERSION = '1.0a'
@@ -159,8 +194,13 @@ class LoginHandler(HTTPHandler, tornado.auth.OAuth2Mixin):
 
     @tornado.gen.coroutine
     def get(self):
-        if self.get_argument('code', False):
-            yield self.provider_callback()
+        if self.get_argument('code', None) is not None:
+            try:
+                yield self.provider_callback()
+            except:
+                traceback.print_exc()
+            finally:
+                self.redirect('/static/close.html')
         else:
             yield self.authorize_redirect(
                 redirect_uri=self._OAUTH_PROVIDER['redirect_uri'],
@@ -177,12 +217,13 @@ class LoginHandler(HTTPHandler, tornado.auth.OAuth2Mixin):
 
         user_info = yield self.oauth2_request(
             self._OAUTH_USERINFO_URL,
-            access_token=access['access_token'])
+            access_token=True,
+            **{self.OAUTH_TOKEN_PARAM: access['access_token']})
 
         account = self.db.query(
             Account
         ).filter(
-            Account.id == user_info['id']
+            Account.id == str(user_info['id'])
         ).filter(
             Account.provider_id == self._OAUTH_PROVIDER_ID
         ).one_or_none()
@@ -190,14 +231,15 @@ class LoginHandler(HTTPHandler, tornado.auth.OAuth2Mixin):
         if not account:
             expires_in = datetime.timedelta(seconds=access['expires_in'])
             account = Account(
-                id=user_info['id'],
+                id=str(user_info['id']),
+                user_id=self.current_user[self._OAUTH_PROVIDER_ID],
                 provider_id=self._OAUTH_PROVIDER_ID,
                 access_token=access['access_token'],
                 refresh_token=access['refresh_token'],
                 token_expiration=datetime.datetime.now() + expires_in)
             self.db.add(account)
-            current_user = self.db.merge(self.current_user)
-            current_user.accounts.append(account)
+
+        # TODO: -re-assign to user/accounts
         self.db.commit()
 
 

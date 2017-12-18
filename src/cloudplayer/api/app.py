@@ -36,6 +36,8 @@ def define_options():
     opt.define('debug', type=bool, group='app')
     opt.define('xheaders', type=bool, group='app')
     opt.define('static_path', type=str, group='app')
+    opt.define('jwt_cookie', default='tok_v1', group='app')
+    opt.define('jwt_expiration', default=30, group='app')
     opt.define('jwt_secret', type=str, group='app')
     opt.define('youtube_oauth', type=dict, group='app')
     opt.define('soundcloud_oauth', type=dict, group='app')

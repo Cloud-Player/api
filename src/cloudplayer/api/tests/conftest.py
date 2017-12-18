@@ -42,10 +42,12 @@ def app(postgresql_proc, redis_proc):
     opt.define('connect_timeout', default=3, group='httpclient')
     opt.define('request_timeout', default=3, group='httpclient')
     opt.define('max_redirects', default=1, group='httpclient')
-    opt.define('google_oauth', default={
+    opt.define('youtube_oauth', default={
         'key': 'g-auth', 'secret': 'g-secret'}, group='app')
     opt.define('soundcloud_oauth', default={
         'key': 'sc-auth', 'secret': 'sc-secret'}, group='app')
+    opt.define('jwt_cookie', default='tok_v1', group='app')
+    opt.define('jwt_expiration', default=1, group='app')
     opt.define('jwt_secret', default='secret', group='app')
     opt.define('providers', default=[
         'youtube', 'soundcloud', 'cloudplayer'], group='app')

@@ -18,10 +18,12 @@ def test_unsupported_method_should_return_405(http_client, base_url):
 
 @pytest.mark.gen_test
 def test_http_handler_should_set_default_headers(http_client, base_url):
-    response = yield http_client.fetch(base_url, raise_error=False)
+    response = yield http_client.fetch(
+        '{}/user/me'.format(base_url), raise_error=False)
     headers = dict(response.headers)
     assert headers.pop('Date')
     assert headers.pop('Set-Cookie')
+    assert headers.pop('Etag')
     assert headers == {
         'Access-Control-Allow-Credentials': 'true',
         'Access-Control-Allow-Headers': 'Accept, Content-Type, Origin',
@@ -30,7 +32,7 @@ def test_http_handler_should_set_default_headers(http_client, base_url):
         'Access-Control-Max-Age': '600',
         'Cache-Control': 'no-cache, no-store, must-revalidate',
         'Content-Language': 'en-US',
-        'Content-Length': '52',
+        'Content-Length': '91',
         'Content-Type': 'application/json',
         'Pragma': 'no-cache',
         'Server': 'cloudplayer',

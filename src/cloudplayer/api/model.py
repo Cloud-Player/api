@@ -1,3 +1,10 @@
+"""
+    cloudplayer.api.model
+    ~~~~~~~~~~~~~~~~~~~~~
+
+    :copyright: (c) 2017 by the cloudplayer team
+    :license: GPL-3.0, see LICENSE for details
+"""
 import pkg_resources
 
 from sqlalchemy.orm import relationship

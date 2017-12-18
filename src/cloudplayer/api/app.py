@@ -3,7 +3,7 @@
     ~~~~~~~~~~~~~~~~~~~
 
     :copyright: (c) 2017 by the cloudplayer team
-    :license: Apache-2.0, see LICENSE for details
+    :license: GPL-3.0, see LICENSE for details
 """
 import signal
 import sys

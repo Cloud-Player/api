@@ -7,6 +7,11 @@ debug = False
 xheaders = True
 static_path = 'static'
 
+providers = [
+    'youtube',
+    'soundcloud',
+    'cloudplayer']
+
 allowed_origins = [
     'https://cloud-player.io',
     'http://localhost:8080',

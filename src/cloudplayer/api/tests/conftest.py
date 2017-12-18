@@ -47,6 +47,8 @@ def app(postgresql_proc, redis_proc):
     opt.define('soundcloud_oauth', default={
         'key': 'sc-auth', 'secret': 'sc-secret'}, group='app')
     opt.define('jwt_secret', default='secret', group='app')
+    opt.define('providers', default=[
+        'youtube', 'soundcloud', 'cloudplayer'], group='app')
     opt.define('allowed_origins', default=['*'], group='app')
     opt.define('num_executors', type=int, default=1, group='app')
     opt.define('redis_host', type=str, default='localhost', group='app')

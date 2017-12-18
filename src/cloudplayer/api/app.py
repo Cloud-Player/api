@@ -38,6 +38,7 @@ def define_options():
     opt.define('jwt_secret', type=str, group='app')
     opt.define('google_oauth', type=dict, group='app')
     opt.define('soundcloud_oauth', type=dict, group='app')
+    opt.define('providers', type=list, group='app')
     opt.define('allowed_origins', type=list, group='app')
     opt.define('num_executors', type=int, default=1, group='app')
     opt.define('redis_host', type=str, default='localhost', group='app')
@@ -85,6 +86,14 @@ class Database(object):
         self.engine = sql.create_engine(url, client_encoding='utf8')
         cloudplayer.api.model.Base.metadata.create_all(self.engine)
         self.session_cls = sqlalchemy.orm.sessionmaker(bind=self.engine)
+        self.populate_providers()
+    def populate_providers(self):
+        session = self.create_session()
+        for provider_id in opt.options.providers:
+            if not session.query(model.Provider).get(provider_id):
+                provider = model.Provider(id=provider_id)
+                session.add(provider)
+        session.commit()
 
     def create_session(self):
         return self.session_cls()

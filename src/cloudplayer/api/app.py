@@ -5,7 +5,6 @@
     :copyright: (c) 2017 by the cloudplayer team
     :license: GPL-3.0, see LICENSE for details
 """
-import re
 import signal
 import sys
 
@@ -91,6 +90,7 @@ class Database(object):
         model.Base.metadata.create_all(self.engine)
         self.session_cls = sqlalchemy.orm.sessionmaker(bind=self.engine)
         self.populate_providers()
+
     def populate_providers(self):
         session = self.create_session()
         for provider_id in opt.options.providers:

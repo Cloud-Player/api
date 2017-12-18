@@ -18,8 +18,8 @@ import tornado.gen
 import tornado.options as opt
 import tornado.web
 
-from cloudplayer.api.model import Account, User, Provider
 import cloudplayer.api.model
+from cloudplayer.api.model import Account, User, Provider, Encoder
 
 
 class HTTPHandler(tornado.web.RequestHandler):
@@ -57,7 +57,9 @@ class HTTPHandler(tornado.web.RequestHandler):
             self.set_header(header, value)
 
     def write(self, data):
-        json.dump(data, super(HTTPHandler, self))
+        if data is None:
+            raise tornado.web.HTTPError(404, 'not found')
+        json.dump(data, super(HTTPHandler, self), cls=Encoder)
         self.finish()
 
     def write_error(self, status_code, **kw):

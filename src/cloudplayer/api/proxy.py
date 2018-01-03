@@ -25,10 +25,13 @@ class Proxy(cloudplayer.api.handler.HTTPHandler):
                 params.append((name, v))
 
         response = yield self.fetch(
-            provider, path, method=method, params=params)
-        yield self.write(response.body)
+            provider, path, method=method, params=params,
+            raise_error=False)
+        if response.error:
+            self.set_status(response.error.code)
+        yield self.write_str(response.body)
 
-    def write(self, data):
+    def write_str(self, data):
         tornado.web.RequestHandler.write(self, data)
         self.finish()
 

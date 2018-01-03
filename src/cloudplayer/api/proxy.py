@@ -26,7 +26,11 @@ class Proxy(cloudplayer.api.handler.HTTPHandler):
 
         response = yield self.fetch(
             provider, path, method=method, params=params)
-        yield self.write_response(response)
+        yield self.write(response.body)
+
+    def write(self, data):
+        tornado.web.RequestHandler.write(self, data)
+        self.finish()
 
     @tornado.gen.coroutine
     def get(self, provider, path):
@@ -43,30 +47,3 @@ class Proxy(cloudplayer.api.handler.HTTPHandler):
     @tornado.gen.coroutine
     def delete(self, provider, path):
         yield self.proxy('DELETE', provider, path)
-
-
-class Youtube(Proxy):
-
-    def write_response(self, data):
-        tornado.web.RequestHandler.write(self, response.body)
-        self.finish()
-
-
-class Soundcloud(Proxy):
-
-    @property
-    def api_key(self):
-        settings_key = cloudplayer.api.auth.Soundcloud._OAUTH_SETTINGS_KEY
-        return self.settings[settings_key]['api_key']
-
-    def write_response(self, response):
-        def append_client_id(match):
-            return '{}?{}'.format(match.group(0), self.api_key)
-
-        data = re.sub(
-            '(api\.soundcloud\.com/tracks/[0-9]+/stream)',
-            append_client_id,
-            response.body.decode('utf-8'))
-
-        tornado.web.RequestHandler.write(self, data)
-        self.finish()

@@ -66,8 +66,7 @@ class Application(tornado.web.Application):
             (r'^/token$', token.Collection),
             (r'^/token/([0-9a-z]+)$', token.Entity),
             (r'^/user/(me|[0-9]+)$', user.Entity),
-            (r'^/proxy/(soundcloud)/(.*)', proxy.Soundcloud),
-            (r'^/proxy/(youtube)/(.*)', proxy.Youtube),
+            (r'^/proxy/(soundcloud|youtube)/(.*)', proxy.Proxy),
             (r'^/.*', handler.FallbackHandler)
         ]
         settings = opt.options.group_dict('app')

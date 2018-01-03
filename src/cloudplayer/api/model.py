@@ -13,6 +13,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 import sqlalchemy as sql
 import sqlalchemy.ext.declarative
+import tornado.options as opt
 
 
 Base = sqlalchemy.ext.declarative.declarative_base()
@@ -63,6 +64,15 @@ class Account(Base):
     access_token = sql.Column(sql.String(256))
     refresh_token = sql.Column(sql.String(256))
     token_expiration = sql.Column(sql.DateTime(timezone=True))
+
+    @property
+    def client_id(self):
+        if self.provider_id == 'youtube':
+            auth_class = cloudplayer.api.auth.Youtube
+        elif self.provider_id == 'soundcloud':
+            auth_class = cloudplayer.api.auth.Soundcloud
+        settings_key = auth_class._OAUTH_SETTINGS_KEY
+        return opt.options[settings_key]['api_key']
 
 
 class Image(Base):

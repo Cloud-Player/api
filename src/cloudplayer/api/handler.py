@@ -57,8 +57,15 @@ class HTTPHandler(tornado.web.RequestHandler):
             new_user = User()
             self.db.add(new_user)
             self.db.commit()
+            new_account = Account(
+                id=str(new_user.id),
+                provider_id='cloudplayer',
+                user_id=new_user.id)
+            self.db.add(new_account)
+            self.db.commit()
             user = {p: None for p in self.settings['providers']}
-            user['cloudplayer'] = new_user.id
+            user['cloudplayer'] = new_account.id
+            user['user_id'] = new_user.id
         return user
 
     def set_user_cookie(self):
@@ -302,7 +309,7 @@ class AuthHandler(HTTPHandler, tornado.auth.OAuth2Mixin):
         ).one_or_none()
 
         if account:
-            self.current_user['cloudplayer'] = account.user_id
+            self.current_user['user_id'] = account.user_id
             for a in account.user.accounts:
                 self.current_user[a.provider_id] = a.id
         else:
@@ -316,7 +323,7 @@ class AuthHandler(HTTPHandler, tornado.auth.OAuth2Mixin):
                     user_info.get('name') or
                     user_info.get('full_name') or
                     user_info.get('username')),
-                user_id=self.current_user['cloudplayer'],
+                user_id=self.current_user['user_id'],
                 provider_id=self._OAUTH_PROVIDER_ID,
                 access_token=access.get('access_token'),
                 refresh_token=access.get('refresh_token'),

@@ -73,6 +73,8 @@ class Account(Base):
             auth_class = cloudplayer.api.auth.Youtube
         elif self.provider_id == 'soundcloud':
             auth_class = cloudplayer.api.auth.Soundcloud
+        else:
+            return
         settings_key = auth_class._OAUTH_SETTINGS_KEY
         return opt.options[settings_key]['api_key']
 
@@ -91,21 +93,67 @@ class Image(Base):
 class Playlist(Base):
 
     __tablename__ = 'playlist'
-    __fields__ = ['id', 'title', 'public', 'follower_count', 'account_id']
+    __fields__ = ['id', 'account_id', 'provider_id',
+                  'title', 'public', 'follower_count']
     __table_args__ = (
         sql.ForeignKeyConstraint(
-            ['account_provider', 'account_id'],
+            ['provider_id', 'account_id'],
             ['account.provider_id', 'account.id']),)
 
-    id = sql.Column(sql.String(32), primary_key=True)
-
-    title = sql.Column(sql.String(512))
-    public = sql.Column(sql.Boolean)
-    follower_count = sql.Column(sql.Integer)
+    id = sql.Column(sql.Integer, primary_key=True)
 
     account_id = sql.Column(sql.String(32))
-    account_provider = sql.Column(sql.String(16))
+    provider_id = sql.Column(sql.String(16))
     account = relationship('Account', back_populates='playlists')
+
+    title = sql.Column(sql.String(512))
+    public = sql.Column(sql.Boolean, default=False)
+    follower_count = sql.Column(sql.Integer, default=0)
+
+    playlist_items = relationship('PlaylistItem')
+
+
+class PlaylistItem(Base):
+
+    __tablename__ = 'PlaylistItem'
+    __fields__ = ['rank', 'track']
+
+    playlist_id = sql.Column(
+        sql.Integer, sql.ForeignKey('playlist.id'), primary_key=True)
+    track_id = sql.Column(
+        sql.String(128), sql.ForeignKey('track.id'), primary_key = True)
+    track = relationship('Track')
+
+    rank = sql.Column(sql.Integer)
+
+
+class Track(Base):
+
+    __tablename__ = 'track'
+    __fields__ = ['id', 'account_id', 'provider_id',
+                  'title', 'play_count', 'like_count', 'aspect_ratio',
+                  'created', 'duration', 'image']
+    __table_args__ = (
+        sql.ForeignKeyConstraint(
+            ['provider_id', 'account_id'],
+            ['account.provider_id', 'account.id']),)
+
+    id = sql.Column(sql.String(128), primary_key=True)
+
+    account_id = sql.Column(sql.String(32))
+    provider_id = sql.Column(sql.String(16))
+    account = relationship('Account')
+
+    title = sql.Column(sql.String)
+
+    play_count = sql.Column(sql.Integer)
+    like_count = sql.Column(sql.Integer)
+    aspect_ratio = sql.Column(sql.Float)
+    created = sql.Column(sql.DateTime(timezone=True))
+    duration = sql.Column(sql.Interval)
+
+    image_id = sql.Column(sql.Integer, sql.ForeignKey('image.id'))
+    image = relationship('Image')
 
 
 class Provider(Base):

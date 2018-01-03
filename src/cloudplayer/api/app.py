@@ -63,6 +63,7 @@ class Application(tornado.web.Application):
         handlers = [
             (r'^/youtube$', auth.Youtube),
             (r'^/playlist$', playlist.Collection),
+            (r'^/playlist/([0-9]+)$', playlist.Entity),
             (r'^/soundcloud$', auth.Soundcloud),
             (r'^/token$', token.Collection),
             (r'^/token/([0-9a-z]+)$', token.Entity),

@@ -59,3 +59,19 @@ class Collection(cloudplayer.api.handler.HTTPHandler):
         if accountId:
             query = query.filter(Playlist.account_id == accountId)
         return query.all()
+
+    @tornado.gen.coroutine
+    def post(self):
+        entity = self.body_json()
+        if not isinstance(entity, dict):
+            raise tornado.web.HTTPError(400, 'invalid playlist format')
+        elif 'title' not in entity:
+            raise tornado.web.HTTPError(400, 'playlist missing title')
+        playlist = Playlist(
+            title=entity['title'],
+            public=entity.get('public', False),
+            account_id=self.current_user['cloudplayer'],
+            account_provider='cloudplayer')
+        self.db.add(playlist)
+        self.db.commit()
+        self.write(playlist)

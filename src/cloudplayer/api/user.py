@@ -18,7 +18,7 @@ class Entity(cloudplayer.api.handler.HTTPHandler):
     @tornado.gen.coroutine
     def get(self, id):
         if id == 'me':
-            id = self.current_user['cloudplayer']
+            id = self.current_user['user_id']
 
         user = self.db.query(
             User

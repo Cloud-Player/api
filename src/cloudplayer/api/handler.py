@@ -21,7 +21,7 @@ import tornado.httputil
 import tornado.options as opt
 import tornado.web
 
-from cloudplayer.api.model import Account, User, Provider, Encoder
+from cloudplayer.api.model import Account, Image, User, Provider, Encoder
 import cloudplayer.api.auth
 
 
@@ -307,8 +307,15 @@ class AuthHandler(HTTPHandler, tornado.auth.OAuth2Mixin):
                 self.current_user[a.provider_id] = a.id
         else:
             expires_in = datetime.timedelta(seconds=access.get('expires_in'))
+            image = Image(
+                large=user_info.get('picture') or user_info.get('avatar_url'))
             account = Account(
                 id=str(user_info['id']),
+                image=image,
+                title=(
+                    user_info.get('name') or
+                    user_info.get('full_name') or
+                    user_info.get('username')),
                 user_id=self.current_user['cloudplayer'],
                 provider_id=self._OAUTH_PROVIDER_ID,
                 access_token=access.get('access_token'),

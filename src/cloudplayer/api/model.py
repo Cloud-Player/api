@@ -15,6 +15,7 @@ import sqlalchemy as sql
 import sqlalchemy.ext.declarative
 import tornado.options as opt
 
+import cloudplayer.api.auth
 
 Base = sqlalchemy.ext.declarative.declarative_base()
 
@@ -41,7 +42,7 @@ class Account(Base):
 
     __tablename__ = 'account'
     __fields__ = ['id', 'provider_id', 'user_id', 'created', 'updated',
-                  'title', 'image']
+                  'title', 'image', 'client_id']
 
     id = sql.Column(sql.String(32), primary_key=True)
 
@@ -55,7 +56,8 @@ class Account(Base):
     playlists = relationship('Playlist', back_populates='account')
 
     title = sql.Column(sql.String(64))
-    image = sql.Column(sql.String(256))
+    image_id = sql.Column(sql.Integer, sql.ForeignKey('image.id'))
+    image = relationship('Image')
 
     created = sql.Column(
         sql.DateTime(timezone=True), server_default=func.now())
@@ -80,7 +82,7 @@ class Image(Base):
     __tablename__ = 'image'
     __fields__ = ['id', 'small', 'medium', 'large']
 
-    id = sql.Column(sql.String(32), primary_key=True)
+    id = sql.Column(sql.Integer, primary_key=True)
     small = sql.Column(sql.String(256))
     medium = sql.Column(sql.String(256))
     large = sql.Column(sql.String(256))

@@ -13,6 +13,7 @@ import traceback
 from sqlalchemy.orm.session import make_transient_to_detached
 import jwt
 import jwt.exceptions
+import redis
 import tornado.auth
 import tornado.escape
 import tornado.gen
@@ -119,15 +120,35 @@ class HTTPHandler(tornado.web.RequestHandler):
             self.set_user_cookie()
         super().finish(chunk=chunk)
 
-    def fetch(self, provider, path, params={}, **kw):
+    def fetch(self, provider, path, params=[], **kw):
         if provider == 'youtube':
-            auth_class = auth.Youtube
+            auth_class = cloudplayer.api.auth.Youtube
         elif provider == 'soundcloud':
-            auth_class = auth.Soundcloud
+            auth_class = cloudplayer.api.auth.Soundcloud
+        else:
+            raise ValueError('unsupported provider')
         url = '{}/{}'.format(auth_class.API_BASE_URL, path)
-        params[auth_class.OAUTH_TOKEN_PARAM] = self.current_user[provider]
+
+        account = self.db.query(
+            Account
+        ).filter(
+            Account.provider_id == provider
+        ).filter(
+            Account.id == self.current_user[provider]
+        ).one_or_none()
+
+        if account:
+            params.append((auth_class.OAUTH_TOKEN_PARAM, account.access_token))
+            key = self.settings[auth_class._OAUTH_SETTINGS_KEY]['api_key']
+            params.append((auth_class._OAUTH_CLIENT_KEY, key))
+
         uri = tornado.httputil.url_concat(url, params)
-        return self.http_client.fetch(uri)
+
+        headers = kw.get('headers', {})
+        headers['Referer'] = 'https://api.cloud-player.io'
+        kw['headers'] = headers
+
+        return self.http_client.fetch(uri, **kw)
 
     def body_json(self):
         try:
@@ -275,11 +296,10 @@ class AuthHandler(HTTPHandler, tornado.auth.OAuth2Mixin):
         account = self.db.query(
             Account
         ).filter(
-            Account.id == str(user_info['id'])
-        ).filter(
             Account.provider_id == self._OAUTH_PROVIDER_ID
+        ).filter(
+            Account.id == str(user_info['id'])
         ).one_or_none()
-
 
         if account:
             self.current_user['cloudplayer'] = account.user_id

@@ -21,6 +21,7 @@ import tornado.web
 from cloudplayer.api import auth
 from cloudplayer.api import handler
 from cloudplayer.api import model
+from cloudplayer.api import proxy
 from cloudplayer.api import playlist
 from cloudplayer.api import token
 from cloudplayer.api import user
@@ -65,6 +66,8 @@ class Application(tornado.web.Application):
             (r'^/token$', token.Collection),
             (r'^/token/([0-9a-z]+)$', token.Entity),
             (r'^/user/(me|[0-9]+)$', user.Entity),
+            (r'^/proxy/(soundcloud)/(.*)', proxy.Soundcloud),
+            (r'^/proxy/(youtube)/(.*)', proxy.Youtube),
             (r'^/.*', handler.FallbackHandler)
         ]
         settings = opt.options.group_dict('app')

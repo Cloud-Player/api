@@ -18,8 +18,9 @@ class Soundcloud(cloudplayer.api.handler.AuthHandler):
     _OAUTH_USERINFO_URL = 'https://api.soundcloud.com/me'
     _OAUTH_SETTINGS_KEY = 'soundcloud_oauth'
     _OAUTH_PROVIDER_ID = 'soundcloud'
+    _OAUTH_CLIENT_KEY = 'client_id'
     _OAUTH_SCOPE_LIST = []
-    _OAUTH_EXTRA_PARAMS = {'state': 'v3'}
+    _OAUTH_EXTRA_PARAMS = {'state': 'dev'}
 
 
 class Youtube(cloudplayer.api.handler.AuthHandler):
@@ -32,6 +33,7 @@ class Youtube(cloudplayer.api.handler.AuthHandler):
     _OAUTH_USERINFO_URL = 'https://www.googleapis.com/oauth2/v1/userinfo'
     _OAUTH_SETTINGS_KEY = 'youtube_oauth'
     _OAUTH_PROVIDER_ID = 'youtube'
+    _OAUTH_CLIENT_KEY = 'key'
     _OAUTH_SCOPE_LIST = [
         'profile', 'email', 'https://www.googleapis.com/auth/youtube']
     _OAUTH_EXTRA_PARAMS = {

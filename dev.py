@@ -13,9 +13,8 @@ providers = [
     'cloudplayer']
 
 allowed_origins = [
-    'http://localhost:8080',
-    'http://0.0.0.0:8080',
-    'http://127.0.0.1:8080']
+    'http://localhost:4200',
+    'http://localhost:8080']
 
 jwt_secret = 'secret'
 

@@ -22,6 +22,7 @@ from cloudplayer.api import auth
 from cloudplayer.api import handler
 from cloudplayer.api import model
 from cloudplayer.api import playlist
+from cloudplayer.api import token
 from cloudplayer.api import user
 
 
@@ -61,6 +62,8 @@ class Application(tornado.web.Application):
             (r'^/youtube$', auth.Youtube),
             (r'^/playlist$', playlist.Collection),
             (r'^/soundcloud$', auth.Soundcloud),
+            (r'^/token$', token.Collection),
+            (r'^/token/([0-9a-z]+)$', token.Entity),
             (r'^/user/(me|[0-9]+)$', user.Entity),
             (r'^/.*', handler.FallbackHandler)
         ]

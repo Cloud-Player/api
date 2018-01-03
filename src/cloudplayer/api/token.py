@@ -6,8 +6,8 @@
     :license: GPL-3.0, see LICENSE for details
 """
 import json
+import random
 import string
-import secrets
 
 import tornado.gen
 import tornado.web
@@ -46,7 +46,8 @@ class Collection(cloudplayer.api.handler.HTTPHandler):
 
     @tornado.gen.coroutine
     def post(self):
-        id = ''.join(secrets.choice(self.ALPHABET) for i in range(6))
+        urand = random.SystemRandom()
+        id = ''.join(urand.choice(self.ALPHABET) for i in range(6))
         token = {'id': id, 'claimed': False}
         self.cache.set(id, json.dumps(token))
         self.cache.expire(id, self.TOKEN_EXPIRATION)

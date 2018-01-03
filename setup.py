@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='cloudplayer.api',
-    version='0.0.1.dev0',
+    version='0.1.0.dev0',
     author='Nicolas Drebenstedt',
     author_email='hello@cloud-player.io',
     url='https://cloud-player.io',

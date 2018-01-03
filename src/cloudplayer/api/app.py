@@ -46,6 +46,7 @@ def define_options():
     opt.define('providers', type=list, group='app')
     opt.define('allowed_origins', type=list, group='app')
     opt.define('num_executors', type=int, default=1, group='app')
+    opt.define('menuflow_state', type=str, default='v3', group='app')
     opt.define('redis_host', type=str, default='localhost', group='app')
     opt.define('redis_port', type=int, default=6379, group='app')
     opt.define('postgres_host', type=str, default='localhost', group='app')

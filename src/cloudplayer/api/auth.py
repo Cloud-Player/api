@@ -20,7 +20,10 @@ class Soundcloud(cloudplayer.api.handler.AuthHandler):
     _OAUTH_PROVIDER_ID = 'soundcloud'
     _OAUTH_CLIENT_KEY = 'client_id'
     _OAUTH_SCOPE_LIST = []
-    _OAUTH_EXTRA_PARAMS = {'state': 'dev'}
+
+    @property
+    def _OAUTH_EXTRA_PARAMS(self):
+        return {'state': self.settings['menuflow_state']}
 
 
 class Youtube(cloudplayer.api.handler.AuthHandler):

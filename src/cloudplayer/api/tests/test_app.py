@@ -28,7 +28,7 @@ def test_http_handler_should_set_default_headers(http_client, base_url):
     assert headers == {
         'Access-Control-Allow-Credentials': 'true',
         'Access-Control-Allow-Headers': 'Accept, Content-Type, Origin',
-        'Access-Control-Allow-Methods': 'GET, POST, DELETE, PUT, OPTIONS',
+        'Access-Control-Allow-Methods': 'GET, OPTIONS',
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Max-Age': '600',
         'Cache-Control': 'no-cache, no-store, must-revalidate',

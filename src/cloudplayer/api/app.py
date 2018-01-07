@@ -11,20 +11,24 @@ import sys
 from tornado.log import app_log
 import redis
 import sqlalchemy as sql
-import sqlalchemy.orm
+import sqlalchemy.orm as orm
 import tornado.concurrent
 import tornado.httpclient
 import tornado.ioloop
 import tornado.options as opt
 import tornado.web
 
-from cloudplayer.api import auth
-from cloudplayer.api import handler
-from cloudplayer.api import model
-from cloudplayer.api import proxy
-from cloudplayer.api import playlist
-from cloudplayer.api import token
-from cloudplayer.api import user
+from cloudplayer.api.handler import account
+from cloudplayer.api.handler import auth
+from cloudplayer.api.handler import base as handler
+from cloudplayer.api.handler import playlist
+from cloudplayer.api.handler import playlist_item as p_item
+from cloudplayer.api.handler import provider
+from cloudplayer.api.handler import proxy
+from cloudplayer.api.handler import token
+from cloudplayer.api.handler import user
+from cloudplayer.api.model import base as model
+from cloudplayer.api.model import provider as p_model
 
 
 def define_options():
@@ -59,21 +63,32 @@ def define_options():
 
 class Application(tornado.web.Application):
 
+    handlers = [
+        (r'^/soundcloud$', auth.Soundcloud),
+        (r'^/youtube$', auth.Youtube),
+        (r'^/token$', token.Collection),
+        (r'^/account/(?P<provider_id>[a-z]+)/(?P<id>[0-9a-zA-Z]+)$',
+         account.Entity),
+        (r'^/playlist/(?P<provider_id>[a-z]+)/(?P<playlist_id>[0-9a-zA-Z]+)'
+         r'/item/(?P<id>[0-9]+)$', p_item.Entity),
+        (r'^/playlist/(?P<provider_id>[a-z]+)/(?P<playlist_id>[0-9a-zA-Z]+)'
+         r'/item$', p_item.Collection),
+        (r'^/playlist/(?P<provider_id>[a-z]+)/(?P<id>[0-9a-zA-Z]+)$',
+         playlist.Entity),
+        (r'^/playlist/(?P<provider_id>[a-z]+)$',
+         playlist.Collection),
+        (r'^/provider$', provider.Collection),
+        (r'^/provider/(?P<id>[a-z]+)$', provider.Entity),
+        (r'^/proxy/(soundcloud|youtube)/(.*)', proxy.Proxy),
+        (r'^/token/([0-9a-z]+)$', token.Entity),
+        (r'^/user/(?P<id>me|[0-9]+)$', user.Entity),
+        (r'^/.*', handler.FallbackHandler)
+    ]
+
     def __init__(self):
-        handlers = [
-            (r'^/youtube$', auth.Youtube),
-            (r'^/playlist$', playlist.Collection),
-            (r'^/playlist/([0-9]+)$', playlist.Entity),
-            (r'^/soundcloud$', auth.Soundcloud),
-            (r'^/token$', token.Collection),
-            (r'^/token/([0-9a-z]+)$', token.Entity),
-            (r'^/user/(me|[0-9]+)$', user.Entity),
-            (r'^/proxy/(soundcloud|youtube)/(.*)', proxy.Proxy),
-            (r'^/.*', handler.FallbackHandler)
-        ]
         settings = opt.options.group_dict('app')
 
-        super(Application, self).__init__(handlers, **settings)
+        super(Application, self).__init__(self.handlers, **settings)
 
         self.executor = tornado.concurrent.futures.ThreadPoolExecutor(
             settings['num_executors'])
@@ -96,16 +111,35 @@ class Database(object):
         url = 'postgresql://{}:{}@{}:{}/{}'.format(
             user, password, host, port, db)
         self.engine = sql.create_engine(url, client_encoding='utf8')
+
+        # model.Base.metadata.drop_all(self.engine)
+        import cloudplayer.api.model.provider as pr
+        import cloudplayer.api.model.user as u
+        import cloudplayer.api.model.track as t
+        import cloudplayer.api.model.image as i
+        import cloudplayer.api.model.account as a
+        import cloudplayer.api.model.playlist as p
+        import cloudplayer.api.model.playlist_item as pi
+        model.Base.metadata.create_all(self.engine, [
+            pr.Provider.__table__,
+            u.User.__table__,
+            a.Account.__table__,
+            i.Image.__table__,
+            t.Track.__table__,
+            p.Playlist.__table__,
+            pi.PlaylistItem.__table__
+        ])
         model.Base.metadata.create_all(self.engine)
-        self.session_cls = sqlalchemy.orm.sessionmaker(bind=self.engine)
+
+        self.session_cls = orm.sessionmaker(bind=self.engine)
         self.populate_providers()
 
     def populate_providers(self):
         session = self.create_session()
         for provider_id in opt.options.providers:
-            if not session.query(model.Provider).get(provider_id):
-                provider = model.Provider(id=provider_id)
-                session.add(provider)
+            if not session.query(p_model.Provider).get(provider_id):
+                entity = p_model.Provider(id=provider_id)
+                session.add(entity)
         session.commit()
 
     def create_session(self):

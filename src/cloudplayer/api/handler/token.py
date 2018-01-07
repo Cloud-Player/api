@@ -1,18 +1,17 @@
 """
-    cloudplayer.api.token
-    ~~~~~~~~~~~~~~~~~~~~~
+    cloudplayer.api.handler.token
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :copyright: (c) 2017 by the cloudplayer team
     :license: GPL-3.0, see LICENSE for details
 """
 import json
-import random
-import string
 
 import tornado.gen
 import tornado.web
 
 import cloudplayer.api.handler
+import cloudplayer.api.util
 
 
 class Entity(cloudplayer.api.handler.HTTPHandler):
@@ -41,14 +40,11 @@ class Entity(cloudplayer.api.handler.HTTPHandler):
 
 class Collection(cloudplayer.api.handler.HTTPHandler):
 
-    ALPHABET = string.ascii_lowercase + string.digits
     TOKEN_EXPIRATION = 60 * 5
 
     @tornado.gen.coroutine
     def post(self):
-        urand = random.SystemRandom()
-        id = ''.join(urand.choice(self.ALPHABET) for i in range(6))
-        token = {'id': id, 'claimed': False}
+        token = {'id': cloudplayer.api.util.gen_token(6), 'claimed': False}
         self.cache.set(id, json.dumps(token))
         self.cache.expire(id, self.TOKEN_EXPIRATION)
         self.write(token)

@@ -5,12 +5,8 @@
     :copyright: (c) 2017 by the cloudplayer team
     :license: GPL-3.0, see LICENSE for details
 """
-import datetime
-import functools
 import json
-import traceback
 
-from sqlalchemy.orm.session import make_transient_to_detached
 import jwt
 import jwt.exceptions
 import redis
@@ -21,8 +17,9 @@ import tornado.httputil
 import tornado.options as opt
 import tornado.web
 
-from cloudplayer.api.model import Account, Image, User, Provider, Encoder
-import cloudplayer.api.auth
+from cloudplayer.api.model import Encoder
+from cloudplayer.api.model.account import Account
+from cloudplayer.api.model.user import User
 
 
 class HTTPHandler(tornado.web.RequestHandler):
@@ -30,7 +27,7 @@ class HTTPHandler(tornado.web.RequestHandler):
     SUPPORTED_METHODS = ('GET', 'POST', 'DELETE', 'PUT', 'OPTIONS')
 
     def __init__(self, request, application):
-        super(HTTPHandler, self).__init__(request, application)
+        super().__init__(request, application)
         self.http_client = tornado.httpclient.AsyncHTTPClient()
         self.database_session = None
         self._current_user = None
@@ -125,13 +122,15 @@ class HTTPHandler(tornado.web.RequestHandler):
     def finish(self, chunk=None):
         if self._original_user != self._current_user:
             self.set_user_cookie()
+        self.db.close()
         super().finish(chunk=chunk)
 
     def fetch(self, provider, path, params=[], **kw):
+        import cloudplayer.api.handler.auth
         if provider == 'youtube':
-            auth_class = cloudplayer.api.auth.Youtube
+            auth_class = cloudplayer.api.handler.auth.Youtube
         elif provider == 'soundcloud':
-            auth_class = cloudplayer.api.auth.Soundcloud
+            auth_class = cloudplayer.api.handler.auth.Soundcloud
         else:
             raise ValueError('unsupported provider')
         url = '{}/{}'.format(auth_class.API_BASE_URL, path)
@@ -157,14 +156,23 @@ class HTTPHandler(tornado.web.RequestHandler):
 
         return self.http_client.fetch(uri, **kw)
 
+    @property
     def body_json(self):
         try:
             return json.loads(self.request.body)
         except ValueError as error:
             raise tornado.web.HTTPError(400, error.message)
 
+    @property
+    def query_params(self):
+        params = []
+        for name, vals in self.request.query_arguments.items():
+            for v in vals:
+                params.append((name, v))
+        return params
+
     @tornado.gen.coroutine
-    def options(self, *args, **kwargs):
+    def options(self, *args, **kw):
         self.finish()
 
     @property
@@ -176,164 +184,53 @@ class HTTPHandler(tornado.web.RequestHandler):
 
     @property
     def allowed_methods(self):
-        return ', '.join(self.SUPPORTED_METHODS)
+        return ', '.join(list(self.SUPPORTED_METHODS) + ['OPTIONS'])
 
 
-class EntityHandler(HTTPHandler):
+class ControllerHandler(HTTPHandler):
 
-    __model__ = NotImplemented
+    __controller__ = NotImplemented
 
-    SUPPORTED_METHODS = ['GET', 'PUT', 'PATCH', 'DELETE']
+    def __init__(self, request, application):
+        super().__init__(request, application)
+        self.controller = self.__controller__(self.db, self.current_user)
 
-    @classmethod
-    def update(entity, dict_):
-        for field, value in dict_.items():
-            if field in entity.__fields__:
-                setattr(entity, field, value)
-            else:
-                raise KeyError('invalid field %s' % field)
+
+class EntityHandler(ControllerHandler):
+
+    SUPPORTED_METHODS = ['GET', 'PATCH', 'DELETE']
 
     @tornado.gen.coroutine
-    def get(self, id):
-        entity = self.db.query(
-            self.__model__
-        ).filter(
-            self.__model__.id == id
-        ).one_or_none()
-
+    def get(self, **ids):
+        entity = self.controller.read(ids)
         yield self.write(entity)
 
     @tornado.gen.coroutine
-    def put(self, id):
-        entity = self.db.query(
-            self.__model__
-        ).filter(
-            self.__model__.id == id
-        ).one_or_none()
-
-        if entity is None:
-            raise tornado.web.HTTPError(404, 'entity not found')
-
-        self.update(entity, body_json)
-
-        self.db.commit()
-
+    def patch(self, **ids):
+        entity = self.controller.update(ids, **self.body_json)
         yield self.write(entity)
 
+    @tornado.gen.coroutine
+    def delete(self, **ids):
+        entity = self.controller.delete(ids)
+        self.set_status(204)
+        self.finish()
 
-class AuthHandler(HTTPHandler, tornado.auth.OAuth2Mixin):
 
-    _OAUTH_NO_CALLBACKS = False
-    _OAUTH_VERSION = '1.0a'
-    _OAUTH_RESPONSE_TYPE = 'code'
-    _OAUTH_GRANT_TYPE = 'authorization_code'
+class CollectionHandler(ControllerHandler):
 
-    _OAUTH_SCOPE_LIST = []
-    _OAUTH_EXTRA_PARAMS = {}
-
-    _OAUTH_AUTHORIZE_URL = NotImplemented
-    _OAUTH_ACCESS_TOKEN_URL = NotImplemented
-    _OAUTH_USERINFO_URL = NotImplemented
-    _OAUTH_SETTINGS_KEY = NotImplemented
-    _OAUTH_PROVIDER_ID = NotImplemented
-
-    @property
-    def _OAUTH_PROVIDER(self):
-        return self.settings[self._OAUTH_SETTINGS_KEY]
-
-    @tornado.auth._auth_return_future
-    def get_authenticated_user(self, redirect_uri, code, callback):
-        """Fetches the authenticated user data upon redirect"""
-        http = self.get_auth_http_client()
-        body = tornado.auth.urllib_parse.urlencode({
-            'redirect_uri': redirect_uri,
-            'code': code,
-            'client_id': self._OAUTH_PROVIDER['key'],
-            'client_secret': self._OAUTH_PROVIDER['secret'],
-            'grant_type': self._OAUTH_GRANT_TYPE})
-
-        http.fetch(
-            self._OAUTH_ACCESS_TOKEN_URL,
-            functools.partial(self._on_access_token, callback),
-            headers={'Content-Type': 'application/x-www-form-urlencoded'},
-            method='POST',
-            body=body)
-
-    def _on_access_token(self, future, response):
-        """Callback function for the exchange to the access token"""
-        if response.error:
-            future.set_exception(
-                tornado.auth.AuthError('{} auth error: {}'.format(
-                    self._OAUTH_PROVIDER_ID, response)))
-        else:
-            args = tornado.escape.json_decode(response.body)
-            future.set_result(args)
+    SUPPORTED_METHODS = ['GET', 'POST']
 
     @tornado.gen.coroutine
-    def get(self):
-        if self.get_argument('code', None) is not None:
-            try:
-                yield self.provider_callback()
-            except:
-                traceback.print_exc()
-            finally:
-                self.redirect('/static/close.html')
-        else:
-            yield self.authorize_redirect(
-                redirect_uri=self._OAUTH_PROVIDER['redirect_uri'],
-                client_id=self._OAUTH_PROVIDER['key'],
-                scope=self._OAUTH_SCOPE_LIST,
-                response_type=self._OAUTH_RESPONSE_TYPE,
-                extra_params=self._OAUTH_EXTRA_PARAMS)
+    def get(self, **ids):
+        query = dict(self.query_params)
+        entities = self.controller.search(ids, **query)
+        yield self.write(entities)
 
     @tornado.gen.coroutine
-    def provider_callback(self):
-        access = yield self.get_authenticated_user(
-            redirect_uri=self._OAUTH_PROVIDER['redirect_uri'],
-            code=self.get_argument('code'))
-
-        args = {'access_token': True}
-        args[self.OAUTH_TOKEN_PARAM] = access.get('access_token')
-        user_info = yield self.oauth2_request(
-            self._OAUTH_USERINFO_URL, **args)
-
-        if not user_info:
-            raise tornado.web.HTTPError(503, 'invalid user info')
-
-        account = self.db.query(
-            Account
-        ).filter(
-            Account.provider_id == self._OAUTH_PROVIDER_ID
-        ).filter(
-            Account.id == str(user_info['id'])
-        ).one_or_none()
-
-        if account:
-            self.current_user['user_id'] = account.user_id
-            for a in account.user.accounts:
-                self.current_user[a.provider_id] = a.id
-        else:
-            expires_in = datetime.timedelta(seconds=access.get('expires_in'))
-            image = Image(
-                large=user_info.get('picture') or user_info.get('avatar_url'))
-            account = Account(
-                id=str(user_info['id']),
-                image=image,
-                title=(
-                    user_info.get('name') or
-                    user_info.get('full_name') or
-                    user_info.get('username')),
-                user_id=self.current_user['user_id'],
-                provider_id=self._OAUTH_PROVIDER_ID,
-                access_token=access.get('access_token'),
-                refresh_token=access.get('refresh_token'),
-                token_expiration=datetime.datetime.now() + expires_in)
-            self.db.add(account)
-            self.current_user[self._OAUTH_PROVIDER_ID] = account.id
-
-            self.db.commit()
-
-        self.set_user_cookie()
+    def post(self, **ids):
+        entity = self.controller.create(ids, **self.body_json)
+        yield self.write(entity)
 
 
 class FallbackHandler(HTTPHandler):

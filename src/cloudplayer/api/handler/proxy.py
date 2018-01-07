@@ -1,17 +1,14 @@
 """
-    cloudplayer.api.proxy
-    ~~~~~~~~~~~~~~~~~~~~~
+    cloudplayer.api.handler.proxy
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :copyright: (c) 2017 by the cloudplayer team
     :license: GPL-3.0, see LICENSE for details
 """
-import json
-import re
-
 import tornado.gen
 import tornado.web
 
-import cloudplayer.api.auth
+import cloudplayer.api.handler.auth
 import cloudplayer.api.handler
 
 
@@ -19,13 +16,8 @@ class Proxy(cloudplayer.api.handler.HTTPHandler):
 
     @tornado.gen.coroutine
     def proxy(self, method, provider, path):
-        params = []
-        for name, vals in self.request.query_arguments.items():
-            for v in vals:
-                params.append((name, v))
-
         response = yield self.fetch(
-            provider, path, method=method, params=params,
+            provider, path, method=method, params=self.query_params,
             raise_error=False)
         if response.error:
             self.set_status(response.error.code)

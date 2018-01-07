@@ -64,8 +64,6 @@ class Account(Base):
 
     playlists = orm.relationship('Playlist', back_populates='account')
 
-    tracks = orm.relationship('Track', back_populates='account')
-
     title = sql.Column('title', sql.String(64))
     image_id = sql.Column(sql.Integer)
     image = orm.relationship('Image')

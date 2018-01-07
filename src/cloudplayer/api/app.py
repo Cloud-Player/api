@@ -69,9 +69,11 @@ class Application(tornado.web.Application):
         (r'^/token$', token.Collection),
         (r'^/account/(?P<provider_id>[a-z]+)/(?P<id>[0-9a-zA-Z]+)$',
          account.Entity),
-        (r'^/playlist/(?P<provider_id>[a-z]+)/(?P<playlist_id>[0-9a-zA-Z]+)'
+        (r'^/playlist/(?P<playlist_provider_id>[a-z]+)'
+         r'/(?P<playlist_id>[0-9a-zA-Z]+)'
          r'/item/(?P<id>[0-9]+)$', p_item.Entity),
-        (r'^/playlist/(?P<provider_id>[a-z]+)/(?P<playlist_id>[0-9a-zA-Z]+)'
+        (r'^/playlist/(?P<playlist_provider_id>[a-z]+)'
+         r'/(?P<playlist_id>[0-9a-zA-Z]+)'
          r'/item$', p_item.Collection),
         (r'^/playlist/(?P<provider_id>[a-z]+)/(?P<id>[0-9a-zA-Z]+)$',
          playlist.Entity),
@@ -115,7 +117,6 @@ class Database(object):
         # model.Base.metadata.drop_all(self.engine)
         import cloudplayer.api.model.provider as pr
         import cloudplayer.api.model.user as u
-        import cloudplayer.api.model.track as t
         import cloudplayer.api.model.image as i
         import cloudplayer.api.model.account as a
         import cloudplayer.api.model.playlist as p
@@ -125,7 +126,6 @@ class Database(object):
             u.User.__table__,
             a.Account.__table__,
             i.Image.__table__,
-            t.Track.__table__,
             p.Playlist.__table__,
             pi.PlaylistItem.__table__
         ])

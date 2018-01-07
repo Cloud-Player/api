@@ -128,18 +128,18 @@ class HTTPHandler(tornado.web.RequestHandler):
         super().finish(chunk=chunk)
 
     @tornado.gen.coroutine
-    def fetch(self, provider, path, params=[], **kw):
+    def fetch(self, provider_id, path, params=[], **kw):
         import cloudplayer.api.handler.auth
-        if provider == 'youtube':
+        if provider_id == 'youtube':
             auth_class = cloudplayer.api.handler.auth.Youtube
-        elif provider == 'soundcloud':
+        elif provider_id == 'soundcloud':
             auth_class = cloudplayer.api.handler.auth.Soundcloud
         else:
             raise ValueError('unsupported provider')
-        url = '{}/{}'.format(auth_class.API_BASE_URL, path)
+        url = '{}/{}'.format(auth_class.API_BASE_URL, path.lstrip('/'))
 
         account = self.db.query(Account).get((
-            self.current_user[provider], provider))
+            self.current_user[provider_id], provider_id))
 
         if account:
             # TODO: Move refresh workflow to auth module
@@ -189,7 +189,7 @@ class HTTPHandler(tornado.web.RequestHandler):
         params = []
         for name, vals in self.request.query_arguments.items():
             for v in vals:
-                params.append((name, v))
+                params.append((name, v.decode('utf-8')))
         return params
 
     @tornado.gen.coroutine

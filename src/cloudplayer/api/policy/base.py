@@ -42,7 +42,7 @@ class BasePolicy(object):
         entity.update(**kw)
 
     def delete(self, entity):
-        entity.delete()
+        self.db.delete(entity)
 
     def query(self, model, **kw):
         query = self.db.query(model)

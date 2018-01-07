@@ -18,7 +18,8 @@ class PlaylistItem(Base):
     __fields__ = [
         'id',
         'rank',
-        'track'
+        'track_provider_id',
+        'track_id'
     ]
     __filters__ = [
         'rank',
@@ -38,8 +39,8 @@ class PlaylistItem(Base):
             ['account_id', 'account_provider_id'],
             ['account.id', 'account.provider_id']),
         sql.ForeignKeyConstraint(
-            ['track_provider_id', 'track_id'],
-            ['track.provider_id', 'track.id'])
+            ['track_provider_id'],
+            ['provider.id'])
     )
 
     id = sql.Column(sql.Integer)
@@ -55,7 +56,6 @@ class PlaylistItem(Base):
 
     track_provider_id = sql.Column(sql.String(16), nullable=False)
     track_id = sql.Column(sql.String(128), nullable=False)
-    track = orm.relationship('Track')
 
     created = sql.Column(
         sql.DateTime(timezone=True), server_default=func.now())

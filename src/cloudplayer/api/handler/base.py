@@ -5,7 +5,9 @@
     :copyright: (c) 2017 by the cloudplayer team
     :license: GPL-3.0, see LICENSE for details
 """
+import datetime
 import json
+import urllib
 
 import jwt
 import jwt.exceptions
@@ -125,6 +127,7 @@ class HTTPHandler(tornado.web.RequestHandler):
         self.db.close()
         super().finish(chunk=chunk)
 
+    @tornado.gen.coroutine
     def fetch(self, provider, path, params=[], **kw):
         import cloudplayer.api.handler.auth
         if provider == 'youtube':
@@ -135,18 +138,35 @@ class HTTPHandler(tornado.web.RequestHandler):
             raise ValueError('unsupported provider')
         url = '{}/{}'.format(auth_class.API_BASE_URL, path)
 
-        account = self.db.query(
-            Account
-        ).filter(
-            Account.provider_id == provider
-        ).filter(
-            Account.id == self.current_user[provider]
-        ).one_or_none()
+        account = self.db.query(Account).get((
+            self.current_user[provider], provider))
 
         if account:
+            # TODO: Move refresh workflow to auth module
+            settings = self.settings[auth_class._OAUTH_SETTINGS_KEY]
+            tzinfo = account.token_expiration.tzinfo
+            now = datetime.datetime.now(tzinfo)
+            threshold = datetime.timedelta(minutes=1)
+            if account.token_expiration - now < threshold:
+                body = urllib.parse.urlencode({
+                    'client_id': settings['key'],
+                    'client_secret': settings['secret'],
+                    'refresh_token': account.refresh_token,
+                    'grant_type': 'refresh_token'
+                })
+                uri = auth_class._OAUTH_ACCESS_TOKEN_URL
+                response = yield self.http_client.fetch(
+                    uri, method='POST', body=body, raise_error=False)
+                access = json.load(response.buffer)
+                account.access_token = access.get('access_token')
+                expires_in = datetime.timedelta(
+                    seconds=access.get('expires_in'))
+                account.token_expiration = (
+                    datetime.datetime.now(tzinfo) + expires_in)
+                self.db.commit()
+
             params.append((auth_class.OAUTH_TOKEN_PARAM, account.access_token))
-            key = self.settings[auth_class._OAUTH_SETTINGS_KEY]['api_key']
-            params.append((auth_class._OAUTH_CLIENT_KEY, key))
+            params.append((auth_class._OAUTH_CLIENT_KEY, settings['api_key']))
 
         uri = tornado.httputil.url_concat(url, params)
 
@@ -154,7 +174,8 @@ class HTTPHandler(tornado.web.RequestHandler):
         headers['Referer'] = 'https://api.cloud-player.io'
         kw['headers'] = headers
 
-        return self.http_client.fetch(uri, **kw)
+        response = yield self.http_client.fetch(uri, **kw)
+        return response
 
     @property
     def body_json(self):

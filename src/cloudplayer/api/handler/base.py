@@ -157,7 +157,7 @@ class HTTPHandler(tornado.web.RequestHandler):
                 uri = auth_class._OAUTH_ACCESS_TOKEN_URL
                 response = yield self.http_client.fetch(
                     uri, method='POST', body=body, raise_error=False)
-                access = json.load(response.buffer)
+                access = json.loads(response.body)
                 account.access_token = access.get('access_token')
                 expires_in = datetime.timedelta(
                     seconds=access.get('expires_in'))

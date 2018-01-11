@@ -27,12 +27,12 @@ types:
   Playback:
     type: object
     properties:
-      id: int
+      id: integer
       timestamp: datetime
-      progress: int
-      track_id: int
+      progress: integer
+      track_id: integer
       provider: Provider
-      next: int
+      next: integer
       status?:
         enum:
           # history
@@ -50,7 +50,7 @@ types:
       provider: Provider
       public: boolean
       image: Image
-      follower_count: int
+      follower_count: integer
       account: Account
       tracks: Track[]
   Track:
@@ -60,11 +60,11 @@ types:
       provider: Provider
       title: string
       account: Account
-      play_count: int
-      like_count: int
+      play_count: integer
+      like_count: integer
       aspect_ratio: float
       created: datetime
-      duration: int
+      duration: integer
       image: Image
   User:
     type: object

@@ -56,7 +56,7 @@ class Account(Base):
 
     account_id = orm.synonym('id')
 
-    provider_id = sql.Column(sql.String(16))
+    provider_id = sql.Column(sql.String(16), nullable=False)
     provider = orm.relationship('Provider')
 
     user_id = sql.Column(sql.Integer, nullable=False)

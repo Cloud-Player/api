@@ -1,6 +1,6 @@
 """
-    cloudplayer.api.handler.auth
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    cloudplayer.api.http.auth
+    ~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :copyright: (c) 2017 by the cloudplayer team
     :license: GPL-3.0, see LICENSE for details
@@ -15,11 +15,10 @@ import tornado.escape
 
 from cloudplayer.api.model.account import Account
 from cloudplayer.api.model.image import Image
-import cloudplayer.api.handler
+from cloudplayer.api.http import HTTPHandler
 
 
-class AuthHandler(cloudplayer.api.handler.HTTPHandler,
-                  tornado.auth.OAuth2Mixin):
+class AuthHandler(HTTPHandler, tornado.auth.OAuth2Mixin):
 
     _OAUTH_NO_CALLBACKS = False
     _OAUTH_VERSION = '1.0a'

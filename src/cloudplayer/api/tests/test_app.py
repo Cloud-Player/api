@@ -11,8 +11,9 @@ def test_base_route_should_return_404(http_client, base_url):
 
 @pytest.mark.gen_test
 def test_unsupported_method_should_return_405(http_client, base_url):
-    request = tornado.httpclient.HTTPRequest(base_url, 'HEAD')
-    response = yield http_client.fetch(request, raise_error=False)
+    # request = tornado.httpclient.HTTPRequest(base_url, 'HEAD')
+    response = yield http_client.fetch(
+        base_url, method='HEAD', raise_error=False)
     assert response.code == 405
 
 
@@ -28,7 +29,7 @@ def test_http_handler_should_set_default_headers(http_client, base_url):
     assert headers == {
         'Access-Control-Allow-Credentials': 'true',
         'Access-Control-Allow-Headers': 'Accept, Content-Type, Origin',
-        'Access-Control-Allow-Methods': 'GET, OPTIONS',
+        'Access-Control-Allow-Methods': 'GET',
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Max-Age': '600',
         'Cache-Control': 'no-cache, no-store, must-revalidate',

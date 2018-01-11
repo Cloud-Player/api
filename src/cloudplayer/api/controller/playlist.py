@@ -6,7 +6,6 @@
     :license: GPL-3.0, see LICENSE for details
 """
 from cloudplayer.api.model.playlist import Playlist
-
 import cloudplayer.api.controller
 
 

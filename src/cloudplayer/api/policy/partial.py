@@ -1,5 +1,5 @@
 """
-    cloudplayer.api.policy.Partial
+    cloudplayer.api.policy.partial
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :copyright: (c) 2017 by the cloudplayer team

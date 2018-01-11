@@ -14,8 +14,9 @@ class PolicyViolation(Exception):
 class PolicyFactory(object):
 
     def __init__(self, policies):
-        name = '{}Policy'.format(p.__name__ for p in policies)
-        self.policy = type(name, (BasePolicy, Mixin, *policies), {})
+        bases = policies + [Policy]
+        name = ''.join([b.__name__ for b in bases])
+        self.policy = type(name, tuple(bases), {})
 
     def __call__(self, *args, **kw):
         return self.policy(*args, **kw)
@@ -25,7 +26,7 @@ class Mixin(object):
     pass
 
 
-class BasePolicy(object):
+class Policy(object):
 
     def __init__(self, db, current_user=None):
         self.db = db

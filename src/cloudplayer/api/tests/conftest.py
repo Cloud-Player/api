@@ -1,6 +1,8 @@
 import os
 import sys
+import random
 
+import sqlalchemy as sql
 import pytest_redis.factories as redis_factories
 import pytest
 import tornado.options as opt
@@ -62,3 +64,35 @@ def app(postgresql_proc, redis_proc):
     opt.define('postgres_user', type=str, default='postgres', group='app')
     opt.define('postgres_password', type=str, default='', group='app')
     return cloudplayer.api.app.Application()
+
+
+@pytest.fixture(scope='function')
+def db(app):
+    return app.database.create_session()
+
+
+@pytest.fixture(scope='function')
+def current_user(db):
+    from cloudplayer.api.model.user import User
+    from cloudplayer.api.model.account import Account
+    user = User()
+    db.add(user)
+    db.commit()
+    account = Account(
+        id=str(user.id),
+        provider_id='cloudplayer',
+        user_id=user.id)
+    db.add(account)
+    db.commit()
+    return {'user_id': user.id, 'cloudplayer': account.id}
+
+
+@pytest.fixture(scope='function')
+def model_factory(app):
+    def factory(**kw):
+        name = 'm{}'.format(random.randint(0, 10000))
+        kw['__tablename__'] = name
+        model = type(name, (Base,), kw)
+        model.Base.metadata.create_all(app.database.engine, [model.__table__])
+        # TODO: Drop table on fixture teardown
+    return factory

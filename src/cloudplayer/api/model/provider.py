@@ -9,7 +9,7 @@ import sqlalchemy as sql
 import tornado.options as opt
 
 from cloudplayer.api.model import Base
-import cloudplayer.api.handler.auth
+import cloudplayer.api.http.auth
 
 
 class Provider(Base):

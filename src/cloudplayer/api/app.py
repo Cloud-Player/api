@@ -9,6 +9,7 @@ import signal
 import sys
 
 from tornado.log import app_log
+from tornado.routing import RuleRouter, Rule
 import redis
 import sqlalchemy as sql
 import sqlalchemy.orm as orm
@@ -18,17 +19,7 @@ import tornado.ioloop
 import tornado.options as opt
 import tornado.web
 
-from cloudplayer.api.handler import account
-from cloudplayer.api.handler import auth
-from cloudplayer.api.handler import base as handler
-from cloudplayer.api.handler import playlist
-from cloudplayer.api.handler import playlist_item as p_item
-from cloudplayer.api.handler import provider
-from cloudplayer.api.handler import proxy
-from cloudplayer.api.handler import token
-from cloudplayer.api.handler import user
-from cloudplayer.api.model import base as model
-from cloudplayer.api.model import provider as p_model
+from cloudplayer.api.routing import ProtocolMatches
 
 
 def define_options():
@@ -63,34 +54,58 @@ def define_options():
 
 class Application(tornado.web.Application):
 
-    handlers = [
-        (r'^/soundcloud$', auth.Soundcloud),
-        (r'^/youtube$', auth.Youtube),
-        (r'^/token$', token.Collection),
-        (r'^/account/(?P<provider_id>[a-z]+)/(?P<id>[0-9a-zA-Z]+)$',
-         account.Entity),
-        (r'^/playlist/(?P<playlist_provider_id>[a-z]+)'
-         r'/(?P<playlist_id>[0-9a-zA-Z]+)'
-         r'/item/(?P<id>[0-9]+)$', p_item.Entity),
-        (r'^/playlist/(?P<playlist_provider_id>[a-z]+)'
-         r'/(?P<playlist_id>[0-9a-zA-Z]+)'
-         r'/item$', p_item.Collection),
-        (r'^/playlist/(?P<provider_id>[a-z]+)/(?P<id>[0-9a-zA-Z]+)$',
-         playlist.Entity),
-        (r'^/playlist/(?P<provider_id>[a-z]+)$',
-         playlist.Collection),
-        (r'^/provider$', provider.Collection),
-        (r'^/provider/(?P<id>[a-z]+)$', provider.Entity),
-        (r'^/proxy/(soundcloud|youtube)/(.*)', proxy.Proxy),
-        (r'^/token/([0-9a-z]+)$', token.Entity),
-        (r'^/user/(?P<id>me|[0-9]+)$', user.Entity),
-        (r'^/.*', handler.FallbackHandler)
-    ]
+    http_routes = {
+        r'^/soundcloud$':
+            'cloudplayer.api.http.auth.Soundcloud',
+        r'^/youtube$':
+            'cloudplayer.api.http.auth.Youtube',
+        r'^/token$':
+            'cloudplayer.api.http.token.Collection',
+        r'^/account/(?P<provider_id>[a-z]+)/(?P<id>[0-9a-zA-Z]+)$':
+            'cloudplayer.api.http.account.Entity',
+        r'^/playlist/(?P<playlist_provider_id>[a-z]+)'
+        r'/(?P<playlist_id>[0-9a-zA-Z]+)'
+        r'/item/(?P<id>[0-9]+)$':
+            'cloudplayer.api.http.playlist_item.Entity',
+        r'^/playlist/(?P<playlist_provider_id>[a-z]+)'
+        r'/(?P<playlist_id>[0-9a-zA-Z]+)'
+        r'/item$':
+            'cloudplayer.api.http.playlist_item.Collection',
+        r'^/playlist/(?P<provider_id>[a-z]+)/(?P<id>[0-9a-zA-Z]+)$':
+            'cloudplayer.api.http.playlist.Entity',
+        r'^/playlist/(?P<provider_id>[a-z]+)$':
+            'cloudplayer.api.http.playlist.Collection',
+        r'^/provider$':
+            'cloudplayer.api.http.provider.Collection',
+        r'^/provider/(?P<id>[a-z]+)$':
+            'cloudplayer.api.http.provider.Entity',
+        r'^/proxy/(soundcloud|youtube)/(.*)':
+            'cloudplayer.api.http.proxy.Proxy',
+        r'^/token/(?P<id>[0-9a-z]+)$':
+            'cloudplayer.api.http.token.Entity',
+        r'^/user/(?P<id>me|[0-9]+)$':
+            'cloudplayer.api.http.user.Entity',
+        r'^/websocket$':
+            'cloudplayer.api.http.socket.Handler',
+        r'^/.*':
+            'cloudplayer.api.http.base.HTTPFallback'
+    }.items()
+
+    ws_routes = {
+        r'^user\.(?P<id>me|[0-9]+)$':
+            'cloudplayer.api.ws.user.Entity',
+        r'^.*$':
+            'cloudplayer.api.ws.base.WSFallback',
+    }.items()
 
     def __init__(self):
         settings = opt.options.group_dict('app')
+        routes = [
+            (ProtocolMatches('^http[s]?$'), list(self.http_routes)),
+            (ProtocolMatches('^ws[s]?$'), list(self.ws_routes))
+        ]
 
-        super(Application, self).__init__(self.handlers, **settings)
+        super(Application, self).__init__(routes, **settings)
 
         self.executor = tornado.concurrent.futures.ThreadPoolExecutor(
             settings['num_executors'])
@@ -114,19 +129,19 @@ class Database(object):
             user, password, host, port, db)
         self.engine = sql.create_engine(url, client_encoding='utf8')
 
-        # model.Base.metadata.drop_all(self.engine)
+        import  cloudplayer.api.model.base as model
         import cloudplayer.api.model.provider as pr
-        import cloudplayer.api.model.user as u
-        import cloudplayer.api.model.image as i
-        import cloudplayer.api.model.account as a
-        import cloudplayer.api.model.playlist as p
+        import cloudplayer.api.model.user as us
+        import cloudplayer.api.model.image as im
+        import cloudplayer.api.model.account as ac
+        import cloudplayer.api.model.playlist as pl
         import cloudplayer.api.model.playlist_item as pi
         model.Base.metadata.create_all(self.engine, [
             pr.Provider.__table__,
-            u.User.__table__,
-            a.Account.__table__,
-            i.Image.__table__,
-            p.Playlist.__table__,
+            us.User.__table__,
+            ac.Account.__table__,
+            im.Image.__table__,
+            pl.Playlist.__table__,
             pi.PlaylistItem.__table__
         ])
         model.Base.metadata.create_all(self.engine)
@@ -135,10 +150,11 @@ class Database(object):
         self.populate_providers()
 
     def populate_providers(self):
+        from cloudplayer.api.model import provider
         session = self.create_session()
         for provider_id in opt.options.providers:
-            if not session.query(p_model.Provider).get(provider_id):
-                entity = p_model.Provider(id=provider_id)
+            if not session.query(provider.Provider).get(provider_id):
+                entity = provider.Provider(id=provider_id)
                 session.add(entity)
         session.commit()
 

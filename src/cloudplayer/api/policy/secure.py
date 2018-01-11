@@ -14,9 +14,17 @@ class Secure(Mixin):
 
     def check_mine(self, entity):
         try:
-            return self.current_user[self.provider_id] == self.account_id
+            return self.current_user[entity.provider_id] == entity.account_id
         except (TypeError, KeyError):
             return False
+
+    def create(self, entity):
+        if not entity.provider_id:
+            entity.provider_id = entity.__class__.provider_id.default.arg
+        if entity.provider_id not in self.current_user:
+            raise PolicyViolation('entity creation denied')
+        entity.account_id = self.current_user[entity.provider_id]
+        super().create(entity)
 
     def read(self, query, *ids):
         entity = super().read(query, *ids)

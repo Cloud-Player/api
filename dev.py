@@ -15,6 +15,7 @@ providers = [
 
 allowed_origins = [
     'http://localhost:4200',
+    'http://localhost:8040',
     'http://localhost:8080']
 
 jwt_secret = 'secret'

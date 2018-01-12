@@ -20,8 +20,7 @@ class Token(Base):
     __tablename__ = 'token'
     __fields__ = [
         'id',
-        'claimed',
-        'expiration'
+        'claimed'
     ]
     __filters__ = []
     __mutable__ = [

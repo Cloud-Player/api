@@ -128,8 +128,15 @@ class Database(object):
         url = 'postgresql://{}:{}@{}:{}/{}'.format(
             user, password, host, port, db)
         self.engine = sql.create_engine(url, client_encoding='utf8')
+        self.session_cls = orm.sessionmaker(bind=self.engine)
+        self.initialize()
 
-        import  cloudplayer.api.model.base as model
+    def initialize(self):
+        self.ensure_tables()
+        self.populate_providers()
+
+    def ensure_tables(self):
+        import cloudplayer.api.model.base as model
         import cloudplayer.api.model.provider as pr
         import cloudplayer.api.model.user as us
         import cloudplayer.api.model.image as im
@@ -146,9 +153,6 @@ class Database(object):
         ])
         model.Base.metadata.create_all(self.engine)
 
-        self.session_cls = orm.sessionmaker(bind=self.engine)
-        self.populate_providers()
-
     def populate_providers(self):
         from cloudplayer.api.model import provider
         session = self.create_session()
@@ -157,6 +161,7 @@ class Database(object):
                 entity = provider.Provider(id=provider_id)
                 session.add(entity)
         session.commit()
+        session.close()
 
     def create_session(self):
         return self.session_cls()

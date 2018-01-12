@@ -63,12 +63,21 @@ def app(postgresql_proc, redis_proc):
     opt.define('postgres_db', type=str, default='postgres', group='app')
     opt.define('postgres_user', type=str, default='postgres', group='app')
     opt.define('postgres_password', type=str, default='', group='app')
-    return cloudplayer.api.app.Application()
+    app = cloudplayer.api.app.Application()
+    yield app
+    app.database.engine.dispose()
 
 
 @pytest.fixture(scope='function')
 def db(app):
-    return app.database.create_session()
+    import cloudplayer.api.model.base as model
+    app.database.initialize()
+    session = app.database.create_session()
+    yield session
+    for table in reversed(model.Base.metadata.sorted_tables):
+        session.execute(table.delete())
+    session.commit()
+    session.close()
 
 
 @pytest.fixture(scope='function')
@@ -88,11 +97,12 @@ def current_user(db):
 
 
 @pytest.fixture(scope='function')
-def model_factory(app):
+def model_factory(app, db):
     def factory(**kw):
+        import cloudplayer.api.model.base as model
         name = 'm{}'.format(random.randint(0, 10000))
         kw['__tablename__'] = name
         model = type(name, (Base,), kw)
-        model.Base.metadata.create_all(app.database.engine, [model.__table__])
-        # TODO: Drop table on fixture teardown
-    return factory
+        model.Base.metadata.create_all(
+            app.database.engine, [model.__table__])
+    return factory()

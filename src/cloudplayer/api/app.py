@@ -87,7 +87,7 @@ class Application(tornado.web.Application):
             'cloudplayer.api.http.user.Entity',
         r'^/websocket$':
             'cloudplayer.api.http.socket.Handler',
-        r'^/health_check':
+        r'^/health_check$':
             'cloudplayer.api.http.base.HTTPHealth',
         r'^/.*':
             'cloudplayer.api.http.base.HTTPFallback'
@@ -106,8 +106,7 @@ class Application(tornado.web.Application):
             (ProtocolMatches('^http[s]?$'), list(self.http_routes)),
             (ProtocolMatches('^ws[s]?$'), list(self.ws_routes))
         ]
-
-        super(Application, self).__init__(self.http_routes, **settings)
+        super(Application, self).__init__(routes, **settings)
 
         self.executor = tornado.concurrent.futures.ThreadPoolExecutor(
             settings['num_executors'])

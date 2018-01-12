@@ -87,6 +87,8 @@ class Application(tornado.web.Application):
             'cloudplayer.api.http.user.Entity',
         r'^/websocket$':
             'cloudplayer.api.http.socket.Handler',
+        r'^/health_check':
+            'cloudplayer.api.http.base.HTTPHealth',
         r'^/.*':
             'cloudplayer.api.http.base.HTTPFallback'
     }.items()

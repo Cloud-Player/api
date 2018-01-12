@@ -138,3 +138,13 @@ class HTTPFallback(HTTPHandler):
 
     def get(self, *args, **kwargs):
         self.write_error(404, reason='resource not found')
+
+
+class HTTPHealth(HTTPHandler):
+
+    SUPPORTED_METHODS = ('GET',)
+
+    def get(self, *args, **kwargs):
+        self.cache.info()
+        self.db.execute('SELECT 1 = 1;').first()
+        self.write({'status_code': 200, 'reason': 'OK'})

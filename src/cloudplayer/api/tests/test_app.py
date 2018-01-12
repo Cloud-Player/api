@@ -18,8 +18,7 @@ def test_unsupported_method_should_return_405(http_client, base_url):
 
 @pytest.mark.gen_test
 def test_http_handler_should_set_default_headers(http_client, base_url):
-    response = yield http_client.fetch(
-        '{}/health_check'.format(base_url), raise_error=False)
+    response = yield http_client.fetch('{}/health_check'.format(base_url))
     headers = dict(response.headers)
     assert headers.pop('Date')
     assert headers.pop('Set-Cookie')

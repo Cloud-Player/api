@@ -33,6 +33,7 @@ setup(
             'pytest-pep8',
             'pytest-postgresql',
             'pytest-redis',
+            'pytest-remove-stale-bytecode',
             'pytest-timeout',
             'pytest-tornado',
             'pytest'

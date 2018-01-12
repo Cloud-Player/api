@@ -90,7 +90,6 @@ class HTTPHandler(HandlerMixin, tornado.web.RequestHandler):
 
     def write(self, data):
         if data is None:
-            __import__('traceback').print_stack()
             raise tornado.web.HTTPError(404, 'resource not found')
         json.dump(data, super(), cls=Encoder)
         self.finish()
@@ -138,7 +137,6 @@ class HTTPFallback(HTTPHandler):
     SUPPORTED_METHODS = ('GET',)
 
     def get(self, *args, **kwargs):
-        __import__('traceback').print_stack()
         self.write_error(404, reason='endpoint not found')
 
 

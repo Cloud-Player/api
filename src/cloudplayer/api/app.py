@@ -54,51 +54,51 @@ def define_options():
 
 class Application(tornado.web.Application):
 
-    http_routes = {
-        r'^/soundcloud$':
-            'cloudplayer.api.http.auth.Soundcloud',
-        r'^/youtube$':
-            'cloudplayer.api.http.auth.Youtube',
-        r'^/token$':
-            'cloudplayer.api.http.token.Collection',
-        r'^/account/(?P<provider_id>[a-z]+)/(?P<id>[0-9a-zA-Z]+)$':
-            'cloudplayer.api.http.account.Entity',
-        r'^/playlist/(?P<playlist_provider_id>[a-z]+)'
-        r'/(?P<playlist_id>[0-9a-zA-Z]+)'
-        r'/item/(?P<id>[0-9]+)$':
-            'cloudplayer.api.http.playlist_item.Entity',
-        r'^/playlist/(?P<playlist_provider_id>[a-z]+)'
-        r'/(?P<playlist_id>[0-9a-zA-Z]+)'
-        r'/item$':
-            'cloudplayer.api.http.playlist_item.Collection',
-        r'^/playlist/(?P<provider_id>[a-z]+)/(?P<id>[0-9a-zA-Z]+)$':
-            'cloudplayer.api.http.playlist.Entity',
-        r'^/playlist/(?P<provider_id>[a-z]+)$':
-            'cloudplayer.api.http.playlist.Collection',
-        r'^/provider$':
-            'cloudplayer.api.http.provider.Collection',
-        r'^/provider/(?P<id>[a-z]+)$':
-            'cloudplayer.api.http.provider.Entity',
-        r'^/proxy/(soundcloud|youtube)/(.*)':
-            'cloudplayer.api.http.proxy.Proxy',
-        r'^/token/(?P<id>[0-9a-z]+)$':
-            'cloudplayer.api.http.token.Entity',
-        r'^/user/(?P<id>me|[0-9]+)$':
-            'cloudplayer.api.http.user.Entity',
-        r'^/websocket$':
-            'cloudplayer.api.http.socket.Handler',
-        r'^/health_check$':
-            'cloudplayer.api.http.base.HTTPHealth',
-        r'^/.*':
-            'cloudplayer.api.http.base.HTTPFallback'
-    }.items()
+    http_routes = [
+        (r'^/soundcloud$',
+         'cloudplayer.api.http.auth.Soundcloud'),
+        (r'^/youtube$',
+         'cloudplayer.api.http.auth.Youtube'),
+        (r'^/token$',
+         'cloudplayer.api.http.token.Collection'),
+        (r'^/account/(?P<provider_id>[a-z]+)/(?P<id>[0-9a-zA-Z]+)$',
+         'cloudplayer.api.http.account.Entity'),
+        ((r'^/playlist/(?P<playlist_provider_id>[a-z]+)'
+          r'/(?P<playlist_id>[0-9a-zA-Z]+)'
+          r'/item/(?P<id>[0-9]+)$'),
+         'cloudplayer.api.http.playlist_item.Entity'),
+        ((r'^/playlist/(?P<playlist_provider_id>[a-z]+)'
+          r'/(?P<playlist_id>[0-9a-zA-Z]+)'
+          r'/item$'),
+         'cloudplayer.api.http.playlist_item.Collection'),
+        (r'^/playlist/(?P<provider_id>[a-z]+)/(?P<id>[0-9a-zA-Z]+)$',
+         'cloudplayer.api.http.playlist.Entity'),
+        (r'^/playlist/(?P<provider_id>[a-z]+)$',
+         'cloudplayer.api.http.playlist.Collection'),
+        (r'^/provider$',
+         'cloudplayer.api.http.provider.Collection'),
+        (r'^/provider/(?P<id>[a-z]+)$',
+         'cloudplayer.api.http.provider.Entity'),
+        (r'^/proxy/(soundcloud|youtube)/(.*)',
+         'cloudplayer.api.http.proxy.Proxy'),
+        (r'^/token/(?P<id>[0-9a-z]+)$',
+         'cloudplayer.api.http.token.Entity'),
+        (r'^/user/(?P<id>me|[0-9]+)$',
+         'cloudplayer.api.http.user.Entity'),
+        (r'^/websocket$',
+         'cloudplayer.api.http.socket.Handler'),
+        (r'^/health_check$',
+         'cloudplayer.api.http.base.HTTPHealth'),
+        (r'^/.*',
+         'cloudplayer.api.http.base.HTTPFallback'),
+    ]
 
-    ws_routes = {
-        r'^user\.(?P<id>me|[0-9]+)$':
-            'cloudplayer.api.ws.user.Entity',
-        r'^.*$':
-            'cloudplayer.api.ws.base.WSFallback',
-    }.items()
+    ws_routes = [
+        (r'^user\.(?P<id>me|[0-9]+)$',
+         'cloudplayer.api.ws.user.Entity'),
+        (r'^.*$',
+         'cloudplayer.api.ws.base.WSFallback'),
+    ]
 
     def __init__(self):
         settings = opt.options.group_dict('app')

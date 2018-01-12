@@ -139,7 +139,7 @@ class HTTPFallback(HTTPHandler):
 
     def get(self, *args, **kwargs):
         __import__('traceback').print_stack()
-        self.write_error(404, reason='resource not found')
+        self.write_error(404, reason='endpoint not found')
 
 
 class HTTPHealth(HTTPHandler):

@@ -56,7 +56,6 @@ class HTTPHandler(HandlerMixin, tornado.web.RequestHandler):
             user['user_id'] = new_user.id
             return None, user
 
-    @tornado.gen.coroutine
     def prepare(self):
         self.original_user, self.current_user = self.load_user()
 

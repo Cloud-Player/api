@@ -71,6 +71,7 @@ class HandlerMixin(object):
         else:
             raise ValueError('unsupported provider')
         url = '{}/{}'.format(auth_class.API_BASE_URL, path.lstrip('/'))
+        settings = self.settings[auth_class._OAUTH_SETTINGS_KEY]
 
         account = self.db.query(Account).get((
             self.current_user[provider_id], provider_id))
@@ -78,7 +79,6 @@ class HandlerMixin(object):
         if account:
             # TODO: Move refresh workflow to auth module
             # TODO: Set quotaUser for Youtube
-            settings = self.settings[auth_class._OAUTH_SETTINGS_KEY]
             tzinfo = account.token_expiration.tzinfo
             now = datetime.datetime.now(tzinfo)
             threshold = datetime.timedelta(minutes=1000000000)

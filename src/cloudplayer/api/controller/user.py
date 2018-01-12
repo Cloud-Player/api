@@ -17,4 +17,7 @@ class UserController(cloudplayer.api.controller.Controller):
     def read(self, ids):
         if ids['id'] == 'me':
             ids['id'] = self.current_user['user_id']
-        return super().read(ids)
+        entity = super().read(ids)
+        if not entity and ids['id'] == self.current_user['user_id']:
+            self.current_user.clear()
+        return entity

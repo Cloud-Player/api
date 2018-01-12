@@ -22,7 +22,7 @@ def test_http_handler_should_set_default_headers(http_client, base_url):
         '{}/health_check'.format(base_url), raise_error=False)
     headers = dict(response.headers)
     assert headers.pop('Date')
-    # assert headers.pop('Set-Cookie')
+    assert headers.pop('Set-Cookie')
     assert headers.pop('Etag')
     assert headers.pop('Content-Length')
     assert headers == {

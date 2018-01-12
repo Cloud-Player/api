@@ -31,16 +31,16 @@ class HTTPHandler(HandlerMixin, tornado.web.RequestHandler):
 
     def __init__(self, request, application):
         super().__init__(request, application)
-        self._current_user = None
-        self._original_user = None
+        self.current_user = None
+        self.original_user = None
 
-    def get_current_user(self):
+    def load_user(self):
         try:
             user = jwt.decode(
                 self.get_cookie(self.settings['jwt_cookie'], ''),
                 self.settings['jwt_secret'],
                 algorithms=['HS256'])
-            self._original_user = user
+            return user, user
         except jwt.exceptions.InvalidTokenError:
             new_user = User()
             self.db.add(new_user)
@@ -54,11 +54,15 @@ class HTTPHandler(HandlerMixin, tornado.web.RequestHandler):
             user = {p: None for p in self.settings['providers']}
             user['cloudplayer'] = new_account.id
             user['user_id'] = new_user.id
-        return user
+            return None, user
+
+    @tornado.gen.coroutine
+    def prepare(self):
+        self.original_user, self.current_user = self.load_user()
 
     def set_user_cookie(self):
         user_jwt = jwt.encode(
-            self._current_user,
+            self.current_user,
             self.settings['jwt_secret'],
             algorithm='HS256')
         super().set_cookie(
@@ -66,15 +70,8 @@ class HTTPHandler(HandlerMixin, tornado.web.RequestHandler):
             user_jwt,
             expires_days=self.settings['jwt_expiration'])
 
-    @property
-    def current_user(self):
-        if self._current_user is None:
-            self._current_user = self.get_current_user()
-        return self._current_user
-
-    @current_user.setter
-    def current_user(self, user):
-        self._current_user = user
+    def clear_user_cookie(self):
+        super().clear_cookie(self.settings['jwt_cookie'])
 
     def set_default_headers(self):
         headers = [
@@ -99,8 +96,10 @@ class HTTPHandler(HandlerMixin, tornado.web.RequestHandler):
         self.finish()
 
     def finish(self, chunk=None):
-        if self._original_user != self._current_user:
+        if self.original_user != self.current_user:
             self.set_user_cookie()
+        elif not self.current_user:
+            self.clear_user_cookie()
         super().finish(chunk=chunk)
 
     @property
@@ -135,6 +134,8 @@ class HTTPHandler(HandlerMixin, tornado.web.RequestHandler):
 
 
 class HTTPFallback(HTTPHandler):
+
+    SUPPORTED_METHODS = ('GET',)
 
     def get(self, *args, **kwargs):
         self.write_error(404, reason='resource not found')

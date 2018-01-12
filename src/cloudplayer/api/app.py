@@ -107,7 +107,7 @@ class Application(tornado.web.Application):
             (ProtocolMatches('^ws[s]?$'), list(self.ws_routes))
         ]
 
-        super(Application, self).__init__(routes, **settings)
+        super(Application, self).__init__(self.http_routes, **settings)
 
         self.executor = tornado.concurrent.futures.ThreadPoolExecutor(
             settings['num_executors'])

@@ -103,10 +103,12 @@ class HTTPHandler(HandlerMixin, tornado.web.RequestHandler):
 
     @property
     def body(self):
+        if not self.request.body:
+            return {}
         try:
             return tornado.escape.json_decode(self.request.body)
-        except ValueError as error:
-            raise tornado.web.HTTPError(400, error.message)
+        except (json.decoder.JSONDecodeError, ValueError):
+            raise tornado.web.HTTPError(400, 'invalid json body')
 
     @property
     def query_params(self):

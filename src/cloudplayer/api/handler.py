@@ -96,10 +96,11 @@ class HandlerMixin(object):
                 account.access_token = access.get('access_token')
                 if access.get('refresh_token'):
                     account.refresh_token = access['refresh_token']
-                expires_in = datetime.timedelta(
-                    seconds=access.get('expires_in'))
-                account.token_expiration = (
-                    datetime.datetime.now(tzinfo) + expires_in)
+                if access.get('expires_in'):
+                    expires_in = datetime.timedelta(
+                        seconds=access.get('expires_in'))
+                    account.token_expiration = (
+                        datetime.datetime.now(tzinfo) + expires_in)
                 self.db.commit()
             params.append((auth_class.OAUTH_TOKEN_PARAM, account.access_token))
 
@@ -115,7 +116,7 @@ class HandlerMixin(object):
         return response
 
 
-class ControllerMixin(object):
+class ControllerHandlerMixin(object):
 
     __controller__ = NotImplemented
 
@@ -126,7 +127,7 @@ class ControllerMixin(object):
         return self._controller
 
 
-class EntityMixin(ControllerMixin):
+class EntityMixin(ControllerHandlerMixin):
 
     SUPPORTED_METHODS = ('GET', 'PATCH', 'DELETE')
 
@@ -147,7 +148,7 @@ class EntityMixin(ControllerMixin):
         self.finish()
 
 
-class CollectionMixin(ControllerMixin):
+class CollectionMixin(ControllerHandlerMixin):
 
     SUPPORTED_METHODS = ('GET', 'POST')
 

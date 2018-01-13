@@ -4,6 +4,7 @@ language: python
 python:
   - "3.5"
 before_install:
+  - wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
   - sudo apt-get update -q
   - sudo /etc/init.d/postgresql stop
   - sudo apt-get --purge -y remove postgresql

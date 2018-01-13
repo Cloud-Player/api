@@ -14,7 +14,6 @@ from cloudplayer.api.model import Base
 
 class User(Base):
 
-    __tablename__ = 'user'
     __fields__ = [
         'id',
         'accounts',
@@ -35,9 +34,3 @@ class User(Base):
     id = sql.Column(sql.Integer)
 
     accounts = orm.relationship('Account', back_populates='user')
-
-    created = sql.Column(
-        sql.DateTime(timezone=True), server_default=func.now())
-    updated = sql.Column(
-        sql.DateTime(timezone=True), server_default=func.now(),
-        onupdate=func.now())

@@ -22,6 +22,7 @@ import tornado.web
 from cloudplayer.api.handler import HandlerMixin
 from cloudplayer.api.model import Encoder
 from cloudplayer.api.model.account import Account
+from cloudplayer.api.model.favourites import Favourites
 from cloudplayer.api.model.user import User
 
 
@@ -48,6 +49,7 @@ class HTTPHandler(HandlerMixin, tornado.web.RequestHandler):
             new_account = Account(
                 id=str(new_user.id),
                 provider_id='cloudplayer',
+                favourites=Favourites(),
                 user_id=new_user.id)
             self.db.add(new_account)
             self.db.commit()

@@ -10,6 +10,8 @@ import json
 import datetime
 import pkg_resources
 
+from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.sql import func
 import sqlalchemy as sql
 import sqlalchemy.ext.declarative
 
@@ -20,6 +22,16 @@ class Model(object):
     __filters__ = []
     __mutable__ = []
     __public__ = []
+
+    @declared_attr
+    def __tablename__(cls):
+        return cls.__name__.lower()
+
+    created = sql.Column(
+        sql.DateTime(timezone=True), server_default=func.now())
+    updated = sql.Column(
+        sql.DateTime(timezone=True), server_default=func.now(),
+        onupdate=func.now())
 
     account_id = None
     provider_id = None

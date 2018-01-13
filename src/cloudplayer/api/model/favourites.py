@@ -1,6 +1,6 @@
 """
-    cloudplayer.api.model.playlist
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    cloudplayer.api.model.favourites
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :copyright: (c) 2017 by the cloudplayer team
     :license: GPL-3.0, see LICENSE for details
@@ -12,33 +12,25 @@ from cloudplayer.api.model import Base
 from cloudplayer.api.model.tracklist import TracklistMixin
 
 
-class Playlist(TracklistMixin, Base):
+class Favourites(TracklistMixin, Base):
 
     __fields__ = [
         'id',
         'account_id',
         'provider_id',
-        'title',
         'public',
-        'follower_count',
         'items'
     ]
     __filters__ = [
         'account_id',
         'provider_id',
-        'title',
         'public',
         'follower_count'
     ]
-    __mutable__ = [
-        'title',
-        'public'
-    ]
+    __mutable__ = []
     __public__ = __fields__
 
     account = orm.relationship(
-        'Account', back_populates='playlists', viewonly=True)
+        'Account', back_populates='favourites', viewonly=True)
 
-    title = sql.Column(sql.String(256), nullable=False)
-
-    items = orm.relationship('PlaylistItem')
+    items = orm.relationship('FavouritesItem')

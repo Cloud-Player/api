@@ -5,7 +5,6 @@
     :copyright: (c) 2017 by the cloudplayer team
     :license: GPL-3.0, see LICENSE for details
 """
-from sqlalchemy.sql import func
 import sqlalchemy as sql
 import sqlalchemy.orm as orm
 
@@ -14,13 +13,13 @@ from cloudplayer.api.model import Base
 
 class Account(Base):
 
-    __tablename__ = 'account'
     __fields__ = [
         'id',
         'provider_id',
         'user_id',
         'created',
         'updated',
+        'favourites',
         'title',
         'image'
     ]
@@ -63,16 +62,12 @@ class Account(Base):
     user = orm.relationship('User', back_populates='accounts')
 
     playlists = orm.relationship('Playlist', back_populates='account')
+    favourites = orm.relationship(
+        'Favourites', uselist=False, back_populates='account')
 
     title = sql.Column('title', sql.String(64))
     image_id = sql.Column(sql.Integer)
     image = orm.relationship('Image')
-
-    created = sql.Column(
-        sql.DateTime(timezone=True), server_default=func.now())
-    updated = sql.Column(
-        sql.DateTime(timezone=True), server_default=func.now(),
-        onupdate=func.now())
 
     access_token = sql.Column(sql.String(256))
     refresh_token = sql.Column(sql.String(256))

@@ -5,7 +5,6 @@
     :copyright: (c) 2017 by the cloudplayer team
     :license: GPL-3.0, see LICENSE for details
 """
-from sqlalchemy.sql import func
 import sqlalchemy as sql
 
 from cloudplayer.api.model import Base
@@ -13,7 +12,6 @@ from cloudplayer.api.model import Base
 
 class Image(Base):
 
-    __tablename__ = 'image'
     __fields__ = [
         'id',
         'small',
@@ -36,9 +34,3 @@ class Image(Base):
     small = sql.Column(sql.String(256))
     medium = sql.Column(sql.String(256))
     large = sql.Column(sql.String(256), nullable=False)
-
-    created = sql.Column(
-        sql.DateTime(timezone=True), server_default=func.now())
-    updated = sql.Column(
-        sql.DateTime(timezone=True), server_default=func.now(),
-        onupdate=func.now())

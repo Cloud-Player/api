@@ -17,7 +17,6 @@ from cloudplayer.api.util import gen_token
 
 class Token(Base):
 
-    __tablename__ = 'token'
     __fields__ = [
         'id',
         'claimed'
@@ -42,9 +41,3 @@ class Token(Base):
     provider_id = sql.Column(
         sql.String(16), nullable=False, default='cloudplayer')
     account_id = sql.Column(sql.String(32), nullable=False)
-
-    created = sql.Column(
-        sql.DateTime(timezone=True), server_default=func.now())
-    updated = sql.Column(
-        sql.DateTime(timezone=True), server_default=func.now(),
-        onupdate=func.now())

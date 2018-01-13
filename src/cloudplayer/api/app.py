@@ -59,10 +59,15 @@ class Application(tornado.web.Application):
          'cloudplayer.api.http.auth.Soundcloud'),
         (r'^/youtube$',
          'cloudplayer.api.http.auth.Youtube'),
+
+        (r'^/token/(?P<id>[0-9a-z]+)$',
+         'cloudplayer.api.http.token.Entity'),
         (r'^/token$',
          'cloudplayer.api.http.token.Collection'),
+
         (r'^/account/(?P<provider_id>[a-z]+)/(?P<id>[0-9a-zA-Z]+)$',
          'cloudplayer.api.http.account.Entity'),
+
         ((r'^/playlist/(?P<playlist_provider_id>[a-z]+)'
           r'/(?P<playlist_id>[0-9a-zA-Z]+)'
           r'/item/(?P<id>[0-9]+)$'),
@@ -71,22 +76,40 @@ class Application(tornado.web.Application):
           r'/(?P<playlist_id>[0-9a-zA-Z]+)'
           r'/item$'),
          'cloudplayer.api.http.playlist_item.Collection'),
+
         (r'^/playlist/(?P<provider_id>[a-z]+)/(?P<id>[0-9a-zA-Z]+)$',
          'cloudplayer.api.http.playlist.Entity'),
         (r'^/playlist/(?P<provider_id>[a-z]+)$',
          'cloudplayer.api.http.playlist.Collection'),
+
+        ((r'^/favourites/(?P<favourites_provider_id>[a-z]+)'
+          r'/(?P<favourites_id>[0-9a-zA-Z]+)'
+          r'/item/(?P<id>[0-9]+)$'),
+         'cloudplayer.api.http.favourites_item.Entity'),
+        ((r'^/favourites/(?P<favourites_provider_id>[a-z]+)'
+          r'/(?P<favourites_id>[0-9a-zA-Z]+)'
+          r'/item$'),
+         'cloudplayer.api.http.favourites_item.Collection'),
+
+        (r'^/favourites/(?P<provider_id>[a-z]+)/(?P<id>[0-9a-zA-Z]+)$',
+         'cloudplayer.api.http.favourites.Entity'),
+        (r'^/favourites/(?P<provider_id>[a-z]+)$',
+         'cloudplayer.api.http.favourites.Collection'),
+
         (r'^/provider$',
          'cloudplayer.api.http.provider.Collection'),
         (r'^/provider/(?P<id>[a-z]+)$',
          'cloudplayer.api.http.provider.Entity'),
-        (r'^/proxy/(soundcloud|youtube)/(.*)',
-         'cloudplayer.api.http.proxy.Proxy'),
-        (r'^/token/(?P<id>[0-9a-z]+)$',
-         'cloudplayer.api.http.token.Entity'),
+
         (r'^/user/(?P<id>me|[0-9]+)$',
          'cloudplayer.api.http.user.Entity'),
+
         (r'^/websocket$',
          'cloudplayer.api.http.socket.Handler'),
+
+        (r'^/proxy/(soundcloud|youtube)/(.*)',
+         'cloudplayer.api.http.proxy.Proxy'),
+
         (r'^/health_check$',
          'cloudplayer.api.http.base.HTTPHealth'),
         (r'^/.*',
@@ -138,12 +161,14 @@ class Database(object):
 
     def ensure_tables(self):
         import cloudplayer.api.model.base as model
-        import cloudplayer.api.model.provider as pr
+        """"import cloudplayer.api.model.provider as pr
         import cloudplayer.api.model.user as us
         import cloudplayer.api.model.image as im
         import cloudplayer.api.model.account as ac
         import cloudplayer.api.model.playlist as pl
         import cloudplayer.api.model.playlist_item as pi
+        import cloudplayer.api.model.favourites as fl
+        import cloudplayer.api.model.favourites_item as fi
         model.Base.metadata.create_all(self.engine, [
             pr.Provider.__table__,
             us.User.__table__,
@@ -152,6 +177,7 @@ class Database(object):
             pl.Playlist.__table__,
             pi.PlaylistItem.__table__
         ])
+        """
         model.Base.metadata.create_all(self.engine)
 
     def populate_providers(self):

@@ -6,6 +6,7 @@
     :license: GPL-3.0, see LICENSE for details
 """
 import sqlalchemy as sql
+import sqlalchemy.orm as orm
 import tornado.options as opt
 
 from cloudplayer.api.model import Base
@@ -14,7 +15,6 @@ import cloudplayer.api.http.auth
 
 class Provider(Base):
 
-    __tablename__ = 'provider'
     __fields__ = [
         'id',
         'client_id'
@@ -28,6 +28,8 @@ class Provider(Base):
     )
 
     id = sql.Column(sql.String(12))
+
+    provider_id = orm.synonym('id')
 
     @property
     def client_id(self):

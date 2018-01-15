@@ -6,13 +6,14 @@
     :license: GPL-3.0, see LICENSE for details
 """
 from cloudplayer.api.model.user import User
+from cloudplayer.api.policy import Open
 import cloudplayer.api.controller
 
 
 class UserController(cloudplayer.api.controller.Controller):
 
     __model__ = User
-    __policies__ = []
+    __policies__ = [Open]
 
     def read(self, ids):
         if ids['id'] == 'me':

@@ -14,7 +14,7 @@ def test_token_model_should_create_table(db):
 def test_token_model_can_be_created(current_user, db):
     token = Token(
         account_id=current_user['cloudplayer'],
-        provider_id='cloudplayer')
+        account_provider_id='cloudplayer')
     db.add(token)
     db.commit()
     token_id = token.id

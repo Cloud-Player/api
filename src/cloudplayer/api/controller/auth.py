@@ -91,7 +91,8 @@ class AuthController(object):
 
         url = '{}/{}'.format(self.API_BASE_URL, path.lstrip('/'))
         uri = tornado.httputil.url_concat(url, params)
-        yield self.http_client.fetch(uri, **kw)
+        response = yield self.http_client.fetch(uri, **kw)
+        return response
 
     def _create_account(self, user_info):
         self.account = Account(
@@ -107,9 +108,9 @@ class AuthController(object):
         cloudplayer = self.db.query(Account).get((
             self.current_user['cloudplayer'], 'cloudplayer'))
         if not cloudplayer.title:
-            cloudplayer.title = account.title
+            cloudplayer.title = self.account.title
         if not cloudplayer.image:
-            cloudplayer.image = account.image
+            cloudplayer.image = self.account.image
 
     def update_account(self, user_info):
         if not self.account:
@@ -154,7 +155,7 @@ class YoutubeController(AuthController):
             headers = dict()
         headers['Referer'] = 'https://api.cloud-player.io'
 
-        yield super().fetch(path, params, headers=headers **kw)
+        yield super().fetch(path, params, headers=headers, **kw)
 
     def _update_account_profile(self, user_info):
         snippet = user_info.get('snippet', {})

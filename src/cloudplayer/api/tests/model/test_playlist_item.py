@@ -19,6 +19,7 @@ def test_playlist_item_model_can_be_created(current_user, db):
         playlist=Playlist(
             provider_id='cloudplayer',
             account_id=current_user['cloudplayer'],
+            account_provider_id='cloudplayer',
             title='5678-abcd'),
         account_provider_id='cloudplayer',
         account_id=current_user['cloudplayer'],

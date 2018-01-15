@@ -3,11 +3,11 @@ import sqlalchemy as sql
 
 from cloudplayer.api.controller.base import Controller
 from cloudplayer.api.model.base import Base
-from cloudplayer.api.policy import Secure
+from cloudplayer.api.policy import Open, Secure
 
 
 def test_controller_should_store_creation_args(db, current_user):
-    controller_class = type('Ctrl', (Controller,), {'__policies__': []})
+    controller_class = type('Ctrl', (Controller,), {'__policies__': [Open]})
     controller = controller_class(db, current_user)
     assert controller.db is db
     assert controller.current_user is current_user

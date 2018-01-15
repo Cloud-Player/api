@@ -6,14 +6,14 @@
     :license: GPL-3.0, see LICENSE for details
 """
 from cloudplayer.api.model.token import Token
-from cloudplayer.api.policy import Secure
+from cloudplayer.api.policy import Owned, Secure
 import cloudplayer.api.controller
 
 
 class TokenController(cloudplayer.api.controller.Controller):
 
     __model__ = Token
-    __policies__ = [Secure]
+    __policies__ = [Owned, Secure]
 
     def create(self, ids, **kw):
         return super().create({})

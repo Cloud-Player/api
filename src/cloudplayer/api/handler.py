@@ -64,8 +64,10 @@ class HandlerMixin(object):
 
     @tornado.gen.coroutine
     def fetch(self, provider_id, path, **kw):
-        controller = create_controller(provider_id)
-        yield controller.fetch(uri, **kw)
+        controller = create_controller(
+            provider_id, self.db, self.current_user)
+        response = yield controller.fetch(path, **kw)
+        return response
 
 
 class ControllerHandlerMixin(object):

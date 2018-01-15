@@ -14,6 +14,8 @@ class PolicyViolation(Exception):
 class PolicyFactory(object):
 
     def __init__(self, policies):
+        if not policies:
+            raise ValueError('need at least one policy')
         bases = policies + [Policy]
         name = ''.join([b.__name__ for b in bases])
         self.policy = type(name, tuple(bases), {})
@@ -31,6 +33,13 @@ class Policy(object):
     def __init__(self, db, current_user=None):
         self.db = db
         self.current_user = current_user
+
+    def _is_mine(self, entity):
+        try:
+            return self.current_user[entity.account_provider_id] == (
+                entity.account_id)
+        except (TypeError, KeyError):
+            return False
 
     def create(self, entity):
         self.db.add(entity)

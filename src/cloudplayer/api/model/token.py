@@ -30,7 +30,7 @@ class Token(Base):
         sql.PrimaryKeyConstraint(
             'id'),
         sql.ForeignKeyConstraint(
-            ['account_id', 'provider_id'],
+            ['account_id', 'account_provider_id'],
             ['account.id', 'account.provider_id'])
     )
 
@@ -38,6 +38,5 @@ class Token(Base):
 
     claimed = sql.Column(sql.Boolean, default=False)
 
-    provider_id = sql.Column(
-        sql.String(16), nullable=False, default='cloudplayer')
+    account_provider_id = sql.Column(sql.String(16), default='cloudplayer')
     account_id = sql.Column(sql.String(32), nullable=False)

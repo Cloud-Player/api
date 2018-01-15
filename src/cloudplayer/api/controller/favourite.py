@@ -7,13 +7,14 @@
 """
 from cloudplayer.api.model.account import Account
 from cloudplayer.api.model.favourite import Favourite
+from cloudplayer.api.policy import Owned
 import cloudplayer.api.controller
 
 
 class FavouriteController(cloudplayer.api.controller.Controller):
 
     __model__ = Favourite
-    __policies__ = []
+    __policies__ = [Owned]
 
     def read(self, ids):
         if ids['id'] == 'mine':

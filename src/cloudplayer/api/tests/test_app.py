@@ -36,5 +36,5 @@ def test_application_should_open_configured_redis_pool(app):
 
 
 def test_application_should_connect_to_configured_database(app):
-    assert app.database.engine.url == (
-        'postgresql://postgres:***@127.0.0.1:8852/postgres')
+    assert str(app.database.engine.url) == (
+        'postgresql://postgres:@127.0.0.1:8852/postgres')

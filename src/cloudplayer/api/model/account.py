@@ -19,7 +19,7 @@ class Account(Base):
         'user_id',
         'created',
         'updated',
-        'favourites',
+        'favourite',
         'title',
         'image'
     ]
@@ -62,8 +62,8 @@ class Account(Base):
     user = orm.relationship('User', back_populates='accounts')
 
     playlists = orm.relationship('Playlist', back_populates='account')
-    favourites = orm.relationship(
-        'Favourites', uselist=False, back_populates='account')
+    favourite = orm.relationship(
+        'Favourite', uselist=False, back_populates='account')
 
     title = sql.Column('title', sql.String(64))
     image_id = sql.Column(sql.Integer)

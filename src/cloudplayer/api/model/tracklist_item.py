@@ -18,6 +18,10 @@ class TracklistItemMixin(object):
     account_id = sql.Column(sql.String(32), nullable=False)
 
     @declared_attr
+    def provider_id(cls):
+        return orm.synonym('track_provider_id')
+
+    @declared_attr
     def account(cls):
         return orm.relationship('Account')
 

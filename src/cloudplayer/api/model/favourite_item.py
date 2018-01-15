@@ -1,6 +1,6 @@
 """
-    cloudplayer.api.model.favourites_item
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    cloudplayer.api.model.favourite_item
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :copyright: (c) 2017 by the cloudplayer team
     :license: GPL-3.0, see LICENSE for details
@@ -12,7 +12,7 @@ from cloudplayer.api.model import Base
 from cloudplayer.api.model.tracklist_item import TracklistItemMixin
 
 
-class FavouritesItem(TracklistItemMixin, Base):
+class FavouriteItem(TracklistItemMixin, Base):
 
     __fields__ = [
         'id',
@@ -20,7 +20,7 @@ class FavouritesItem(TracklistItemMixin, Base):
         'track_id'
     ]
     __filters__ = [
-        'favourites_id'
+        'favourite_id'
     ]
     __mutable__ = []
     __public__ = __fields__
@@ -28,8 +28,8 @@ class FavouritesItem(TracklistItemMixin, Base):
         sql.PrimaryKeyConstraint(
             'id'),
         sql.ForeignKeyConstraint(
-            ['favourites_provider_id', 'favourites_id'],
-            ['favourites.provider_id', 'favourites.id']),
+            ['favourite_provider_id', 'favourite_id'],
+            ['favourite.provider_id', 'favourite.id']),
         sql.ForeignKeyConstraint(
             ['account_id', 'account_provider_id'],
             ['account.id', 'account.provider_id']),
@@ -38,6 +38,6 @@ class FavouritesItem(TracklistItemMixin, Base):
             ['provider.id'])
     )
 
-    favourites_provider_id = sql.Column(sql.String(16), nullable=False)
-    favourites_id = sql.Column(sql.String(96), nullable=False)
-    favourites = orm.relationship('Favourites', back_populates='items')
+    favourite_provider_id = sql.Column(sql.String(16), nullable=False)
+    favourite_id = sql.Column(sql.String(96), nullable=False)
+    favourite = orm.relationship('Favourite', back_populates='items')

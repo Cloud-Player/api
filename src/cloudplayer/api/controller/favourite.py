@@ -1,18 +1,18 @@
 """
-    cloudplayer.api.controller.favourites
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    cloudplayer.api.controller.favourite
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :copyright: (c) 2017 by the cloudplayer team
     :license: GPL-3.0, see LICENSE for details
 """
 from cloudplayer.api.model.account import Account
-from cloudplayer.api.model.favourites import Favourites
+from cloudplayer.api.model.favourite import Favourite
 import cloudplayer.api.controller
 
 
-class FavouritesController(cloudplayer.api.controller.Controller):
+class FavouriteController(cloudplayer.api.controller.Controller):
 
-    __model__ = Favourites
+    __model__ = Favourite
     __policies__ = []
 
     def read(self, ids):
@@ -20,5 +20,5 @@ class FavouritesController(cloudplayer.api.controller.Controller):
             provider_id = ids['provider_id']
             account_id = self.current_user[provider_id]
             account = self.db.query(Account).get((account_id, provider_id))
-            ids['id'] = account.favourites.id
+            ids['id'] = account.favourite.id
         return super().read(ids)

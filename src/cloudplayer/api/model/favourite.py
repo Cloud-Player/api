@@ -1,6 +1,6 @@
 """
-    cloudplayer.api.model.favourites
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    cloudplayer.api.model.favourite
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     :copyright: (c) 2017 by the cloudplayer team
     :license: GPL-3.0, see LICENSE for details
@@ -12,7 +12,7 @@ from cloudplayer.api.model import Base
 from cloudplayer.api.model.tracklist import TracklistMixin
 
 
-class Favourites(TracklistMixin, Base):
+class Favourite(TracklistMixin, Base):
 
     __fields__ = [
         'id',
@@ -31,6 +31,6 @@ class Favourites(TracklistMixin, Base):
     __public__ = __fields__
 
     account = orm.relationship(
-        'Account', back_populates='favourites', viewonly=True)
+        'Account', back_populates='favourite', viewonly=True)
 
-    items = orm.relationship('FavouritesItem')
+    items = orm.relationship('FavouriteItem')

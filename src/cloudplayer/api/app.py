@@ -82,19 +82,19 @@ class Application(tornado.web.Application):
         (r'^/playlist/(?P<provider_id>[a-z]+)$',
          'cloudplayer.api.http.playlist.Collection'),
 
-        ((r'^/favourites/(?P<favourites_provider_id>[a-z]+)'
-          r'/(?P<favourites_id>[0-9a-zA-Z]+)'
+        ((r'^/favourite/(?P<favourite_provider_id>[a-z]+)'
+          r'/(?P<favourite_id>[0-9a-zA-Z]+)'
           r'/item/(?P<id>[0-9]+)$'),
-         'cloudplayer.api.http.favourites_item.Entity'),
-        ((r'^/favourites/(?P<favourites_provider_id>[a-z]+)'
-          r'/(?P<favourites_id>[0-9a-zA-Z]+)'
+         'cloudplayer.api.http.favourite_item.Entity'),
+        ((r'^/favourite/(?P<favourite_provider_id>[a-z]+)'
+          r'/(?P<favourite_id>[0-9a-zA-Z]+)'
           r'/item$'),
-         'cloudplayer.api.http.favourites_item.Collection'),
+         'cloudplayer.api.http.favourite_item.Collection'),
 
-        (r'^/favourites/(?P<provider_id>[a-z]+)/(?P<id>[0-9a-zA-Z]+)$',
-         'cloudplayer.api.http.favourites.Entity'),
-        (r'^/favourites/(?P<provider_id>[a-z]+)$',
-         'cloudplayer.api.http.favourites.Collection'),
+        (r'^/favourite/(?P<provider_id>[a-z]+)/(?P<id>[0-9a-zA-Z]+)$',
+         'cloudplayer.api.http.favourite.Entity'),
+        (r'^/favourite/(?P<provider_id>[a-z]+)$',
+         'cloudplayer.api.http.favourite.Collection'),
 
         (r'^/provider$',
          'cloudplayer.api.http.provider.Collection'),
@@ -167,8 +167,8 @@ class Database(object):
         import cloudplayer.api.model.account as ac
         import cloudplayer.api.model.playlist as pl
         import cloudplayer.api.model.playlist_item as pi
-        import cloudplayer.api.model.favourites as fl
-        import cloudplayer.api.model.favourites_item as fi
+        import cloudplayer.api.model.favourite as fl
+        import cloudplayer.api.model.favourite_item as fi
         model.Base.metadata.create_all(self.engine, [
             pr.Provider.__table__,
             us.User.__table__,

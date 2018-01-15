@@ -45,6 +45,8 @@ def define_options():
     opt.define('menuflow_state', type=str, default='v3', group='app')
     opt.define('redis_host', type=str, default='localhost', group='app')
     opt.define('redis_port', type=int, default=6379, group='app')
+    opt.define('redis_db', type=int, default=0, group='app')
+    opt.define('redis_password', type=int, default=None, group='app')
     opt.define('postgres_host', type=str, default='localhost', group='app')
     opt.define('postgres_port', type=int, default=5432, group='app')
     opt.define('postgres_db', type=str, default='cloudplayer', group='app')
@@ -137,7 +139,9 @@ class Application(tornado.web.Application):
 
         self.redis_pool = redis.ConnectionPool(
             host=settings['redis_host'],
-            port=settings['redis_port'])
+            port=settings['redis_port'],
+            db=settings['redis_db'],
+            password=settings['redis_password'])
 
         self.database = Database(
             settings['postgres_user'],
@@ -162,23 +166,6 @@ class Database(object):
 
     def ensure_tables(self):
         import cloudplayer.api.model.base as model
-        """"import cloudplayer.api.model.provider as pr
-        import cloudplayer.api.model.user as us
-        import cloudplayer.api.model.image as im
-        import cloudplayer.api.model.account as ac
-        import cloudplayer.api.model.playlist as pl
-        import cloudplayer.api.model.playlist_item as pi
-        import cloudplayer.api.model.favourite as fl
-        import cloudplayer.api.model.favourite_item as fi
-        model.Base.metadata.create_all(self.engine, [
-            pr.Provider.__table__,
-            us.User.__table__,
-            ac.Account.__table__,
-            im.Image.__table__,
-            pl.Playlist.__table__,
-            pi.PlaylistItem.__table__
-        ])
-        """
         model.Base.metadata.create_all(self.engine)
 
     def populate_providers(self):

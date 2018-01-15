@@ -44,10 +44,12 @@ def app(postgresql_proc, redis_proc):
     opt.define('connect_timeout', default=3, group='httpclient')
     opt.define('request_timeout', default=3, group='httpclient')
     opt.define('max_redirects', default=1, group='httpclient')
-    opt.define('youtube_oauth', default={
-        'key': 'g-auth', 'secret': 'g-secret'}, group='app')
-    opt.define('soundcloud_oauth', default={
-        'key': 'sc-auth', 'secret': 'sc-secret'}, group='app')
+    opt.define('youtube', group='app', default={
+        'key': 'yt-key', 'secret': 'yt-secret', 'api_key': 'yt-api-key'})
+    opt.define('cloudplayer', group='app', default={
+        'key': 'cp-key', 'secret': 'cp-secret', 'api_key': 'cp-api-key'})
+    opt.define('soundcloud', group='app', default={
+        'key': 'sc-key', 'secret': 'sc-secret', 'api_key': 'sc-api-key'})
     opt.define('jwt_cookie', default='tok_v1', group='app')
     opt.define('jwt_expiration', default=1, group='app')
     opt.define('jwt_secret', default='secret', group='app')
@@ -58,6 +60,8 @@ def app(postgresql_proc, redis_proc):
     opt.define('menuflow_state', default='dev', group='app')
     opt.define('redis_host', default=redis_proc.host, group='app')
     opt.define('redis_port', default=redis_proc.port, group='app')
+    opt.define('redis_db', default=0, group='app')
+    opt.define('redis_password', default=None, group='app')
     opt.define('postgres_host', default=postgresql_proc.host, group='app')
     opt.define('postgres_port', default=postgresql_proc.port, group='app')
     opt.define('postgres_db', default='postgres', group='app')
@@ -94,15 +98,3 @@ def current_user(db):
     db.add(account)
     db.commit()
     return {'user_id': user.id, 'cloudplayer': account.id}
-
-
-@pytest.fixture(scope='function')
-def model_factory(app, db):
-    def factory(**kw):
-        import cloudplayer.api.model.base as model
-        name = 'm{}'.format(random.randint(0, 10000))
-        kw['__tablename__'] = name
-        model = type(name, (Base,), kw)
-        model.Base.metadata.create_all(
-            app.database.engine, [model.__table__])
-    return factory()

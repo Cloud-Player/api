@@ -10,7 +10,7 @@ import sqlalchemy.orm as orm
 import tornado.options as opt
 
 from cloudplayer.api.model import Base
-import cloudplayer.api.http.auth
+from cloudplayer.api.http.auth import Soundcloud, Youtube
 
 
 class Provider(Base):
@@ -33,11 +33,5 @@ class Provider(Base):
 
     @property
     def client_id(self):
-        if self.id == 'youtube':
-            auth_class = cloudplayer.api.handler.auth.Youtube
-        elif self.id == 'soundcloud':
-            auth_class = cloudplayer.api.handler.auth.Soundcloud
-        else:
-            return
-        settings_key = auth_class._OAUTH_SETTINGS_KEY
-        return opt.options[settings_key]['api_key']
+        if self.id in opt.options['providers']:
+            return opt.options[self.id]['api_key']

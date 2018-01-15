@@ -19,15 +19,23 @@ allowed_origins = [
 
 jwt_secret = 'secret'
 
-youtube_oauth = {
+youtube = {
     'key': 'key',
+    'api_key': 'api_key',
     'secret': 'secret',
     'redirect_uri': 'https://api.cloud-player.io/youtube'}
 
-soundcloud_oauth = {
+soundcloud = {
     'key': 'key',
+    'api_key': 'api_key',
     'secret': 'secret',
     'redirect_uri': 'https://api.cloud-player.io/soundcloud'}
+
+cloudplayer = {
+    'key': 'key',
+    'api_key': 'api_key',
+    'secret': 'secret',
+    'redirect_uri': 'https://api.cloud-player.io/cloudplayer'}
 
 try:
     from private import *

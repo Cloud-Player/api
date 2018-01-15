@@ -19,6 +19,7 @@ import tornado.options as opt
 import tornado.web
 
 from cloudplayer.api.model import Encoder
+from cloudplayer.api.controller.auth import create_controller
 from cloudplayer.api.model.account import Account
 from cloudplayer.api.model.user import User
 
@@ -62,58 +63,9 @@ class HandlerMixin(object):
         self.write({'status_code': status_code, 'reason': reason})
 
     @tornado.gen.coroutine
-    def fetch(self, provider_id, path, params=[], **kw):
-        import cloudplayer.api.http.auth
-        if provider_id == 'youtube':
-            auth_class = cloudplayer.api.http.auth.Youtube
-        elif provider_id == 'soundcloud':
-            auth_class = cloudplayer.api.http.auth.Soundcloud
-        else:
-            raise ValueError('unsupported provider')
-        url = '{}/{}'.format(auth_class.API_BASE_URL, path.lstrip('/'))
-        settings = self.settings[auth_class._OAUTH_SETTINGS_KEY]
-
-        account = self.db.query(Account).get((
-            self.current_user[provider_id], provider_id))
-
-        if account:
-            # TODO: Move refresh workflow to auth module
-            # TODO: Set quotaUser for Youtube
-            tzinfo = account.token_expiration.tzinfo
-            now = datetime.datetime.now(tzinfo)
-            threshold = datetime.timedelta(minutes=1000000000)
-            if account.token_expiration - now < threshold:
-                body = urllib.parse.urlencode({
-                    'client_id': settings['key'],
-                    'client_secret': settings['secret'],
-                    'refresh_token': account.refresh_token,
-                    'grant_type': 'refresh_token'
-                })
-                uri = auth_class._OAUTH_ACCESS_TOKEN_URL
-                response = yield self.http_client.fetch(
-                    uri, method='POST', body=body, raise_error=False)
-                access = tornado.escape.json_decode(response.body)
-                account.access_token = access.get('access_token')
-                if access.get('refresh_token'):
-                    account.refresh_token = access['refresh_token']
-                if access.get('expires_in'):
-                    expires_in = datetime.timedelta(
-                        seconds=access.get('expires_in'))
-                    account.token_expiration = (
-                        datetime.datetime.now(tzinfo) + expires_in)
-                self.db.commit()
-            params.append((auth_class.OAUTH_TOKEN_PARAM, account.access_token))
-
-        params.append((auth_class._OAUTH_CLIENT_KEY, settings['api_key']))
-
-        uri = tornado.httputil.url_concat(url, params)
-
-        headers = kw.get('headers', {})
-        headers['Referer'] = 'https://api.cloud-player.io'
-        kw['headers'] = headers
-
-        response = yield self.http_client.fetch(uri, **kw)
-        return response
+    def fetch(self, provider_id, path, **kw):
+        controller = create_controller(provider_id)
+        yield controller.fetch(uri, **kw)
 
 
 class ControllerHandlerMixin(object):

@@ -13,6 +13,7 @@ import tornado.httpclient
 import tornado.httputil
 import tornado.escape
 import tornado.gen
+import tornado.web
 
 from cloudplayer.api.model.image import Image
 from cloudplayer.api.model.account import Account
@@ -36,17 +37,11 @@ class AuthController(object):
         self.current_user = current_user
         self.http_client = tornado.httpclient.AsyncHTTPClient()
         self.settings = opt.options[self.PROVIDER_ID]
-
-    @property
-    def account(self):
-        if not getattr(self, '_account', None):
-            id = (self.current_user or {}).get(self.PROVIDER_ID)
-            self._account = self.db.query(Account).get((id, self.PROVIDER_ID))
-        return self._account
-
-    @account.setter
-    def account(self, value):
-        self._account = value
+        id = (self.current_user or {}).get(self.PROVIDER_ID)
+        if id:
+            self.account = self.db.query(Account).get((id, self.PROVIDER_ID))
+        else:
+            self.account = None
 
     @property
     def should_refresh(self):
@@ -78,6 +73,9 @@ class AuthController(object):
 
     @tornado.gen.coroutine
     def fetch(self, path, params=None, **kw):
+        if not self.account:
+            raise tornado.web.HTTPError('cannot proxy without account')
+
         if self.should_refresh:
             self.refresh()
 
@@ -113,6 +111,8 @@ class AuthController(object):
             cloudplayer.image = self.account.image
 
     def update_account(self, user_info):
+        self.account = self.db.query(
+            Account).get((str(user_info['id']), self.PROVIDER_ID))
         if not self.account:
             self._create_account(user_info)
         self._update_account_profile(user_info)
@@ -136,7 +136,6 @@ class SoundcloudController(AuthController):
         self.account.title = user_info.get('username')
 
 
-
 class YoutubeController(AuthController):
 
     PROVIDER_ID = 'youtube'
@@ -155,7 +154,8 @@ class YoutubeController(AuthController):
             headers = dict()
         headers['Referer'] = 'https://api.cloud-player.io'
 
-        yield super().fetch(path, params, headers=headers, **kw)
+        response = yield super().fetch(path, params, headers=headers, **kw)
+        return response
 
     def _update_account_profile(self, user_info):
         snippet = user_info.get('snippet', {})

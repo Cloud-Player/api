@@ -13,6 +13,8 @@ from cloudplayer.api.http import HTTPHandler
 
 class Proxy(HTTPHandler):
 
+    SUPPORTED_METHODS = ('GET', 'POST', 'PUT', 'DELETE', 'OPTIONS')
+
     @tornado.gen.coroutine
     def proxy(self, method, provider, path, **kw):
         response = yield self.fetch(

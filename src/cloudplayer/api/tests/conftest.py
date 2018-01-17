@@ -50,6 +50,7 @@ def app(postgresql_proc, redis_proc):
         'key': 'cp-key', 'secret': 'cp-secret', 'api_key': 'cp-api-key'})
     opt.define('soundcloud', group='app', default={
         'key': 'sc-key', 'secret': 'sc-secret', 'api_key': 'sc-api-key'})
+    opt.define('bugsnag', group='app', default={})
     opt.define('jwt_cookie', default='tok_v1', group='app')
     opt.define('jwt_expiration', default=1, group='app')
     opt.define('jwt_secret', default='secret', group='app')

@@ -37,6 +37,11 @@ cloudplayer = {
     'secret': 'secret',
     'redirect_uri': 'https://api.cloud-player.io/cloudplayer'}
 
+bugsnag = {
+    'api_key': 'api_key',
+    'project_root': '/usr/local/cloudplayer'
+}
+
 try:
     from private import *
 except ImportError:

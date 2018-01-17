@@ -10,6 +10,7 @@ import sys
 
 from tornado.log import app_log
 from tornado.routing import RuleRouter, Rule
+import bugsnag
 import redis
 import sqlalchemy as sql
 import sqlalchemy.orm as orm
@@ -38,6 +39,7 @@ def define_options():
     opt.define('jwt_secret', type=str, group='app')
     opt.define('youtube', type=dict, group='app')
     opt.define('soundcloud', type=dict, group='app')
+    opt.define('bugsnag', type=dict, group='app')
     opt.define('cloudplayer', type=dict, group='app')
     opt.define('providers', type=list, group='app')
     opt.define('allowed_origins', type=list, group='app')
@@ -133,6 +135,11 @@ class Application(tornado.web.Application):
             (ProtocolMatches('^ws[s]?$'), list(self.ws_routes))
         ]
         super(Application, self).__init__(routes, **settings)
+
+        if settings.get('bugsnag'):
+            bugsnag.configure(
+                api_key=settings['bugsnag']['api_key'],
+                project_root=settings['bugsnag']['project_root'])
 
         self.executor = tornado.concurrent.futures.ThreadPoolExecutor(
             settings['num_executors'])

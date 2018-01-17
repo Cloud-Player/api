@@ -20,6 +20,7 @@ setup(
         'pycurl',
         'PyJWT',
         'redis',
+        'bugsnag',
         'setuptools',
         'sqlalchemy',
         'tornado'

@@ -12,7 +12,8 @@ class Owned(Mixin):
 
     def create(self, entity):
         if not entity.account_provider_id:
-            provider_id = entity.__table__.c.account_provider_id.default.arg
+            default = entity.__table__.c.account_provider_id.default
+            provider_id = getattr(default, 'arg', 'cloudplayer')
             entity.account_provider_id = provider_id
         if not self.current_user.get(entity.account_provider_id):
             raise PolicyViolation('entity creation denied')

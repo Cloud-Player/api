@@ -74,7 +74,7 @@ class AuthController(object):
     @tornado.gen.coroutine
     def fetch(self, path, params=None, **kw):
         if not self.account:
-            raise tornado.web.HTTPError('cannot proxy without account')
+            raise tornado.web.HTTPError(400, 'cannot proxy without account')
 
         if self.should_refresh:
             self.refresh()

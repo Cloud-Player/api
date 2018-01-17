@@ -1,9 +1,10 @@
+import datetime
 import json
 
 from http.cookies import SimpleCookie
-import datetime
 import jwt
 import pytest
+import tornado.escape
 
 from cloudplayer.api.model.token import Token
 from cloudplayer.api.model import Encoder
@@ -12,7 +13,7 @@ from cloudplayer.api.model import Encoder
 @pytest.mark.gen_test
 def test_token_collection_should_create_new_token_anonymously(db, user_fetch):
     response = yield user_fetch('/token', method='POST', body='')
-    token = json.loads(response.body)
+    token = tornado.escape.json_decode(response.body)
     assert len(token['id']) == 6
     assert token['claimed'] is False
     entity = db.query(Token).get(token['id'])
@@ -48,9 +49,9 @@ def test_token_entity_should_find_unclaimed_entites(
 
     response = yield http_client.fetch(
         '{}/token/{}'.format(base_url, entity.id))
-    token = json.loads(response.body)
+    token = tornado.escape.json_decode(response.body)
     assert token['claimed'] is False
-    assert json.loads(response.body) == json.loads(
+    assert tornado.escape.json_decode(response.body) == json.loads(
         json.dumps(entity, cls=Encoder))
 
 
@@ -66,9 +67,9 @@ def test_token_entity_should_set_cookie_for_claimed_entites(
 
     response = yield http_client.fetch(
         '{}/token/{}'.format(base_url, entity.id))
-    token = json.loads(response.body)
+    token = tornado.escape.json_decode(response.body)
     assert token['claimed'] is True
-    assert json.loads(response.body) == json.loads(
+    assert tornado.escape.json_decode(response.body) == json.loads(
         json.dumps(entity, cls=Encoder))
     cookie = SimpleCookie()
     cookie.load(response.headers['Set-Cookie'])

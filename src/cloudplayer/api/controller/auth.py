@@ -15,8 +15,8 @@ import tornado.escape
 import tornado.gen
 import tornado.web
 
-from cloudplayer.api.model.image import Image
 from cloudplayer.api.model.account import Account
+from cloudplayer.api.model.image import Image
 
 
 def create_controller(provider_id, db, current_user=None):
@@ -30,14 +30,12 @@ def create_controller(provider_id, db, current_user=None):
 
 class AuthController(object):
 
-    REFRESH_THRESHOLD = 60
-
     def __init__(self, db, current_user=None):
         self.db = db
         self.current_user = current_user
         self.http_client = tornado.httpclient.AsyncHTTPClient()
         self.settings = opt.options[self.PROVIDER_ID]
-        id = (self.current_user or {}).get(self.PROVIDER_ID)
+        id = (current_user or {}).get(self.PROVIDER_ID)
         if id:
             self.account = self.db.query(Account).get((id, self.PROVIDER_ID))
         else:
@@ -47,8 +45,7 @@ class AuthController(object):
     def should_refresh(self):
         tzinfo = self.account.token_expiration.tzinfo
         now = datetime.datetime.now(tzinfo)
-        threshold = datetime.timedelta(seconds=self.REFRESH_THRESHOLD)
-        return self.account.token_expiration - now < threshold
+        return self.account.token_expiration - now < datetime.timedelta(0)
 
     def refresh(self):
         body = urllib.parse.urlencode({
@@ -73,19 +70,19 @@ class AuthController(object):
 
     @tornado.gen.coroutine
     def fetch(self, path, params=None, **kw):
-        if not self.account:
-            raise tornado.web.HTTPError(400, 'cannot proxy without account')
-
-        if self.should_refresh:
-            self.refresh()
-
         if not params:
             params = list()
 
-        params.append((self.OAUTH_TOKEN_PARAM,
-                       self.account.access_token))
-        params.append((self.OAUTH_CLIENT_KEY,
-                       self.account.provider.client_id))
+        if self.account:
+            if self.should_refresh:
+                self.refresh()
+            params.append((self.OAUTH_TOKEN_PARAM, self.account.access_token))
+            provider = account.provider
+        else:
+            from cloudplayer.api.model.provider import Provider
+            provider = self.db.query(Provider).get(self.PROVIDER_ID)
+
+        params.append((self.OAUTH_CLIENT_KEY, provider.client_id))
 
         url = '{}/{}'.format(self.API_BASE_URL, path.lstrip('/'))
         uri = tornado.httputil.url_concat(url, params)

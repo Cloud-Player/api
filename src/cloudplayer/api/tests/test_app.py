@@ -1,9 +1,10 @@
 import pytest
-
+import mock
 import tornado.httpclient
 
 import cloudplayer.api.http.base
 import cloudplayer.api.ws.base
+import cloudplayer.api.app
 
 
 @pytest.mark.gen_test
@@ -38,3 +39,8 @@ def test_application_should_open_configured_redis_pool(app):
 def test_application_should_connect_to_configured_database(app):
     assert str(app.database.engine.url) == (
         'postgresql://postgres:@127.0.0.1:8852/postgres')
+
+
+def test_database_should_create_sessions_bound_to_engine(app):
+    session = app.database.create_session()
+    assert session.get_bind() is app.database.engine

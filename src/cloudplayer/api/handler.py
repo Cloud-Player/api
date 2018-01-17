@@ -21,6 +21,7 @@ import tornado.web
 from cloudplayer.api.model import Encoder
 from cloudplayer.api.controller.auth import create_controller
 from cloudplayer.api.model.account import Account
+from cloudplayer.api.policy import PolicyViolation
 from cloudplayer.api.model.user import User
 
 
@@ -87,19 +88,31 @@ class EntityMixin(ControllerHandlerMixin):
 
     @tornado.gen.coroutine
     def get(self, **ids):
-        entity = self.controller.read(ids)
-        yield self.write(entity)
+        try:
+            entity = self.controller.read(ids)
+        except PolicyViolation as violation:
+            self.write_error(403, reason=violation.message)
+        else:
+            yield self.write(entity)
 
     @tornado.gen.coroutine
     def patch(self, **ids):
-        entity = self.controller.update(ids, **self.body)
-        yield self.write(entity)
+        try:
+            entity = self.controller.update(ids, **self.body)
+        except PolicyViolation as violation:
+            self.write_error(403, reason=violation.message)
+        else:
+            yield self.write(entity)
 
     @tornado.gen.coroutine
     def delete(self, **ids):
-        entity = self.controller.delete(ids)
-        self.set_status(204)
-        self.finish()
+        try:
+            entity = self.controller.delete(ids)
+        except PolicyViolation as violation:
+            self.write_error(403, reason=violation.message)
+        else:
+            self.set_status(204)
+            self.finish()
 
 
 class CollectionMixin(ControllerHandlerMixin):
@@ -109,10 +122,18 @@ class CollectionMixin(ControllerHandlerMixin):
     @tornado.gen.coroutine
     def get(self, **ids):
         query = dict(self.query_params)
-        entities = self.controller.search(ids, **query)
-        yield self.write(entities)
+        try:
+            entities = self.controller.search(ids, **query)
+        except PolicyViolation as violation:
+            self.write_error(403, reason=violation.message)
+        else:
+            yield self.write(entities)
 
     @tornado.gen.coroutine
     def post(self, **ids):
-        entity = self.controller.create(ids, **self.body)
-        yield self.write(entity)
+        try:
+            entity = self.controller.create(ids, **self.body)
+        except PolicyViolation as violation:
+            self.write_error(403, reason=violation.message)
+        else:
+            yield self.write(entity)

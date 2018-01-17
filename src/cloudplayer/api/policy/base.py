@@ -48,8 +48,8 @@ class Policy(object):
         query = self.query(model, **ids)
         return query.one_or_none()
 
-    def update(self, entity, **kw):
-        entity.update(**kw)
+    def update(self, model, entity, **kw):
+        self.db.query(model).filter_by(id=entity.id).update(kw)
 
     def delete(self, entity):
         self.db.delete(entity)

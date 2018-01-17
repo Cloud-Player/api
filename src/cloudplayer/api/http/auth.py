@@ -126,7 +126,7 @@ class AuthHandler(
         account.access_token = access['access_token']
         if access.get('refresh_token'):
             account.refresh_token = access['refresh_token']
-            account.token_expiration = datetime.datetime.now() + (
+            account.token_expiration = datetime.datetime.utcnow() + (
                 datetime.timedelta(seconds=access.get('expires_in')))
         self.db.commit()
 

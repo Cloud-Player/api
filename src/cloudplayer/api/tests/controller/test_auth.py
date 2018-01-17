@@ -38,10 +38,10 @@ def test_auth_controller_should_provide_instance_args(db, current_user):
 def test_auth_controller_should_check_token_expiration_before_refresh(
         db, current_user):
     controller = CloudplayerController(db, current_user)
-    a_second_ago = datetime.datetime.now() - datetime.timedelta(seconds=1)
+    a_second_ago = datetime.datetime.utcnow() - datetime.timedelta(seconds=1)
     controller.account.token_expiration = a_second_ago
     assert controller.should_refresh is True
-    in_an_hour = datetime.datetime.now() + datetime.timedelta(hours=1)
+    in_an_hour = datetime.datetime.utcnow() + datetime.timedelta(hours=1)
     controller.account.token_expiration = in_an_hour
     assert controller.should_refresh is False
     db.rollback()

@@ -2,6 +2,7 @@ import os
 import sys
 import random
 
+import jwt
 import sqlalchemy as sql
 import pytest_redis.factories as redis_factories
 import pytest
@@ -98,4 +99,35 @@ def current_user(db):
         user_id=user.id)
     db.add(account)
     db.commit()
-    return {'user_id': user.id, 'cloudplayer': account.id}
+    return {
+        'user_id': user.id,
+        'cloudplayer': account.id,
+        'youtube': None,
+        'soundcloud': None}
+
+
+@pytest.fixture(scope='function')
+def user_cookie(current_user):
+    user_jwt = jwt.encode(
+        current_user,
+        opt.options['jwt_secret'],
+        algorithm='HS256').decode('ascii')
+    return '{}={};'.format(opt.options['jwt_cookie'], user_jwt)
+
+
+@pytest.fixture(scope='function')
+def user_fetch(user_cookie, http_client, base_url):
+    def fetch(req, **kw):
+        if isinstance(req, str):
+            if not req.startswith(base_url):
+                req = '{}/{}'.format(base_url, req.lstrip('/'))
+        else:
+            if not req.url.startswith(base_url):
+                req.url = '{}/{}'.format(base_url, req.url.lstrip('/'))
+        headers = kw.get('headers', {})
+        cookies = headers.get('Cookie', '')
+        cookies = '{};{}'.format(cookies.rstrip(';'), user_cookie)
+        headers['Cookie'] = cookies
+        kw['headers'] = headers
+        return http_client.fetch(req, **kw)
+    return fetch

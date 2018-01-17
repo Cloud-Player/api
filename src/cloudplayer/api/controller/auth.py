@@ -43,8 +43,7 @@ class AuthController(object):
 
     @property
     def should_refresh(self):
-        tzinfo = self.account.token_expiration.tzinfo
-        now = datetime.datetime.now(tzinfo)
+        now = datetime.datetime.utcnow()
         return self.account.token_expiration - now < datetime.timedelta(0)
 
     def refresh(self):
@@ -65,7 +64,7 @@ class AuthController(object):
             expires_in = datetime.timedelta(
                 seconds=access.get('expires_in'))
             self.account.token_expiration = (
-                datetime.datetime.now(tzinfo) + expires_in)
+                datetime.datetime.utcnow() + expires_in)
         self.db.commit()
 
     @tornado.gen.coroutine
@@ -77,7 +76,7 @@ class AuthController(object):
             if self.should_refresh:
                 self.refresh()
             params.append((self.OAUTH_TOKEN_PARAM, self.account.access_token))
-            provider = account.provider
+            provider = self.account.provider
         else:
             from cloudplayer.api.model.provider import Provider
             provider = self.db.query(Provider).get(self.PROVIDER_ID)

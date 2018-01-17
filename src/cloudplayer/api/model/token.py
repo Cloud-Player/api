@@ -7,6 +7,7 @@
 """
 import functools
 
+from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.sql import func
 import sqlalchemy as sql
 import sqlalchemy.orm as orm
@@ -38,5 +39,9 @@ class Token(Base):
 
     claimed = sql.Column(sql.Boolean, default=False)
 
-    account_provider_id = sql.Column(sql.String(16), default='cloudplayer')
-    account_id = sql.Column(sql.String(32), nullable=False)
+    account_provider_id = sql.Column(sql.String(16))
+    account_id = sql.Column(sql.String(32))
+
+    @declared_attr
+    def account(cls):
+        return orm.relationship('Account')

@@ -10,10 +10,21 @@ import json
 import datetime
 import pkg_resources
 
-from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.sql import func
+from sqlalchemy.ext.compiler import compiles
+from sqlalchemy.ext.declarative import declared_attr, declarative_base
+from sqlalchemy.sql import func, expression
+from sqlalchemy.types import DateTime
 import sqlalchemy as sql
 import sqlalchemy.ext.declarative
+
+
+class utcnow(expression.FunctionElement):
+    type = DateTime()
+
+
+@compiles(utcnow, 'postgresql')
+def pg_utcnow(element, compiler, **kw):
+    return "TIMEZONE('utc', CURRENT_TIMESTAMP)"
 
 
 class Model(object):
@@ -28,16 +39,15 @@ class Model(object):
         return cls.__name__.lower()
 
     created = sql.Column(
-        sql.DateTime(timezone=True), server_default=func.now())
+        sql.DateTime, server_default=utcnow())
     updated = sql.Column(
-        sql.DateTime(timezone=True), server_default=func.now(),
-        onupdate=func.now())
+        sql.DateTime, server_default=utcnow(), onupdate=utcnow())
 
     account_id = None
     provider_id = None
 
 
-Base = sqlalchemy.ext.declarative.declarative_base(cls=Model)
+Base = declarative_base(cls=Model)
 
 
 class Encoder(json.JSONEncoder):

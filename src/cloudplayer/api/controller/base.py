@@ -43,7 +43,7 @@ class Controller(object):
     def update(self, ids, **kw):
         kw = self._merge_ids_into_kw(ids, **kw)
         entity = self.read(ids)
-        self.policy.update(entity, **kw)
+        self.policy.update(self.__model__, entity, **kw)
         self.db.commit()
         return entity
 

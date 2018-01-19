@@ -41,7 +41,7 @@ class HTTPHandler(HandlerMixin, tornado.web.RequestHandler):
                 self.get_cookie(self.settings['jwt_cookie'], ''),
                 self.settings['jwt_secret'],
                 algorithms=['HS256'])
-            return user, user
+            return user, user.copy()
         except jwt.exceptions.InvalidTokenError:
             new_user = User()
             self.db.add(new_user)

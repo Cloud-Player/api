@@ -21,9 +21,9 @@ from cloudplayer.api.model.image import Image
 
 def create_controller(provider_id, db, current_user=None):
     if provider_id == 'soundcloud':
-        return SoundcloudController(db, current_user)
+        return SoundcloudAuthController(db, current_user)
     elif provider_id == 'youtube':
-        return YoutubeController(db, current_user)
+        return YoutubeAuthController(db, current_user)
     else:
         raise ValueError('unsupported provider')
 
@@ -116,7 +116,7 @@ class AuthController(object):
         self.db.commit()
 
 
-class SoundcloudController(AuthController):
+class SoundcloudAuthController(AuthController):
 
     PROVIDER_ID = 'soundcloud'
     API_BASE_URL = 'https://api.soundcloud.com'
@@ -132,7 +132,7 @@ class SoundcloudController(AuthController):
         self.account.title = user_info.get('username')
 
 
-class YoutubeController(AuthController):
+class YoutubeAuthController(AuthController):
 
     PROVIDER_ID = 'youtube'
     API_BASE_URL = 'https://www.googleapis.com/youtube/v3'

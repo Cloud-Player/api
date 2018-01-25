@@ -18,8 +18,8 @@ import tornado.escape
 from cloudplayer.api.model.account import Account
 from cloudplayer.api.http import HTTPHandler
 from cloudplayer.api.handler import ControllerHandlerMixin
-from cloudplayer.api.controller.auth import SoundcloudController
-from cloudplayer.api.controller.auth import YoutubeController
+from cloudplayer.api.controller.auth import SoundcloudAuthController
+from cloudplayer.api.controller.auth import YoutubeAuthController
 
 
 class AuthHandler(
@@ -133,7 +133,7 @@ class AuthHandler(
 
 class Soundcloud(AuthHandler):
 
-    __controller__ = SoundcloudController
+    __controller__ = SoundcloudAuthController
 
     PROVIDER_ID = 'soundcloud'
     _OAUTH_AUTHORIZE_URL = 'https://soundcloud.com/connect'
@@ -148,7 +148,7 @@ class Soundcloud(AuthHandler):
 
 class Youtube(AuthHandler):
 
-    __controller__ = YoutubeController
+    __controller__ = YoutubeAuthController
 
     PROVIDER_ID = 'youtube'
     _OAUTH_AUTHORIZE_URL = 'https://accounts.google.com/o/oauth2/auth'

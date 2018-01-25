@@ -6,12 +6,12 @@ import pytest
 from cloudplayer.api.model.account import Account
 from cloudplayer.api.controller.auth import (
     create_controller, AuthController,
-    SoundcloudController, YoutubeController)
+    SoundcloudAuthController, YoutubeAuthController)
 
 
 @pytest.mark.parametrize('id_, class_', [
-    ('soundcloud', SoundcloudController),
-    ('youtube', YoutubeController)])
+    ('soundcloud', SoundcloudAuthController),
+    ('youtube', YoutubeAuthController)])
 def test_create_controller_should_return_correct_controller(id_, class_):
     controller = create_controller(id_, mock.Mock())
     assert isinstance(controller, class_)

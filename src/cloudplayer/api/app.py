@@ -101,6 +101,11 @@ class Application(tornado.web.Application):
         (r'^/favourite/(?P<provider_id>[a-z]+)$',
          'cloudplayer.api.http.favourite.Collection'),
 
+        (r'^/track/(?P<provider_id>soundcloud)/(?P<id>[0-9a-zA-Z]+)$',
+         'cloudplayer.api.http.track.Soundcloud'),
+        (r'^/track/(?P<provider_id>youtube)/(?P<id>[0-9a-zA-Z-_]+)$',
+         'cloudplayer.api.http.track.Youtube'),
+
         (r'^/provider$',
          'cloudplayer.api.http.provider.Collection'),
         (r'^/provider/(?P<id>[a-z]+)$',

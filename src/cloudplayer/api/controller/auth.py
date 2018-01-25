@@ -71,6 +71,8 @@ class AuthController(object):
     def fetch(self, path, params=None, **kw):
         if not params:
             params = list()
+        elif isinstance(params, dict):
+            params = list(params.items())
 
         if self.account:
             if self.should_refresh:
@@ -143,6 +145,9 @@ class YoutubeAuthController(AuthController):
     def fetch(self, path, params=None, headers=None, **kw):
         if not params:
             params = list()
+        elif isinstance(params, dict):
+            params = list(params.items())
+
         params.append(('prettyPrint', 'false'))
         params.append(('quotaUser', self.current_user[self.PROVIDER_ID]))
 

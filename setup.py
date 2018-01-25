@@ -21,6 +21,7 @@ setup(
         'PyJWT',
         'redis',
         'bugsnag',
+        'isodate',
         'setuptools',
         'sqlalchemy',
         'tornado'

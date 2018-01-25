@@ -58,7 +58,7 @@ class Encoder(json.JSONEncoder):
         except:
             if isinstance(obj, Base):
                 dict_ = {c: getattr(obj, c) for c in obj.__fields__}
-                if 'id' in dict_:  # TODO: There must be a better solution
+                if dict_.get('id'):  # TODO: There must be a better solution
                     dict_['id'] = str(dict_['id'])
                 return dict_
             elif isinstance(obj, datetime.datetime):

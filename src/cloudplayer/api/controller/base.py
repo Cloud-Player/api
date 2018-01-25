@@ -6,7 +6,9 @@
     :license: GPL-3.0, see LICENSE for details
 """
 from sqlalchemy.inspection import inspect
+import tornado.gen
 
+from cloudplayer.api.controller.auth import create_controller
 import cloudplayer.api.policy
 
 
@@ -29,6 +31,14 @@ class Controller(object):
             kw[field] = value
         return kw
 
+    @tornado.gen.coroutine
+    def fetch(self, provider_id, path, **kw):
+        controller = create_controller(
+            provider_id, self.db, self.current_user)
+        response = yield controller.fetch(path, **kw)
+        return response
+
+    @tornado.gen.coroutine
     def create(self, ids, **kw):
         kw = self._merge_ids_into_kw(ids, **kw)
         entity = self.__model__(**kw)
@@ -36,28 +46,36 @@ class Controller(object):
         self.db.commit()
         return entity
 
+    @tornado.gen.coroutine
     def read(self, ids):
         entity = self.policy.read(self.__model__, ids)
         return entity
 
+    @tornado.gen.coroutine
     def update(self, ids, **kw):
         kw = self._merge_ids_into_kw(ids, **kw)
-        entity = self.read(ids)
+        entity = yield self.read(ids)
         self.policy.update(self.__model__, entity, **kw)
         self.db.commit()
         return entity
 
+    @tornado.gen.coroutine
     def delete(self, ids):
-        entity = self.read(ids)
+        entity = yield self.read(ids)
         self.policy.delete(entity)
         self.db.commit()
 
+    @tornado.gen.coroutine
     def query(self, ids, **kw):
         kw = self._merge_ids_into_kw(ids, **kw)
         return self.policy.query(self.__model__, **kw)
 
+    @tornado.gen.coroutine
     def search(self, ids, **kw):
-        return self.query(ids, **kw).all()
+        collection = yield self.query(ids, **kw).all()
+        return collection
 
+    @tornado.gen.coroutine
     def count(self, ids, **kw):
-        return self.query(ids, **kw).count()
+        collection = yield self.query(ids, **kw).count()
+        return collection

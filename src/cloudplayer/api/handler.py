@@ -89,7 +89,7 @@ class EntityMixin(ControllerHandlerMixin):
     @tornado.gen.coroutine
     def get(self, **ids):
         try:
-            entity = self.controller.read(ids)
+            entity = yield self.controller.read(ids)
         except PolicyViolation as violation:
             self.write_error(403, reason=violation.message)
         else:
@@ -98,7 +98,7 @@ class EntityMixin(ControllerHandlerMixin):
     @tornado.gen.coroutine
     def patch(self, **ids):
         try:
-            entity = self.controller.update(ids, **self.body)
+            entity = yield self.controller.update(ids, **self.body)
         except PolicyViolation as violation:
             self.write_error(403, reason=violation.message)
         else:
@@ -107,7 +107,7 @@ class EntityMixin(ControllerHandlerMixin):
     @tornado.gen.coroutine
     def delete(self, **ids):
         try:
-            entity = self.controller.delete(ids)
+            entity = yield self.controller.delete(ids)
         except PolicyViolation as violation:
             self.write_error(403, reason=violation.message)
         else:
@@ -123,7 +123,7 @@ class CollectionMixin(ControllerHandlerMixin):
     def get(self, **ids):
         query = dict(self.query_params)
         try:
-            entities = self.controller.search(ids, **query)
+            entities = yield self.controller.search(ids, **query)
         except PolicyViolation as violation:
             self.write_error(403, reason=violation.message)
         else:
@@ -132,7 +132,7 @@ class CollectionMixin(ControllerHandlerMixin):
     @tornado.gen.coroutine
     def post(self, **ids):
         try:
-            entity = self.controller.create(ids, **self.body)
+            entity = yield self.controller.create(ids, **self.body)
         except PolicyViolation as violation:
             self.write_error(403, reason=violation.message)
         else:

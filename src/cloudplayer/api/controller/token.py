@@ -7,6 +7,7 @@
 """
 import datetime
 
+import tornado.gen
 import tornado.options as opt
 
 from cloudplayer.api.model.token import Token
@@ -19,11 +20,14 @@ class TokenController(cloudplayer.api.controller.Controller):
     __model__ = Token
     __policies__ = [Open]
 
+    @tornado.gen.coroutine
     def create(self, ids, **kw):
-        return super().create({})
+        entity = yield super().create({})
+        return entity
 
+    @tornado.gen.coroutine
     def read(self, ids):
-        query = self.query(ids)
+        query = yield self.query(ids)
         entity = query.one_or_none()
         if entity and entity.claimed:
             self.current_user['user_id'] = entity.account.user_id
@@ -36,13 +40,16 @@ class TokenController(cloudplayer.api.controller.Controller):
             self.db.commit()
         return entity
 
+    @tornado.gen.coroutine
     def update(self, ids, **kw):
-        return super().update(
+        entity = yield super().update(
             ids, claimed=True,
             account_id=self.current_user['cloudplayer'],
             account_provider_id='cloudplayer')
+        return entity
 
+    @tornado.gen.coroutine
     def query(self, ids, **kw):
-        query = super().query(ids, **kw)
+        query = yield super().query(ids, **kw)
         threshold = datetime.datetime.utcnow() - datetime.timedelta(minutes=5)
         return query.filter(Token.created > threshold)

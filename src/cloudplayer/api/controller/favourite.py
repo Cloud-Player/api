@@ -5,6 +5,8 @@
     :copyright: (c) 2017 by the cloudplayer team
     :license: GPL-3.0, see LICENSE for details
 """
+import tornado.gen
+
 from cloudplayer.api.model.account import Account
 from cloudplayer.api.model.favourite import Favourite
 from cloudplayer.api.policy import Owned

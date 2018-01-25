@@ -6,6 +6,7 @@
     :license: GPL-3.0, see LICENSE for details
 """
 from  sqlalchemy.sql.expression import func
+import tornado.gen
 
 from cloudplayer.api.model.playlist import Playlist
 from cloudplayer.api.policy import Owned
@@ -17,6 +18,7 @@ class PlaylistController(cloudplayer.api.controller.Controller):
     __model__ = Playlist
     __policies__ = [Owned]
 
+    @tornado.gen.coroutine
     def read(self, ids):
         if ids['id'] == 'random':
             random = self.db.query(

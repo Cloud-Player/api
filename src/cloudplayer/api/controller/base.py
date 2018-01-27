@@ -72,10 +72,10 @@ class Controller(object):
 
     @tornado.gen.coroutine
     def search(self, ids, **kw):
-        collection = yield self.query(ids, **kw).all()
-        return collection
+        query = yield self.query(ids, **kw)
+        return query.all()
 
     @tornado.gen.coroutine
     def count(self, ids, **kw):
-        collection = yield self.query(ids, **kw).count()
-        return collection
+        query = yield self.query(ids, **kw)
+        return query.count()

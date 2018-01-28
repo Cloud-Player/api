@@ -17,6 +17,7 @@ class Account(Base):
         'id',
         'provider_id',
         'user_id',
+        'connected',
         'created',
         'updated',
         'favourite',
@@ -72,3 +73,10 @@ class Account(Base):
     access_token = sql.Column(sql.String(256))
     refresh_token = sql.Column(sql.String(256))
     token_expiration = sql.Column(sql.DateTime())
+
+    @property
+    def connected(self):
+        return all([
+            self.access_token,
+            self.refresh_token,
+            self.token_expiration])

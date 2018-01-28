@@ -46,6 +46,7 @@ class AuthController(object):
         now = datetime.datetime.utcnow()
         return self.account.token_expiration - now < datetime.timedelta(0)
 
+    @tornado.gen.coroutine
     def refresh(self):
         body = urllib.parse.urlencode({
             'client_id': self.settings['key'],
@@ -55,16 +56,23 @@ class AuthController(object):
         })
         uri = self.OAUTH_ACCESS_TOKEN_URL
         response = yield self.http_client.fetch(
-            uri, method='POST', body=body)
-        access = tornado.escape.json_decode(response.body)
-        self.account.access_token = access.get('access_token')
-        if access.get('refresh_token'):
-            self.account.refresh_token = access['refresh_token']
-        if access.get('expires_in'):
-            expires_in = datetime.timedelta(
-                seconds=access.get('expires_in'))
-            self.account.token_expiration = (
-                datetime.datetime.utcnow() + expires_in)
+            uri, method='POST', body=body, raise_error=False)
+
+        if response.error:
+            self.account.access_token = None
+            self.account.refresh_token = None
+            self.account.token_expiration = None
+        else:
+            access = tornado.escape.json_decode(response.body)
+            self.account.access_token = access.get('access_token')
+            if access.get('refresh_token'):
+                self.account.refresh_token = access['refresh_token']
+            if access.get('expires_in'):
+                expires_in = datetime.timedelta(
+                    seconds=access.get('expires_in'))
+                self.account.token_expiration = (
+                    datetime.datetime.utcnow() + expires_in)
+
         self.db.add(self.account)
         self.db.commit()
 
@@ -77,8 +85,11 @@ class AuthController(object):
 
         if self.account:
             if self.should_refresh:
-                self.refresh()
-            params.append((self.OAUTH_TOKEN_PARAM, self.account.access_token))
+                yield self.refresh()
+
+            if self.account.access_token:
+                params.append(
+                    (self.OAUTH_TOKEN_PARAM, self.account.access_token))
             provider = self.account.provider
         else:
             from cloudplayer.api.model.provider import Provider

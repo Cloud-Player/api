@@ -65,6 +65,7 @@ class AuthController(object):
                 seconds=access.get('expires_in'))
             self.account.token_expiration = (
                 datetime.datetime.utcnow() + expires_in)
+        self.db.add(self.account)
         self.db.commit()
 
     @tornado.gen.coroutine

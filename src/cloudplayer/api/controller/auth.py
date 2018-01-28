@@ -53,7 +53,7 @@ class AuthController(object):
             'refresh_token': self.account.refresh_token,
             'grant_type': 'refresh_token'
         })
-        uri = auth_class._OAUTH_ACCESS_TOKEN_URL
+        uri = self.OAUTH_ACCESS_TOKEN_URL
         response = yield self.http_client.fetch(
             uri, method='POST', body=body)
         access = tornado.escape.json_decode(response.body)
@@ -122,6 +122,7 @@ class SoundcloudAuthController(AuthController):
 
     PROVIDER_ID = 'soundcloud'
     API_BASE_URL = 'https://api.soundcloud.com'
+    OAUTH_ACCESS_TOKEN_URL = 'https://api.soundcloud.com/oauth2/token'
     OAUTH_TOKEN_PARAM = 'oauth_token'
     OAUTH_CLIENT_KEY = 'client_id'
 
@@ -133,11 +134,11 @@ class SoundcloudAuthController(AuthController):
             large=image_url.replace('large', 't500x500'))
         self.account.title = user_info.get('username')
 
-
 class YoutubeAuthController(AuthController):
 
     PROVIDER_ID = 'youtube'
     API_BASE_URL = 'https://www.googleapis.com/youtube/v3'
+    OAUTH_ACCESS_TOKEN_URL = 'https://www.googleapis.com/oauth2/v4/token'
     OAUTH_TOKEN_PARAM = 'access_token'
     OAUTH_CLIENT_KEY = 'key'
 

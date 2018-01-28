@@ -34,7 +34,6 @@ class AuthHandler(
     _OAUTH_EXTRA_PARAMS = {}
 
     _OAUTH_AUTHORIZE_URL = NotImplemented
-    _OAUTH_ACCESS_TOKEN_URL = NotImplemented
     _OAUTH_USERINFO_URL = NotImplemented
 
     @property
@@ -61,7 +60,7 @@ class AuthHandler(
             'grant_type': self._OAUTH_GRANT_TYPE})
 
         http.fetch(
-            self._OAUTH_ACCESS_TOKEN_URL,
+            self.controller.OAUTH_ACCESS_TOKEN_URL,
             functools.partial(self._on_access_token, callback),
             headers={'Content-Type': 'application/x-www-form-urlencoded'},
             method='POST',
@@ -137,7 +136,6 @@ class Soundcloud(AuthHandler):
 
     PROVIDER_ID = 'soundcloud'
     _OAUTH_AUTHORIZE_URL = 'https://soundcloud.com/connect'
-    _OAUTH_ACCESS_TOKEN_URL = 'https://api.soundcloud.com/oauth2/token'
     _OAUTH_USERINFO_URL = 'https://api.soundcloud.com/me'
     _OAUTH_SCOPE_LIST = []
 
@@ -152,7 +150,6 @@ class Youtube(AuthHandler):
 
     PROVIDER_ID = 'youtube'
     _OAUTH_AUTHORIZE_URL = 'https://accounts.google.com/o/oauth2/auth'
-    _OAUTH_ACCESS_TOKEN_URL = 'https://www.googleapis.com/oauth2/v4/token'
     _OAUTH_USERINFO_URL = ('https://www.googleapis.com/youtube/v3/channels'
                            '?part=snippet&mine=true')
     _OAUTH_SCOPE_LIST = [

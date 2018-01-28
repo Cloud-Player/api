@@ -76,7 +76,5 @@ class Account(Base):
 
     @property
     def connected(self):
-        return all([
-            self.access_token,
-            self.refresh_token,
-            self.token_expiration])
+        return self.provider_id == 'cloudplayer' or all([
+            self.access_token, self.refresh_token])

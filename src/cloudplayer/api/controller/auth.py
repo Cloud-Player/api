@@ -61,7 +61,7 @@ class AuthController(object):
         if response.error:
             self.account.access_token = None
             self.account.refresh_token = None
-            self.account.token_expiration = None
+            self.account.token_expiration = datetime.datetime.utcnow()
         else:
             access = tornado.escape.json_decode(response.body)
             self.account.access_token = access.get('access_token')

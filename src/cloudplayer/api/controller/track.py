@@ -52,8 +52,8 @@ class SoundcloudTrackController(Controller):
             ),
             'account_id': track['user_id'],
             'account_provider_id': ids['provider_id'],
-            'play_count': track['playback_count'],
-            'favourite_count': track['favoritings_count'],
+            'play_count': track.get('playback_count', 0),
+            'favourite_count': track.get('favoritings_count', 0),
             'aspect_ratio': 1.0,
             'created': datetime.datetime.strptime(
                 track['created_at'], self.DATE_FORMAT),

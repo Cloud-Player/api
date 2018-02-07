@@ -27,6 +27,9 @@ def test_create_controller_should_reject_invalid_provider_id():
 class CloudplayerController(AuthController):
     PROVIDER_ID = 'cloudplayer'
     OAUTH_ACCESS_TOKEN_URL = 'cp://auth'
+    API_BASE_URL = 'cp://base-api'
+    OAUTH_TOKEN_PARAM = 'token-param'
+    OAUTH_CLIENT_KEY = 'client-key'
 
 
 def test_auth_controller_should_provide_instance_args(db, current_user):
@@ -61,12 +64,12 @@ def test_auth_controller_should_reset_account_on_refresh_error(
     account.token_expiration = ages_ago
 
     @tornado.gen.coroutine
-    def fail_fetch(*_, **kw):
+    def fetch(*_, **kw):
         response = mock.Mock()
         response.error = True
         return response
 
-    with mock.patch.object(controller.http_client, 'fetch', fail_fetch):
+    with mock.patch.object(controller.http_client, 'fetch', fetch):
         yield controller.refresh()
 
     assert account.access_token is None
@@ -113,16 +116,60 @@ def test_auth_controller_should_refresh_access_token(
     account.token_expiration = datetime.datetime(2015, 7, 14, 12, 30)
 
     @tornado.gen.coroutine
-    def good_fetch(*_, **kw):
+    def fetch(*_, **kw):
         response = mock.Mock()
         response.error = None
         response.body = json.dumps(body)
         return response
 
-    with mock.patch.object(controller.http_client, 'fetch', good_fetch):
+    with mock.patch.object(controller.http_client, 'fetch', fetch):
         yield controller.refresh()
 
     assert account.access_token == expect.get('access_token')
     assert account.refresh_token == expect.get('refresh_token')
     assert account.token_expiration.strftime(
         '%d/%m/%y %H:%M') == expect.get('token_expiration')
+
+
+@pytest.mark.gen_test
+def test_auth_controller_should_fetch_with_refresh(db, current_user):
+    controller = CloudplayerController(db, current_user)
+    account = controller.account
+    account.token_expiration = datetime.datetime(2015, 7, 14, 12, 30)
+
+    @tornado.gen.coroutine
+    def fetch(path, method=None, **kw):
+        response = mock.Mock()
+        response.error = None
+        if method:
+            response.body = json.dumps({'access_token': 'access-token'})
+        else:
+            response.body = json.dumps({'path': path})
+        return response
+
+    with mock.patch.object(controller.http_client, 'fetch', fetch):
+        response = yield controller.fetch('/path')
+
+    fetched = tornado.escape.json_decode(response.body)
+    assert fetched.get('path') == (
+        'cp://base-api'
+        '/path?token-param=access-token&client-key=cp-api-key')
+
+
+@pytest.mark.gen_test
+def test_auth_controller_should_fetch_anonymously(db):
+    controller = CloudplayerController(db, {})
+
+    @tornado.gen.coroutine
+    def fetch(path, **kw):
+        response = mock.Mock()
+        response.error = None
+        response.body = json.dumps({'path': path})
+        return response
+
+    with mock.patch.object(controller.http_client, 'fetch', fetch):
+        response = yield controller.fetch('/path')
+
+    fetched = tornado.escape.json_decode(response.body)
+    assert fetched.get('path') == (
+        'cp://base-api/path?client-key=cp-api-key')

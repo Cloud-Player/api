@@ -44,4 +44,3 @@ def test_auth_controller_should_check_token_expiration_before_refresh(
     in_an_hour = datetime.datetime.utcnow() + datetime.timedelta(hours=1)
     controller.account.token_expiration = in_an_hour
     assert controller.should_refresh is False
-    db.rollback()

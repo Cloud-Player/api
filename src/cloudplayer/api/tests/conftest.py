@@ -80,6 +80,7 @@ def db(app):
     app.database.initialize()
     session = app.database.create_session()
     yield session
+    session.rollback()
     for table in reversed(model.Base.metadata.sorted_tables):
         session.execute(table.delete())
     session.commit()

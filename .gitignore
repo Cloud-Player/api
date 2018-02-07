@@ -1,13 +1,14 @@
 .cache
-.eggs
 .coverage
+.eggs
 *.pyc
 *.pyo
+aws_upload
 bin
+build
 dist
 include
 lib
 pip-selfcheck.json
-pyvenv.cfg
-aws_upload
 private.py
+pyvenv.cfg

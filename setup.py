@@ -16,12 +16,12 @@ setup(
     namespace_packages=['cloudplayer'],
     setup_requires=['setuptools_git'],
     install_requires=[
+        'bugsnag',
+        'isodate',
         'psycopg2',
         'pycurl',
         'PyJWT',
         'redis',
-        'bugsnag',
-        'isodate',
         'setuptools',
         'sqlalchemy',
         'tornado'
@@ -39,6 +39,11 @@ setup(
             'pytest-timeout',
             'pytest-tornado',
             'pytest'
+        ],
+        'doc': [
+            'recommonmark',
+            'sphinx-autobuild',
+            'sphinx',
         ]
     },
     entry_points={

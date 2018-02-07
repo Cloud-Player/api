@@ -43,6 +43,7 @@ class Handler(HTTPHandler, WebSocketHandler):
         delegate = self.application.find_handler(request)
         handler = delegate.request_callback(self.application, request)
         yield handler()
+        handler.finish()
 
     def listen(self):
         if self.pubsub.subscribed:

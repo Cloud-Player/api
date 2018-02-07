@@ -46,9 +46,9 @@ class HandlerMixin(object):
             self._db = self.application.database.create_session()
         return self._db
 
-    def finish(self, chunk=None):
+    def finish(self, *args, **kw):
         self.db.close()
-        super().finish(chunk=chunk)
+        super().finish(*args, **kw)
 
     def write_error(self, status_code, **kw):
         reason = 'no reason given'

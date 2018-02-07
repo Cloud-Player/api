@@ -1,6 +1,6 @@
 """
-    cloudplayer.api.http.socket
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    cloudplayer.api.routing
+    ~~~~~~~~~~~~~~~~~~~~~~~
 
     :copyright: (c) 2017 by the cloudplayer team
     :license: GPL-3.0, see LICENSE for details

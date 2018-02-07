@@ -35,11 +35,12 @@ class AuthController(object):
         self.current_user = current_user
         self.http_client = tornado.httpclient.AsyncHTTPClient()
         self.settings = opt.options[self.PROVIDER_ID]
-        id = (current_user or {}).get(self.PROVIDER_ID)
-        if id:
-            self.account = self.db.query(Account).get((id, self.PROVIDER_ID))
-        else:
-            self.account = None
+        self.account = None
+        if current_user:
+            id = current_user.get(self.PROVIDER_ID)
+            if id:
+                keys = (id, self.PROVIDER_ID)
+                self.account = self.db.query(Account).get(keys)
 
     @property
     def should_refresh(self):

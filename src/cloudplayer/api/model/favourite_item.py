@@ -8,22 +8,28 @@
 import sqlalchemy as sql
 import sqlalchemy.orm as orm
 
+from cloudplayer.api.access import (Allow, Create, Delete, Deny, Fields, Owner,
+                                    Parent, Query, Read)
 from cloudplayer.api.model import Base
 from cloudplayer.api.model.tracklist_item import TracklistItemMixin
 
 
 class FavouriteItem(TracklistItemMixin, Base):
 
-    __fields__ = [
+    __acl__ = (
+        Allow(Parent, Create),
+        Allow(Owner, Read),
+        Allow(Owner, Delete),
+        Allow(Owner, Query, Fields(
+            'favourite_id'
+        )),
+        Deny()
+    )
+    __fields__ = Fields(
         'id',
         'track_provider_id',
         'track_id'
-    ]
-    __filters__ = [
-        'favourite_id'
-    ]
-    __mutable__ = []
-    __public__ = __fields__
+    )
     __table_args__ = (
         sql.PrimaryKeyConstraint(
             'id'),
@@ -41,3 +47,4 @@ class FavouriteItem(TracklistItemMixin, Base):
     favourite_provider_id = sql.Column(sql.String(16), nullable=False)
     favourite_id = sql.Column(sql.String(96), nullable=False)
     favourite = orm.relationship('Favourite', back_populates='items')
+    parent = orm.synonym('favourite')

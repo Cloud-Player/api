@@ -88,7 +88,7 @@ def test_token_entity_should_update_claimed_attribute(
     db.commit()
 
     token = {'id': entity.id, 'claimed': True}
-    response = yield user_fetch(
+    yield user_fetch(
         '/token/{}'.format(entity.id), method='PATCH',
         body=json.dumps(token, cls=Encoder))
 
@@ -106,7 +106,7 @@ def test_token_entity_should_always_set_claim_attribute_true(
     db.commit()
 
     token = {'id': entity.id, 'claimed': False}
-    response = yield user_fetch(
+    yield user_fetch(
         '/token/{}'.format(entity.id), method='PATCH',
         body=json.dumps(token, cls=Encoder))
 

@@ -7,27 +7,24 @@
 """
 import sqlalchemy.orm as orm
 
+from cloudplayer.api.access import Allow, Deny, Fields, Owner, Read
 from cloudplayer.api.model import Base
 from cloudplayer.api.model.tracklist import TracklistMixin
 
 
 class Favourite(TracklistMixin, Base):
 
-    __fields__ = [
+    __acl__ = (
+        Allow(Owner, Read),
+        Deny()
+    )
+    __fields__ = Fields(
         'id',
         'account_id',
         'provider_id',
         'public',
         'items'
-    ]
-    __filters__ = [
-        'account_id',
-        'provider_id',
-        'public',
-        'follower_count'
-    ]
-    __mutable__ = []
-    __public__ = __fields__
+    )
 
     account = orm.relationship(
         'Account', back_populates='favourite', viewonly=True)

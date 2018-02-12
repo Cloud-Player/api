@@ -8,28 +8,29 @@
 import sqlalchemy as sql
 import sqlalchemy.orm as orm
 
+from cloudplayer.api.access import Allow, Child, Deny, Fields, Read
 from cloudplayer.api.model import Base
 
 
 class User(Base):
 
-    __fields__ = [
+    __acl__ = (
+        Allow(Child, Read),
+        Deny()
+    )
+    __fields__ = Fields(
         'id',
         'accounts',
         'created',
         'updated'
-    ]
-    __filters__ = []
-    __mutable__ = []
-    __public__ = [
-        'id',
-        'accounts'
-    ]
+    )
     __table_args__ = (
         sql.PrimaryKeyConstraint(
             'id'),
     )
 
     id = sql.Column(sql.Integer)
+    provider_id = 'cloudplayer'
 
     accounts = orm.relationship('Account', back_populates='user')
+    children = orm.synonym('accounts')

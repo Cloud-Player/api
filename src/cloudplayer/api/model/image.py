@@ -7,24 +7,21 @@
 """
 import sqlalchemy as sql
 
+from cloudplayer.api.access import Allow, Everyone, Fields, Read
 from cloudplayer.api.model import Base
 
 
 class Image(Base):
 
-    __fields__ = [
+    __acl__ = (
+        Allow(Everyone, Read)
+    )
+    __fields__ = Fields(
         'id',
         'small',
         'medium',
         'large'
-    ]
-    __filters__ = []
-    __mutable__ = [
-        'small',
-        'medium',
-        'large'
-    ]
-    __public__ = __fields__
+    )
     __table_args__ = (
         sql.PrimaryKeyConstraint(
             'id'),

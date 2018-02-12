@@ -7,67 +7,107 @@
 """
 import tornado.gen
 
+from cloudplayer.api import APIException
+from cloudplayer.api.access import Policy
 from cloudplayer.api.controller.auth import create_controller
-import cloudplayer.api.policy
+from cloudplayer.api.model.account import Account
+
+
+class ControllerException(APIException):
+
+    def __init__(self, status_code=403, log_message='operation failed'):
+        super().__init__(status_code, log_message)
 
 
 class Controller(object):
 
     __model__ = NotImplemented
-    __policies__ = NotImplemented
 
     def __init__(self, db, current_user=None):
         self.db = db
         self.current_user = current_user
-        factory = cloudplayer.api.policy.PolicyFactory(self.__policies__)
-        self.policy = factory(db, current_user)
+        self.policy = Policy(db, current_user)
 
     @staticmethod
-    def _merge_ids_into_kw(ids, **kw):
+    def _merge_ids_with_kw(ids, **kw):
+        params = kw.copy()
         for field, value in ids.items():
-            if field in kw and kw[field] != value:
-                raise ValueError('mismatch of %s', field)
-            kw[field] = value
-        return kw
+            if field in params and params[field] != value:
+                raise ControllerException(400, 'mismatch on {}'.format(field))
+            params[field] = value
+        return params
 
     @tornado.gen.coroutine
     def fetch(self, provider_id, path, **kw):
+        # XXX Can this go?
         controller = create_controller(
             provider_id, self.db, self.current_user)
         response = yield controller.fetch(path, **kw)
         return response
 
+    @property
+    def accounts(self):
+        # TODO: This should move up the food chain
+        from sqlalchemy.orm.session import make_transient_to_detached
+        dict_ = {}
+        for provider_id in ('cloudplayer', 'youtube', 'soundcloud'):
+            account = Account(
+                id=self.current_user[provider_id],
+                provider_id=provider_id)
+            make_transient_to_detached(account)
+            account = self.db.merge(account, load=False)
+            dict_[provider_id] = account
+        return dict_
+
     @tornado.gen.coroutine
     def create(self, ids, **kw):
-        kw = self._merge_ids_into_kw(ids, **kw)
-        entity = self.__model__(**kw)
-        self.policy.create(entity)
+        params = self._merge_ids_with_kw(ids, **kw)
+        entity = self.__model__(**params)
+        account = self.accounts.get(entity.provider_id)
+        self.policy.grant_create(account, entity)
+        self.db.add(entity)
         self.db.commit()
         return entity
 
     @tornado.gen.coroutine
     def read(self, ids):
-        entity = self.policy.read(self.__model__, ids)
-        return entity
+        entity = self.db.query(self.__model__).filter_by(**ids).one_or_none()
+        if entity:
+            account = self.accounts.get(entity.provider_id)
+            self.policy.grant_read(account, entity)
+            return entity
+        else:
+            raise ControllerException(404)
 
     @tornado.gen.coroutine
     def update(self, ids, **kw):
-        kw = self._merge_ids_into_kw(ids, **kw)
+        # TODO: Extract read op, to circumvent read grant
         entity = yield self.read(ids)
-        self.policy.update(self.__model__, entity, **kw)
+        account = self.accounts.get(entity.provider_id)
+        self.policy.grant_update(account, entity, kw.keys())
+        self.db.query(self.__model__).filter_by(**ids).update(kw)
         self.db.commit()
         return entity
 
     @tornado.gen.coroutine
     def delete(self, ids):
+        # TODO: Extract read op, to circumvent read grant
         entity = yield self.read(ids)
-        self.policy.delete(entity)
+        account = self.accounts.get(entity.provider_id)
+        self.policy.grant_delete(account, entity)
+        self.db.delete(entity)
         self.db.commit()
 
     @tornado.gen.coroutine
     def query(self, ids, **kw):
-        kw = self._merge_ids_into_kw(ids, **kw)
-        return self.policy.query(self.__model__, **kw)
+        params = self._merge_ids_with_kw(ids, **kw)
+        account = self.accounts.get(params.get('provider_id'), 'cloudplayer')
+        self.policy.grant_query(account, self.__model__, kw.keys())
+        query = self.db.query(self.__model__)
+        for field, value in params.items():
+            expression = getattr(self.__model__, field) == value
+            query = query.filter(expression)
+        return query
 
     @tornado.gen.coroutine
     def search(self, ids, **kw):

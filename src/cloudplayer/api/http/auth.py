@@ -15,11 +15,11 @@ import tornado.httputil
 import tornado.options as opt
 import tornado.web
 
-from cloudplayer.api.model.account import Account
-from cloudplayer.api.http import HTTPHandler
-from cloudplayer.api.handler import ControllerHandlerMixin
+from cloudplayer.api.http import HTTPException
 from cloudplayer.api.controller.auth import SoundcloudAuthController
 from cloudplayer.api.controller.auth import YoutubeAuthController
+from cloudplayer.api.handler import ControllerHandlerMixin
+from cloudplayer.api.http import HTTPHandler
 
 
 class AuthHandler(
@@ -107,7 +107,7 @@ class AuthHandler(
              self.controller.OAUTH_TOKEN_PARAM: access.get('access_token')})
         user_info = yield self.oauth2_request(uri)
         if not user_info:
-            raise tornado.web.HTTPError(503, 'invalid user info')
+            raise HTTPException(503, 'invalid user info')
 
         # update or create a new account for this provider
         self.controller.update_account(user_info)

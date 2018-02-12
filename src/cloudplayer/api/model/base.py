@@ -14,6 +14,8 @@ from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy.sql import expression
 from sqlalchemy.types import DateTime
 
+from cloudplayer.api.access import Deny, Fields
+
 
 class utcnow(expression.FunctionElement):
     type = DateTime()
@@ -26,10 +28,8 @@ def pg_utcnow(element, compiler, **kw):
 
 class Model(object):
 
-    __fields__ = []
-    __filters__ = []
-    __mutable__ = []
-    __public__ = []
+    __acl__ = (Deny(),)
+    __fields__ = Fields()
 
     @declared_attr
     def __tablename__(cls):
@@ -42,6 +42,7 @@ class Model(object):
 
     account_id = None
     provider_id = None
+    parent = None
 
 
 Base = declarative_base(cls=Model)
@@ -52,7 +53,7 @@ class Encoder(json.JSONEncoder):
     def default(self, obj):
         try:
             return json.JSONEncoder.default(self, obj)
-        except:
+        except:  # NOQA
             if isinstance(obj, Base):
                 dict_ = {c: getattr(obj, c) for c in obj.__fields__}
                 if dict_.get('id'):  # TODO: There must be a better solution

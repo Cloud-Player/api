@@ -15,11 +15,16 @@ import tornado.gen
 import tornado.httputil
 import tornado.web
 
+from cloudplayer.api import APIException
 from cloudplayer.api.handler import HandlerMixin
 from cloudplayer.api.model import Encoder
 from cloudplayer.api.model.account import Account
 from cloudplayer.api.model.favourite import Favourite
 from cloudplayer.api.model.user import User
+
+
+class HTTPException(APIException):
+    pass
 
 
 class HTTPHandler(HandlerMixin, tornado.web.RequestHandler):
@@ -88,16 +93,16 @@ class HTTPHandler(HandlerMixin, tornado.web.RequestHandler):
 
     def write(self, data):
         if data is None:
-            raise tornado.web.HTTPError(404, 'resource not found')
+            raise HTTPException(404)
         json.dump(data, super(), cls=Encoder)
         self.finish()
 
-    def finish(self, chunk=None):
+    def on_finish(self):
         if self.original_user != self.current_user:
             self.set_user_cookie()
         elif not self.current_user:
             self.clear_user_cookie()
-        super().finish(chunk=chunk)
+        super().on_finish()
 
     @property
     def body(self):
@@ -106,7 +111,7 @@ class HTTPHandler(HandlerMixin, tornado.web.RequestHandler):
         try:
             return tornado.escape.json_decode(self.request.body)
         except (json.decoder.JSONDecodeError, ValueError):
-            raise tornado.web.HTTPError(400, 'invalid json body')
+            raise HTTPException(400, 'invalid json body')
 
     @property
     def query_params(self):
@@ -137,7 +142,7 @@ class HTTPFallback(HTTPHandler):
     SUPPORTED_METHODS = ('GET',)
 
     def get(self, *args, **kwargs):
-        self.write_error(404, reason='endpoint not found')
+        raise HTTPException(404)
 
 
 class HTTPHealth(HTTPHandler):

@@ -7,25 +7,28 @@
 """
 import functools
 
-from sqlalchemy.ext.declarative import declared_attr
 import sqlalchemy as sql
 import sqlalchemy.orm as orm
 
+from cloudplayer.api.access import (Allow, Create, Everyone, Fields, Read,
+                                    Update)
 from cloudplayer.api.model import Base
 from cloudplayer.api.util import gen_token
 
 
 class Token(Base):
 
-    __fields__ = [
+    __acl__ = (
+        Allow(Everyone, Create),
+        Allow(Everyone, Update, Fields(
+            'claimed'
+        )),
+        Allow(Everyone, Read)
+    )
+    __fields__ = Fields(
         'id',
         'claimed'
-    ]
-    __filters__ = []
-    __mutable__ = [
-        'claimed'
-    ]
-    __public__ = []
+    )
     __table_args__ = (
         sql.PrimaryKeyConstraint(
             'id'),
@@ -40,7 +43,5 @@ class Token(Base):
 
     account_provider_id = sql.Column(sql.String(16))
     account_id = sql.Column(sql.String(32))
-
-    @declared_attr
-    def account(cls):
-        return orm.relationship('Account')
+    account = orm.relationship('Account')
+    parent = orm.synonym('account')

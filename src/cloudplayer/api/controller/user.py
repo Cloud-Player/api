@@ -8,14 +8,12 @@
 import tornado.gen
 
 from cloudplayer.api.model.user import User
-from cloudplayer.api.policy import Open
 import cloudplayer.api.controller
 
 
 class UserController(cloudplayer.api.controller.Controller):
 
     __model__ = User
-    __policies__ = [Open]
 
     @tornado.gen.coroutine
     def read(self, ids):

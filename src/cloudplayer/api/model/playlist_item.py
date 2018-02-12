@@ -8,26 +8,33 @@
 import sqlalchemy as sql
 import sqlalchemy.orm as orm
 
+from cloudplayer.api.access import (Allow, Create, Delete, Deny, Fields, Owner,
+                                    Parent, Query, Read, Update)
 from cloudplayer.api.model import Base
 from cloudplayer.api.model.tracklist_item import TracklistItemMixin
 
 
 class PlaylistItem(TracklistItemMixin, Base):
 
-    __fields__ = [
+    __acl__ = (
+        Allow(Parent, Create),
+        Allow(Owner, Read),
+        Allow(Owner, Update, Fields(
+            'rank'
+        )),
+        Allow(Owner, Delete),
+        Allow(Owner, Query, Fields(
+            'rank',
+            'provider_id'
+        )),
+        Deny()
+    )
+    __fields__ = Fields(
         'id',
         'rank',
         'track_provider_id',
         'track_id'
-    ]
-    __filters__ = [
-        'rank',
-        'playlist_id'
-    ]
-    __mutable__ = [
-        'rank'
-    ]
-    __public__ = __fields__
+    )
     __table_args__ = (
         sql.PrimaryKeyConstraint(
             'id'),
@@ -47,3 +54,4 @@ class PlaylistItem(TracklistItemMixin, Base):
     playlist_provider_id = sql.Column(sql.String(16), nullable=False)
     playlist_id = sql.Column(sql.String(96), nullable=False)
     playlist = orm.relationship('Playlist', back_populates='items')
+    parent = orm.synonym('playlist')

@@ -29,8 +29,6 @@ class Handler(HTTPHandler, WebSocketHandler):
 
     @tornado.gen.coroutine
     def on_message(self, message):
-        if len(message) > 2 << 15:
-            self.close(1011, 'message too big')
         try:
             message = json.loads(message)
             assert isinstance(message, dict)
@@ -39,11 +37,13 @@ class Handler(HTTPHandler, WebSocketHandler):
         request = WSRequest(
             self.ws_connection,
             self.current_user,
+            self.request,
             message)
         delegate = self.application.find_handler(request)
         handler = delegate.request_callback(self.application, request)
         yield handler()
-        handler.finish()
+        handler.on_finish()
+        self.application.log_request(handler)
 
     def listen(self):
         if self.pubsub.subscribed:
@@ -54,9 +54,10 @@ class Handler(HTTPHandler, WebSocketHandler):
                 self.listener.stop()
 
     def forward(self, data):
-        message = json.dumps(
-            {'channel': data['channel'],
-             'body': json.loads(data['data'])})
+        message = json.dumps({
+            'channel': data['channel'],
+            'body': json.loads(data['data']),
+            'method': 'PUT'})
         self.ws_connection.write_message(message)
 
     def on_close(self):

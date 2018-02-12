@@ -9,18 +9,20 @@ import sqlalchemy as sql
 import sqlalchemy.orm as orm
 import tornado.options as opt
 
+from cloudplayer.api.access import Allow, Empty, Everyone, Fields, Query, Read
 from cloudplayer.api.model import Base
 
 
 class Provider(Base):
 
-    __fields__ = [
+    __acl__ = (
+        Allow(Everyone, Read),
+        Allow(Everyone, Query, Empty)
+    )
+    __fields__ = Fields(
         'id',
         'client_id'
-    ]
-    __filters__ = []
-    __mutable__ = []
-    __public__ = __fields__
+    )
     __table_args__ = (
         sql.PrimaryKeyConstraint(
             'id'),

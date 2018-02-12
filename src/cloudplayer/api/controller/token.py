@@ -11,14 +11,12 @@ import tornado.gen
 import tornado.options as opt
 
 from cloudplayer.api.model.token import Token
-from cloudplayer.api.policy import Open
 import cloudplayer.api.controller
 
 
 class TokenController(cloudplayer.api.controller.Controller):
 
     __model__ = Token
-    __policies__ = [Open]
 
     @tornado.gen.coroutine
     def create(self, ids, **kw):

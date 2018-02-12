@@ -13,12 +13,9 @@ import tornado.gen
 from cloudplayer.api.controller import Controller
 from cloudplayer.api.model.account import Account
 from cloudplayer.api.model.image import Image
-from cloudplayer.api.policy import Open
 
 
 class SoundcloudTrackController(Controller):
-
-    __policies__ = [Open]
 
     DATE_FORMAT = '%Y/%m/%d %H:%M:%S %z'
 
@@ -63,8 +60,6 @@ class SoundcloudTrackController(Controller):
 
 
 class YoutubeTrackController(Controller):
-
-    __policies__ = [Open]
 
     DATE_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
 

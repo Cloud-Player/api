@@ -7,6 +7,7 @@ aws_upload
 bin
 build
 dist
+share
 include
 lib
 pip-selfcheck.json

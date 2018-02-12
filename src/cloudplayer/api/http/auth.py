@@ -2,18 +2,18 @@
     cloudplayer.api.http.auth
     ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    :copyright: (c) 2017 by the cloudplayer team
+    :copyright: (c) 2018 by Nicolas Drebenstedt
     :license: GPL-3.0, see LICENSE for details
 """
-import functools
 import datetime
+import functools
 import traceback
 
-import tornado.options as opt
 import tornado.auth
-import tornado.web
-import tornado.httputil
 import tornado.escape
+import tornado.httputil
+import tornado.options as opt
+import tornado.web
 
 from cloudplayer.api.model.account import Account
 from cloudplayer.api.http import HTTPHandler

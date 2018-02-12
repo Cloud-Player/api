@@ -2,13 +2,12 @@
     cloudplayer.api.model.token
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    :copyright: (c) 2017 by the cloudplayer team
+    :copyright: (c) 2018 by Nicolas Drebenstedt
     :license: GPL-3.0, see LICENSE for details
 """
 import functools
 
 from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.sql import func
 import sqlalchemy as sql
 import sqlalchemy.orm as orm
 

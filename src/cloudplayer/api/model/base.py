@@ -2,20 +2,17 @@
     cloudplayer.api.base.model
     ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    :copyright: (c) 2017 by the cloudplayer team
+    :copyright: (c) 2018 by Nicolas Drebenstedt
     :license: GPL-3.0, see LICENSE for details
 """
-
-import json
 import datetime
-import pkg_resources
+import json
 
-from sqlalchemy.ext.compiler import compiles
-from sqlalchemy.ext.declarative import declared_attr, declarative_base
-from sqlalchemy.sql import func, expression
-from sqlalchemy.types import DateTime
 import sqlalchemy as sql
-import sqlalchemy.ext.declarative
+from sqlalchemy.ext.compiler import compiles
+from sqlalchemy.ext.declarative import declarative_base, declared_attr
+from sqlalchemy.sql import expression
+from sqlalchemy.types import DateTime
 
 
 class utcnow(expression.FunctionElement):

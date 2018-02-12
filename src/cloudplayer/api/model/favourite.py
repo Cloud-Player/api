@@ -2,10 +2,9 @@
     cloudplayer.api.model.favourite
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    :copyright: (c) 2017 by the cloudplayer team
+    :copyright: (c) 2018 by Nicolas Drebenstedt
     :license: GPL-3.0, see LICENSE for details
 """
-import sqlalchemy as sql
 import sqlalchemy.orm as orm
 
 from cloudplayer.api.model import Base

@@ -2,14 +2,14 @@
     cloudplayer.api.http.socket
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    :copyright: (c) 2017 by the cloudplayer team
+    :copyright: (c) 2018 by Nicolas Drebenstedt
     :license: GPL-3.0, see LICENSE for details
 """
 import json
 
-from tornado.websocket import WebSocketHandler
-import tornado.ioloop
 import tornado.gen
+import tornado.ioloop
+from tornado.websocket import WebSocketHandler
 
 from cloudplayer.api.http import HTTPHandler
 from cloudplayer.api.ws import WSRequest

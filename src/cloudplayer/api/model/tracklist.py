@@ -2,14 +2,14 @@
     cloudplayer.api.model.tracklist
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    :copyright: (c) 2017 by the cloudplayer team
+    :copyright: (c) 2018 by Nicolas Drebenstedt
     :license: GPL-3.0, see LICENSE for details
 """
 import functools
 
-from sqlalchemy.ext.declarative import declared_attr
 import sqlalchemy as sql
 import sqlalchemy.orm as orm
+from sqlalchemy.ext.declarative import declared_attr
 
 import cloudplayer.api.util
 

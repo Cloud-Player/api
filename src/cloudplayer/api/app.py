@@ -2,14 +2,12 @@
     cloudplayer.api.app
     ~~~~~~~~~~~~~~~~~~~
 
-    :copyright: (c) 2017 by the cloudplayer team
+    :copyright: (c) 2018 by Nicolas Drebenstedt
     :license: GPL-3.0, see LICENSE for details
 """
 import signal
 import sys
 
-from tornado.log import app_log
-from tornado.routing import RuleRouter, Rule
 import bugsnag
 import redis
 import sqlalchemy as sql
@@ -19,6 +17,7 @@ import tornado.httpclient
 import tornado.ioloop
 import tornado.options as opt
 import tornado.web
+from tornado.log import app_log
 
 from cloudplayer.api.routing import ProtocolMatches
 

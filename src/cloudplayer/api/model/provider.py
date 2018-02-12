@@ -2,7 +2,7 @@
     cloudplayer.api.model.provider
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    :copyright: (c) 2017 by the cloudplayer team
+    :copyright: (c) 2018 by Nicolas Drebenstedt
     :license: GPL-3.0, see LICENSE for details
 """
 import sqlalchemy as sql
@@ -10,7 +10,6 @@ import sqlalchemy.orm as orm
 import tornado.options as opt
 
 from cloudplayer.api.model import Base
-from cloudplayer.api.http.auth import Soundcloud, Youtube
 
 
 class Provider(Base):

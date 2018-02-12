@@ -2,18 +2,16 @@
     cloudplayer.api.ws.base
     ~~~~~~~~~~~~~~~~~~~~~~~
 
-    :copyright: (c) 2017 by the cloudplayer team
+    :copyright: (c) 2018 by Nicolas Drebenstedt
     :license: GPL-3.0, see LICENSE for details
 """
 import json
 import sys
-import functools
 
 from tornado.log import app_log
 from tornado.escape import _unicode
 import tornado.concurrent
 import tornado.gen
-import tornado.options as opt
 import tornado.websocket
 import tornado.httputil
 import tornado.routing

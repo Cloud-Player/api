@@ -46,7 +46,8 @@ class Model(object):
 
     @property
     def account(self):
-        # TODO: Check session for this account id without querying
+        # XXX: Check session for this account id without querying
+        from cloudplayer.api.model.account import Account
         return Account(id=self.account_id, provider_id=self.provider_id)
 
 

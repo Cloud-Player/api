@@ -1,17 +1,15 @@
 import os
 import sys
-import random
 
 import jwt
-import sqlalchemy as sql
-import pytest_redis.factories as redis_factories
 import pytest
+import pytest_redis.factories as redis_factories
 import tornado.options as opt
 
 import cloudplayer.api.app
 
 
-def which(executable):
+def which(executable):  # pragma: no cover
     path = os.environ['PATH']
     paths = path.split(os.pathsep)
     extlist = ['']

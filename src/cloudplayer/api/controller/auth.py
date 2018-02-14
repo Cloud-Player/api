@@ -111,7 +111,7 @@ class AuthController(object):
         self.db.add(self.account)
 
     def _update_account_profile(self, user_info):
-        pass
+        raise NotImplementedError()  # pragma: no cover
 
     def _update_cloudplayer_profile(self, user_info):
         cloudplayer = self.db.query(Account).get((

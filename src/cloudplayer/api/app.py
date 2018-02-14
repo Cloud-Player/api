@@ -22,7 +22,7 @@ from tornado.log import app_log
 from cloudplayer.api.routing import ProtocolMatches
 
 
-def define_options():
+def define_options():  # pragma: no cover
     """Defines global configuration options"""
     opt.define('config', type=str, default='dev.py')
     opt.define('port', type=int, default=8040)

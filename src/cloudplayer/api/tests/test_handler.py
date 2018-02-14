@@ -31,6 +31,7 @@ def test_handler_mixin_should_close_db_on_finish(app):
     class Base(object):
         def finish(self, chunk=None):
             self.finished = True
+            self.on_finish()
 
     class Handler(HandlerMixin, Base):
         application = app

@@ -21,7 +21,9 @@ class Token(Base):
     __acl__ = (
         Allow(Everyone, Create),
         Allow(Everyone, Update, Fields(
-            'claimed'
+            'claimed',
+            'account_id',
+            'account_provider_id'
         )),
         Allow(Everyone, Read)
     )

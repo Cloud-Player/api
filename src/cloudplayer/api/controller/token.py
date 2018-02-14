@@ -41,7 +41,8 @@ class TokenController(cloudplayer.api.controller.Controller):
     @tornado.gen.coroutine
     def update(self, ids, **kw):
         entity = yield super().update(
-            ids, claimed=True,
+            ids,
+            claimed=True,
             account_id=self.current_user['cloudplayer'],
             account_provider_id='cloudplayer')
         return entity

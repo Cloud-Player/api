@@ -44,6 +44,11 @@ class Model(object):
     provider_id = None
     parent = None
 
+    @property
+    def account(self):
+        # TODO: Check session for this account id without querying
+        return Account(id=self.account_id, provider_id=self.provider_id)
+
 
 Base = declarative_base(cls=Model)
 

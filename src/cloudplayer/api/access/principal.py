@@ -25,7 +25,7 @@ class Everyone(Principal):
 class Owner(Principal):
 
     def __eq__(self, other):
-        return self.target == other
+        return self.target.account == other
 
 
 class Parent(Principal):

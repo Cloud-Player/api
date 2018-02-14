@@ -81,8 +81,6 @@ class AuthController(object):
     def fetch(self, path, params=None, **kw):
         if not params:
             params = list()
-        elif isinstance(params, dict):
-            params = list(params.items())
 
         if self.account:
             if self.should_refresh:
@@ -146,6 +144,7 @@ class SoundcloudAuthController(AuthController):
             medium=image_url.replace('large', 't300x300'),
             large=image_url.replace('large', 't500x500'))
         self.account.title = user_info.get('username')
+
 
 class YoutubeAuthController(AuthController):
 

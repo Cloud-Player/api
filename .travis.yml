@@ -31,7 +31,7 @@ deploy:
   github_token: $GITHUB_TOKEN
   local_dir: gh-pages
   on:
-    branch: master
+    branch: production
 - provider: s3
   access_key_id: AKIAIQZ6VQOFSEMUSNYQ
   secret_access_key:
@@ -41,7 +41,7 @@ deploy:
   local_dir: aws_upload
   skip_cleanup: true
   on:
-    branch: master
+    branch: production
 - provider: codedeploy
   access_key_id: AKIAIQZ6VQOFSEMUSNYQ
   secret_access_key:
@@ -54,4 +54,4 @@ deploy:
   application: ApiCp
   skip_cleanup: true
   on:
-    branch: master
+    branch: production

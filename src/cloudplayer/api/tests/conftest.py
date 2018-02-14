@@ -67,6 +67,7 @@ def app(postgresql_proc, redis_proc):
     opt.define('postgres_db', default='postgres', group='app')
     opt.define('postgres_user', default='postgres', group='app')
     opt.define('postgres_password', default='', group='app')
+    cloudplayer.api.app.configure_httpclient()
     app = cloudplayer.api.app.Application()
     yield app
     app.database.engine.dispose()

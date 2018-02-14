@@ -147,7 +147,6 @@ class WSBase(object):
         return self._status_code
 
 
-
 class WSHandler(HandlerMixin, WSBase):
     pass
 

@@ -6,6 +6,7 @@
     :license: GPL-3.0, see LICENSE for details
 """
 import tornado.gen
+import tornado.options as opt
 
 from cloudplayer.api import APIException
 from cloudplayer.api.access import Policy
@@ -64,7 +65,7 @@ class Controller(object):
         # TODO: This should move up the food chain
         from sqlalchemy.orm.session import make_transient_to_detached
         dict_ = {}
-        for provider_id in ('cloudplayer', 'youtube', 'soundcloud'):
+        for provider_id in opt.options['providers']:
             account = Account(
                 id=self.current_user[provider_id],
                 provider_id=provider_id)

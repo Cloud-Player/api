@@ -97,12 +97,12 @@ class HTTPHandler(HandlerMixin, tornado.web.RequestHandler):
         json.dump(data, super(), cls=Encoder)
         self.finish()
 
-    def on_finish(self):
+    def finish(self, chunk=None):
         if self.original_user != self.current_user:
             self.set_user_cookie()
         elif not self.current_user:
             self.clear_user_cookie()
-        super().on_finish()
+        super().finish(chunk=chunk)
 
     @property
     def body(self):

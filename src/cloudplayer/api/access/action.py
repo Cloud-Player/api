@@ -13,7 +13,7 @@ class Action(object):
         self.target = target
 
     def __eq__(self, other):
-        raise NotImplementedError()
+        raise NotImplementedError()  # pragma: no cover
 
 
 class Anything(Action):

@@ -19,7 +19,7 @@ class Rule(object):
         self.fields = fields
 
     def __call__(self, principal, action, fields):
-        raise NotImplementedError()
+        raise NotImplementedError()  # pragma: no cover
 
 
 class Allow(Rule):

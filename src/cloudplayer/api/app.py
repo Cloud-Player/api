@@ -140,7 +140,7 @@ class Application(tornado.web.Application):
         ]
         super(Application, self).__init__(routes, **settings)
 
-        if settings.get('bugsnag'):
+        if settings.get('bugsnag'):  # pragma: no cover
             bugsnag.configure(
                 api_key=settings['bugsnag']['api_key'],
                 project_root=settings['bugsnag']['project_root'])
@@ -227,5 +227,5 @@ def main():
         shutdown()
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     main()

@@ -87,14 +87,16 @@ def db(app):
 
 @pytest.fixture(scope='function')
 def current_user(db):
-    from cloudplayer.api.model.user import User
     from cloudplayer.api.model.account import Account
+    from cloudplayer.api.model.favourite import Favourite
+    from cloudplayer.api.model.user import User
     user = User()
     db.add(user)
     db.commit()
     account = Account(
         id=str(user.id),
         provider_id='cloudplayer',
+        favourite=Favourite(),
         user_id=user.id)
     db.add(account)
     db.commit()

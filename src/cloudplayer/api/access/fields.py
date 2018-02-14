@@ -10,21 +10,20 @@
 class Fields(object):
 
     def __init__(self, *args):
-        self.target = None
-        self.values = frozenset(args)
-
-    def __iter__(self):
-        if self.values:
-            yield from self.values
+        self._target = None
+        self._values = frozenset(args)
 
     def __call__(self, target):
-        self.target = target
+        self._target = target
         return self
+
+    def __iter__(self):
+        yield from self._values
 
     def __contains__(self, item):
         if isinstance(item, Fields):
-            return self.values.issuperset(item)
-        return self.values.__contains__(item)
+            return self._values.issuperset(item._values)
+        return self._values.__contains__(item)
 
 
 class Available(Fields):
@@ -33,9 +32,19 @@ class Available(Fields):
         self(target)
 
     def __call__(self, target):
-        self.target = target
-        self.values = frozenset(target.__fields__)
+        self._target = target
+        self._values = frozenset(target.__fields__)
         return self
 
 
-Empty = Fields()
+class _Empty(Fields):
+
+    def __init__(self):
+        self._target = None
+        self._values = frozenset()
+
+    def __call__(self, *args):
+        return self
+
+
+Empty = _Empty()

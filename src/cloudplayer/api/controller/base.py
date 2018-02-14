@@ -29,12 +29,26 @@ class Controller(object):
         self.policy = Policy(db, current_user)
 
     @staticmethod
-    def _merge_ids_with_kw(ids, **kw):
+    def _merge_ids_with_kw(ids, kw):
+        # XXX: This exposes entity existence
         params = kw.copy()
         for field, value in ids.items():
             if field in params and params[field] != value:
                 raise ControllerException(400, 'mismatch on {}'.format(field))
             params[field] = value
+        return params
+
+    @staticmethod
+    def _eject_ids_from_kw(ids, kw):
+        # XXX: This exposes entity existence
+        params = kw.copy()
+        for field, value in ids.items():
+            if field in params:
+                if params[field] == value:
+                    del params[field]
+                else:
+                    raise ControllerException(
+                        400, 'mismatch on {}'.format(field))
         return params
 
     @tornado.gen.coroutine
@@ -61,7 +75,7 @@ class Controller(object):
 
     @tornado.gen.coroutine
     def create(self, ids, **kw):
-        params = self._merge_ids_with_kw(ids, **kw)
+        params = self._merge_ids_with_kw(ids, kw)
         entity = self.__model__(**params)
         account = self.accounts.get(entity.provider_id)
         self.policy.grant_create(account, entity)
@@ -81,18 +95,21 @@ class Controller(object):
 
     @tornado.gen.coroutine
     def update(self, ids, **kw):
-        # TODO: Extract read op, to circumvent read grant
-        entity = yield self.read(ids)
+        entity = self.db.query(self.__model__).filter_by(**ids).one_or_none()
+        if not entity:
+            raise ControllerException(404)
+        params = self._eject_ids_from_kw(ids, kw)
         account = self.accounts.get(entity.provider_id)
-        self.policy.grant_update(account, entity, kw.keys())
-        self.db.query(self.__model__).filter_by(**ids).update(kw)
+        self.policy.grant_update(account, entity, params)
+        self.db.query(self.__model__).filter_by(**ids).update(params)
         self.db.commit()
         return entity
 
     @tornado.gen.coroutine
     def delete(self, ids):
-        # TODO: Extract read op, to circumvent read grant
-        entity = yield self.read(ids)
+        entity = self.db.query(self.__model__).filter_by(**ids).one_or_none()
+        if not entity:
+            raise ControllerException(404)
         account = self.accounts.get(entity.provider_id)
         self.policy.grant_delete(account, entity)
         self.db.delete(entity)
@@ -100,7 +117,7 @@ class Controller(object):
 
     @tornado.gen.coroutine
     def query(self, ids, **kw):
-        params = self._merge_ids_with_kw(ids, **kw)
+        params = self._merge_ids_with_kw(ids, kw)
         account = self.accounts.get(params.get('provider_id'), 'cloudplayer')
         self.policy.grant_query(account, self.__model__, kw.keys())
         query = self.db.query(self.__model__)

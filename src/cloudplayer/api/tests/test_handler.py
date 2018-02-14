@@ -48,6 +48,7 @@ def test_handler_mixin_should_close_db_on_finish(app):
 def test_http_handler_should_set_default_headers(http_client, base_url):
     response = yield http_client.fetch('{}/health_check'.format(base_url))
     headers = dict(response.headers)
+    headers.pop('X-Http-Reason', None)
     assert headers.pop('Date')
     assert headers.pop('Set-Cookie')
     assert headers.pop('Etag')

@@ -9,7 +9,7 @@
 
 class Action(object):
 
-    def __init__(self, target):
+    def __init__(self, target=None):
         self.target = target
 
     def __eq__(self, other):

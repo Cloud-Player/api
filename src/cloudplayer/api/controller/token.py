@@ -10,11 +10,11 @@ import datetime
 import tornado.gen
 import tornado.options as opt
 
+from cloudplayer.api.controller import Controller, ControllerException
 from cloudplayer.api.model.token import Token
-import cloudplayer.api.controller
 
 
-class TokenController(cloudplayer.api.controller.Controller):
+class TokenController(Controller):
 
     __model__ = Token
 
@@ -25,9 +25,15 @@ class TokenController(cloudplayer.api.controller.Controller):
 
     @tornado.gen.coroutine
     def read(self, ids):
-        query = yield self.query(ids)
+        threshold = datetime.datetime.utcnow() - datetime.timedelta(minutes=5)
+        query = self.db.query(
+            self.__model__).filter_by(**ids).filter(Token.created > threshold)
         entity = query.one_or_none()
-        if entity and entity.claimed:
+        if not entity:
+            raise ControllerException(404)
+        account = self.accounts.get(entity.provider_id)
+        self.policy.grant_read(account, entity)
+        if entity.claimed:
             self.current_user['user_id'] = entity.account.user_id
             for p in opt.options['providers']:
                 self.current_user[p] = None
@@ -46,9 +52,3 @@ class TokenController(cloudplayer.api.controller.Controller):
             account_id=self.current_user['cloudplayer'],
             account_provider_id='cloudplayer')
         return entity
-
-    @tornado.gen.coroutine
-    def query(self, ids, **kw):
-        query = yield super().query(ids, **kw)
-        threshold = datetime.datetime.utcnow() - datetime.timedelta(minutes=5)
-        return query.filter(Token.created > threshold)

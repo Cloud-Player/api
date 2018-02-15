@@ -23,23 +23,23 @@ class Policy(object):
         self.current_user = current_user
 
     @staticmethod
-    def release(account, action, target, fields):
+    def _release(account, action, target, fields):
         for rule in target.__acl__:
             if rule(account, action, target, fields):
                 return
         raise PolicyViolation()
 
     def grant_create(self, account, entity):
-        self.release(account, Create, entity, Available)
+        self._release(account, Create, entity, Available)
 
     def grant_read(self, account, entity):
-        self.release(account, Read, entity, Available)
+        self._release(account, Read, entity, Available)
 
     def grant_update(self, account, entity, fields):
-        self.release(account, Update, entity, Fields(*fields))
+        self._release(account, Update, entity, Fields(*fields))
 
     def grant_delete(self, account, entity):
-        self.release(account, Delete, entity)
+        self._release(account, Delete, entity, Available)
 
     def grant_query(self, account, model, fields):
-        self.release(account, Query, model, Fields(*fields))
+        self._release(account, Query, model, Fields(*fields))

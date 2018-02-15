@@ -40,3 +40,4 @@ def test_fields_module_exposes_empty_fields_object():
     assert len(list(Empty)) == 0
     assert not Empty._target
     assert not Empty._values
+    assert Empty() is Empty

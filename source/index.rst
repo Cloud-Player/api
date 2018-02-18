@@ -1,7 +1,7 @@
 .. Cloud-Player API documentation master file
 
-Cloud-Player API Documentation
-==============================
+Cloud-Player API
+================
 
 .. toctree::
    :maxdepth: 2

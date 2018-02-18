@@ -10,7 +10,7 @@
 class Action(object):
 
     def __init__(self, target=None):
-        self.target = target
+        self._target = target
 
     def __eq__(self, other):
         raise NotImplementedError()  # pragma: no cover

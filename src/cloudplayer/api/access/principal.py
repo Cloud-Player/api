@@ -10,7 +10,7 @@
 class Principal(object):
 
     def __init__(self, target):
-        self.target = target
+        self._target = target
 
     def __eq__(self, other):
         raise NotImplementedError()  # pragma: no cover
@@ -25,16 +25,16 @@ class Everyone(Principal):
 class Owner(Principal):
 
     def __eq__(self, other):
-        return self.target.account == other
+        return self._target.account == other
 
 
 class Parent(Principal):
 
     def __eq__(self, other):
-        return self.target.parent == other
+        return self._target.parent == other
 
 
 class Child(Principal):
 
     def __eq__(self, other):
-        return other in self.target.children
+        return other in self._target.children

@@ -18,14 +18,14 @@ class Rule(object):
         self.action = action
         self.fields = fields
 
-    def __call__(self, principal, action, fields):
+    def __call__(self, account, action, fields):
         raise NotImplementedError()  # pragma: no cover
 
 
 class Allow(Rule):
 
-    def __call__(self, principal, action, target, fields):
-        if self.principal(target) == principal:
+    def __call__(self, account, action, target, fields):
+        if self.principal(target) == account:
             if self.action(target) == action(target):
                 if fields(target) in self.fields(target):
                     return True
@@ -33,8 +33,8 @@ class Allow(Rule):
 
 class Deny(Rule):
 
-    def __call__(self, principal, action, target, fields):
-        if self.principal(target) == principal:
+    def __call__(self, account, action, target, fields):
+        if self.principal(target) == account:
             if self.action(target) == action(target):
                 if fields(target) in self.fields(target):
                     raise PolicyViolation(404)

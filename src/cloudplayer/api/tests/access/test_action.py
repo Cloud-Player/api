@@ -1,5 +1,13 @@
+import mock
+
 from cloudplayer.api.access import (Anything, Create, Delete, Query, Read,
                                     Update)
+
+
+def test_action_should_bind_to_target():
+    target = mock.Mock()
+    action = Anything(target)
+    assert action._target is target
 
 
 def test_actions_for_extended_crud_are_available_in_module():

@@ -199,12 +199,12 @@ def configure_httpclient():
     try:
         tornado.httpclient.AsyncHTTPClient.configure(
             'tornado.curl_httpclient.CurlAsyncHTTPClient', defaults=defaults)
-    except ImportError:
+    except ImportError:  # pragma: no cover
         app_log.warn('could not setup curl client, using simple http instead')
         tornado.httpclient.AsyncHTTPClient.configure(None, defaults=defaults)
 
 
-def main():
+def main():  # pragma: no cover
     """Main tornado application entry point"""
     define_options()
     configure_httpclient()

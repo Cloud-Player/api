@@ -3,10 +3,10 @@ os: linux
 files:
   - source: .
     destination: /srv/cloudplayer
-  - source: ./api.conf
-    destination: /etc/supervisor/conf.d
-  - source: ./cloudplayer.conf
-    destination: /etc/nginx/sites-enabled
+  - source: ./supervisor.conf
+    destination: /etc/supervisor/conf.d/api.conf
+  - source: ./nginx.conf
+    destination: /etc/nginx/sites-enabled/cloudplayer.conf
 permissions:
   - object: /srv/cloudplayer
     owner: cloudplayer

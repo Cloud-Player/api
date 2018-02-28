@@ -62,7 +62,9 @@ types:
       account: Account
       play_count: integer
       favourite_count: integer
-      aspect_ratio: float
+      aspect_ratio:
+        type: number
+        format: float
       created: datetime
       duration: integer
       image: Image
@@ -85,30 +87,34 @@ types:
       playbacks: Playback[]
 
 /account:
+  uriParameters:
+    q?: string
+    user_id?: string
   get:
-    uriParameters:
-      q?: string
-      user_id?: string
-    200:
-      body: Account[]
+    responses:
+      200:
+        body: Account[]
   /{id}:
     get:
-      200:
-        body: Account
+      responses:
+        200:
+          body: Account
 
 /playlist:
+  uriParameters:
+    q?: string
+    account_id?: string
+    provider_id: string
   get:
-    uriParameters:
-      q?: string
-      account_id?: string
-      provider_id: string
-    200:
-      body: Playlist[]
+    responses:
+      200:
+        body: Playlist[]
   post:
     body:
       application/json: Playlist
-    200:
-      body: Playlist
+    responses:
+      200:
+        body: Playlist
 
   /{id}:
     get:
@@ -116,53 +122,62 @@ types:
     put:
       body:
         application/json: Playlist
-      200:
-        body: Playlist
+      responses:
+        200:
+          body: Playlist
     delete:
-      204:
+      responses:
+        204:
 
 /track:
+  uriParameters:
+    q?: string
+    account_id?: string
   get:
-    uriParameters:
-      q?: string
-      account_id?: string
-    200:
-      body: Track[]
+    responses:
+      200:
+        body: Track[]
   /{id}:
     get:
-      200:
-        body: Track
+      responses:
+        200:
+          body: Track
 
 /user:
   /{id}:
     get:
-      200:
-        body: User
+      responses:
+        200:
+          body: User
 
 /history:
   /{id}:
     get:
-      200:
-        body: History
+      responses:
+        200:
+          body: History
 
 /queue:
   /{id}:
     get:
-      200:
-        body: Queue
+      responses:
+        200:
+          body: Queue
 
 /youtube:
   description: Authorization endpoint to login with youtube
   get:
-    302:
-      description: Redirects to youtube oauth login prompt
-    200:
-      description: Callback endpoint that shows a popup closer
+    responses:
+      302:
+        description: Redirects to youtube oauth login prompt
+      200:
+        description: Callback endpoint that shows a popup closer
 
 /soundcloud:
   description: Authorization endpoint to login with soundcloud
   get:
-    302:
-      description: Redirects to soundcloud oauth login prompt
-    200:
-      description: Callback endpoint that shows a popup closer
+    responses:
+      302:
+        description: Redirects to soundcloud oauth login prompt
+      200:
+        description: Callback endpoint that shows a popup closer

@@ -1,0 +1,737 @@
+{
+  "swagger" : "2.0",
+  "info" : {
+    "version" : "1.0",
+    "title" : "Cloud-Player API",
+    "description" : "rest and websocket backend services"
+  },
+  "host" : "api.cloud-player.io",
+  "basePath" : "/",
+  "schemes" : [ "https" ],
+  "consumes" : [ "application/json" ],
+  "produces" : [ "application/json" ],
+  "paths" : {
+    "/account/{id}" : {
+      "get" : {
+        "summary" : "AccountById",
+        "tags" : [ "account" ],
+        "operationId" : "AccountByIdGet",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "type" : "string",
+          "description" : ""
+        }, {
+          "name" : "q",
+          "in" : "path",
+          "required" : true,
+          "type" : "string",
+          "description" : ""
+        }, {
+          "name" : "user_id",
+          "in" : "path",
+          "required" : true,
+          "type" : "string",
+          "description" : ""
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "schema" : {
+              "$ref" : "#/definitions/Account"
+            }
+          }
+        }
+      }
+    },
+    "/account" : {
+      "get" : {
+        "summary" : "Account",
+        "tags" : [ "account" ],
+        "operationId" : "AccountGet",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "q",
+          "in" : "path",
+          "required" : true,
+          "type" : "string",
+          "description" : ""
+        }, {
+          "name" : "user_id",
+          "in" : "path",
+          "required" : true,
+          "type" : "string",
+          "description" : ""
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/Account"
+              }
+            }
+          }
+        },
+        "x-unitTests" : [ {
+          "request" : {
+            "method" : "GET",
+            "uri" : "/account"
+          }
+        } ]
+      }
+    },
+    "/playlist/{id}" : {
+      "get" : {
+        "summary" : "PlaylistById",
+        "tags" : [ "playlist" ],
+        "operationId" : "PlaylistByIdGet",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "provider_id",
+          "in" : "path",
+          "required" : true,
+          "type" : "string",
+          "description" : ""
+        }, {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "type" : "string",
+          "description" : ""
+        }, {
+          "name" : "q",
+          "in" : "path",
+          "required" : true,
+          "type" : "string",
+          "description" : ""
+        }, {
+          "name" : "account_id",
+          "in" : "path",
+          "required" : true,
+          "type" : "string",
+          "description" : ""
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : ""
+          }
+        }
+      },
+      "put" : {
+        "summary" : "PlaylistById",
+        "tags" : [ "playlist" ],
+        "operationId" : "PlaylistByIdPut",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "provider_id",
+          "in" : "path",
+          "required" : true,
+          "type" : "string",
+          "description" : ""
+        }, {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "type" : "string",
+          "description" : ""
+        }, {
+          "name" : "body",
+          "in" : "body",
+          "required" : true,
+          "description" : "",
+          "schema" : {
+            "$ref" : "#/definitions/Playlist"
+          }
+        }, {
+          "name" : "q",
+          "in" : "path",
+          "required" : true,
+          "type" : "string",
+          "description" : ""
+        }, {
+          "name" : "account_id",
+          "in" : "path",
+          "required" : true,
+          "type" : "string",
+          "description" : ""
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "schema" : {
+              "$ref" : "#/definitions/Playlist"
+            }
+          }
+        }
+      },
+      "delete" : {
+        "summary" : "PlaylistById",
+        "tags" : [ "playlist" ],
+        "operationId" : "PlaylistByIdDelete",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "provider_id",
+          "in" : "path",
+          "required" : true,
+          "type" : "string",
+          "description" : ""
+        }, {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "type" : "string",
+          "description" : ""
+        }, {
+          "name" : "q",
+          "in" : "path",
+          "required" : true,
+          "type" : "string",
+          "description" : ""
+        }, {
+          "name" : "account_id",
+          "in" : "path",
+          "required" : true,
+          "type" : "string",
+          "description" : ""
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : ""
+          }
+        }
+      }
+    },
+    "/playlist" : {
+      "get" : {
+        "summary" : "Playlist",
+        "tags" : [ "playlist" ],
+        "operationId" : "PlaylistGet",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "provider_id",
+          "in" : "path",
+          "required" : true,
+          "type" : "string",
+          "description" : ""
+        }, {
+          "name" : "q",
+          "in" : "path",
+          "required" : true,
+          "type" : "string",
+          "description" : ""
+        }, {
+          "name" : "account_id",
+          "in" : "path",
+          "required" : true,
+          "type" : "string",
+          "description" : ""
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/Playlist"
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "summary" : "Playlist",
+        "tags" : [ "playlist" ],
+        "operationId" : "PlaylistPost",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "provider_id",
+          "in" : "path",
+          "required" : true,
+          "type" : "string",
+          "description" : ""
+        }, {
+          "name" : "body",
+          "in" : "body",
+          "required" : true,
+          "description" : "",
+          "schema" : {
+            "$ref" : "#/definitions/Playlist"
+          }
+        }, {
+          "name" : "q",
+          "in" : "path",
+          "required" : true,
+          "type" : "string",
+          "description" : ""
+        }, {
+          "name" : "account_id",
+          "in" : "path",
+          "required" : true,
+          "type" : "string",
+          "description" : ""
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "schema" : {
+              "$ref" : "#/definitions/Playlist"
+            }
+          }
+        }
+      }
+    },
+    "/track/{id}" : {
+      "get" : {
+        "summary" : "TrackById",
+        "tags" : [ "track" ],
+        "operationId" : "TrackByIdGet",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "type" : "string",
+          "description" : ""
+        }, {
+          "name" : "q",
+          "in" : "path",
+          "required" : true,
+          "type" : "string",
+          "description" : ""
+        }, {
+          "name" : "account_id",
+          "in" : "path",
+          "required" : true,
+          "type" : "string",
+          "description" : ""
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "schema" : {
+              "$ref" : "#/definitions/Track"
+            }
+          }
+        }
+      }
+    },
+    "/track" : {
+      "get" : {
+        "summary" : "Track",
+        "tags" : [ "track" ],
+        "operationId" : "TrackGet",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "q",
+          "in" : "path",
+          "required" : true,
+          "type" : "string",
+          "description" : ""
+        }, {
+          "name" : "account_id",
+          "in" : "path",
+          "required" : true,
+          "type" : "string",
+          "description" : ""
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/Track"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/{id}" : {
+      "get" : {
+        "summary" : "UserById",
+        "tags" : [ "user" ],
+        "operationId" : "UserByIdGet",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "type" : "string",
+          "description" : ""
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "schema" : {
+              "$ref" : "#/definitions/User"
+            }
+          }
+        }
+      }
+    },
+    "/history/{id}" : {
+      "get" : {
+        "summary" : "HistoryById",
+        "tags" : [ "history" ],
+        "operationId" : "HistoryByIdGet",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "type" : "string",
+          "description" : ""
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "schema" : {
+              "$ref" : "#/definitions/History"
+            }
+          }
+        }
+      }
+    },
+    "/queue/{id}" : {
+      "get" : {
+        "summary" : "QueueById",
+        "tags" : [ "queue" ],
+        "operationId" : "QueueByIdGet",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "type" : "string",
+          "description" : ""
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "",
+            "schema" : {
+              "$ref" : "#/definitions/Queue"
+            }
+          }
+        }
+      }
+    },
+    "/youtube" : {
+      "get" : {
+        "summary" : "Youtube",
+        "tags" : [ "youtube" ],
+        "operationId" : "YoutubeGet",
+        "produces" : [ "application/json" ],
+        "parameters" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "Callback endpoint that shows a popup closer"
+          }
+        }
+      }
+    },
+    "/soundcloud" : {
+      "get" : {
+        "summary" : "Soundcloud",
+        "tags" : [ "soundcloud" ],
+        "operationId" : "SoundcloudGet",
+        "produces" : [ "application/json" ],
+        "parameters" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "Callback endpoint that shows a popup closer"
+          }
+        }
+      }
+    }
+  },
+  "definitions" : {
+    "Image" : {
+      "title" : "Image",
+      "type" : "object",
+      "properties" : {
+        "id" : {
+          "description" : "",
+          "type" : "string"
+        },
+        "small" : {
+          "description" : "",
+          "type" : "string"
+        },
+        "medium" : {
+          "description" : "",
+          "type" : "string"
+        },
+        "large" : {
+          "description" : "",
+          "type" : "string"
+        }
+      },
+      "required" : [ "id", "small", "medium", "large" ]
+    },
+    "ProviderEnum" : {
+      "title" : "ProviderEnum",
+      "example" : "cloudplayer",
+      "x-enum-elements" : [ {
+        "name" : "cloudplayer",
+        "description" : ""
+      }, {
+        "name" : "soundcloud",
+        "description" : ""
+      }, {
+        "name" : "youtube",
+        "description" : ""
+      } ],
+      "type" : "string",
+      "enum" : [ "cloudplayer", "soundcloud", "youtube" ]
+    },
+    "Account" : {
+      "title" : "Account",
+      "type" : "object",
+      "properties" : {
+        "id" : {
+          "description" : "",
+          "type" : "string"
+        },
+        "title" : {
+          "description" : "",
+          "type" : "string"
+        },
+        "image" : {
+          "$ref" : "#/definitions/Image"
+        },
+        "created" : {
+          "description" : "",
+          "type" : "string",
+          "format" : "date-time"
+        },
+        "updated" : {
+          "description" : "",
+          "type" : "string",
+          "format" : "date-time"
+        },
+        "provider" : {
+          "$ref" : "#/definitions/ProviderEnum"
+        }
+      },
+      "required" : [ "id", "title", "image", "created", "updated", "provider" ]
+    },
+    "Playback" : {
+      "title" : "Playback",
+      "type" : "object",
+      "properties" : {
+        "id" : {
+          "description" : "",
+          "type" : "integer",
+          "format" : "int32"
+        },
+        "timestamp" : {
+          "description" : "",
+          "type" : "string",
+          "format" : "date-time"
+        },
+        "progress" : {
+          "description" : "",
+          "type" : "integer",
+          "format" : "int32"
+        },
+        "track_id" : {
+          "description" : "",
+          "type" : "integer",
+          "format" : "int32"
+        },
+        "provider" : {
+          "$ref" : "#/definitions/ProviderEnum"
+        },
+        "next" : {
+          "description" : "",
+          "type" : "integer",
+          "format" : "int32"
+        },
+        "status" : {
+          "$ref" : "#/definitions/StatusEnum"
+        }
+      },
+      "required" : [ "id", "timestamp", "progress", "track_id", "provider", "next" ]
+    },
+    "StatusEnum" : {
+      "title" : "statusEnum",
+      "example" : "completed",
+      "x-enum-elements" : [ {
+        "name" : "completed",
+        "description" : ""
+      }, {
+        "name" : "skipped",
+        "description" : ""
+      }, {
+        "name" : "current",
+        "description" : ""
+      }, {
+        "name" : "queued",
+        "description" : ""
+      }, {
+        "name" : "suggested",
+        "description" : ""
+      } ],
+      "type" : "string",
+      "enum" : [ "completed", "skipped", "current", "queued", "suggested" ]
+    },
+    "Playlist" : {
+      "title" : "Playlist",
+      "type" : "object",
+      "properties" : {
+        "id" : {
+          "description" : "",
+          "type" : "string"
+        },
+        "title" : {
+          "description" : "",
+          "type" : "string"
+        },
+        "provider" : {
+          "$ref" : "#/definitions/ProviderEnum"
+        },
+        "public" : {
+          "description" : "",
+          "type" : "boolean"
+        },
+        "image" : {
+          "$ref" : "#/definitions/Image"
+        },
+        "follower_count" : {
+          "description" : "",
+          "type" : "integer",
+          "format" : "int32"
+        },
+        "account" : {
+          "$ref" : "#/definitions/Account"
+        },
+        "tracks" : {
+          "description" : "",
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/Track"
+          }
+        }
+      },
+      "required" : [ "id", "title", "provider", "public", "image", "follower_count", "account", "tracks" ]
+    },
+    "Track" : {
+      "title" : "Track",
+      "type" : "object",
+      "properties" : {
+        "id" : {
+          "description" : "",
+          "type" : "string"
+        },
+        "provider" : {
+          "$ref" : "#/definitions/ProviderEnum"
+        },
+        "title" : {
+          "description" : "",
+          "type" : "string"
+        },
+        "account" : {
+          "$ref" : "#/definitions/Account"
+        },
+        "play_count" : {
+          "description" : "",
+          "type" : "integer",
+          "format" : "int32"
+        },
+        "favourite_count" : {
+          "description" : "",
+          "type" : "integer",
+          "format" : "int32"
+        },
+        "aspect_ratio" : {
+          "description" : "",
+          "type" : "number",
+          "format" : "double"
+        },
+        "created" : {
+          "description" : "",
+          "type" : "string",
+          "format" : "date-time"
+        },
+        "duration" : {
+          "description" : "",
+          "type" : "integer",
+          "format" : "int32"
+        },
+        "image" : {
+          "$ref" : "#/definitions/Image"
+        }
+      },
+      "required" : [ "id", "provider", "title", "account", "play_count", "favourite_count", "aspect_ratio", "created", "duration", "image" ]
+    },
+    "User" : {
+      "title" : "User",
+      "type" : "object",
+      "properties" : {
+        "id" : {
+          "description" : "",
+          "type" : "string"
+        },
+        "accounts" : {
+          "description" : "",
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/Account"
+          }
+        },
+        "created" : {
+          "description" : "",
+          "type" : "string",
+          "format" : "date-time"
+        },
+        "updated" : {
+          "description" : "",
+          "type" : "string",
+          "format" : "date-time"
+        }
+      },
+      "required" : [ "id", "accounts", "created", "updated" ]
+    },
+    "History" : {
+      "title" : "History",
+      "type" : "object",
+      "properties" : {
+        "user_id" : {
+          "description" : "",
+          "type" : "string"
+        },
+        "playbacks" : {
+          "description" : "",
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/Playback"
+          }
+        }
+      },
+      "required" : [ "user_id", "playbacks" ]
+    },
+    "Queue" : {
+      "title" : "Queue",
+      "type" : "object",
+      "properties" : {
+        "user_id" : {
+          "description" : "",
+          "type" : "string"
+        },
+        "playbacks" : {
+          "description" : "",
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/Playback"
+          }
+        }
+      },
+      "required" : [ "user_id", "playbacks" ]
+    }
+  }
+}

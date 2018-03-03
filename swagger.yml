@@ -14,15 +14,17 @@ produces:
 paths:
   /account/{provider_id}/{id}:
     parameters:
+      parameters:
       - name: provider_id
         in: path
         required: true
-        $ref: '#/definitions/Account/properties/provider_id'
+        type: string
+        description: 'Account provider ID'
       - name: id
         in: path
         required: true
         type: string
-        description: 'Foo Account ID'
+        description: 'Account ID'
     get:
       operationId: AccountEntityGet
       responses:
@@ -358,21 +360,13 @@ definitions:
     - small
     - medium
     - large
-  ProviderEnum:
-    title: ProviderEnum
-    example: cloudplayer
-    x-enum-elements:
-    - name: cloudplayer
-      description: ''
-    - name: soundcloud
-      description: ''
-    - name: youtube
-      description: ''
-    type: string
-    enum:
-    - cloudplayer
-    - soundcloud
-    - youtube
+  Provider:
+    title: Provider
+    type: object
+    properties:
+      id:
+        description: 'Provider ID'
+        type: string
   Account:
     title: Account
     type: object
@@ -380,6 +374,8 @@ definitions:
       id:
         description: ''
         type: string
+      provider_id:
+        $ref: '#/definitions/Provider/properties/id'
       title:
         description: ''
         type: string
@@ -394,7 +390,7 @@ definitions:
         type: string
         format: date-time
       provider:
-        $ref: '#/definitions/ProviderEnum'
+        $ref: '#/definitions/Provider'
     required:
     - id
     - title

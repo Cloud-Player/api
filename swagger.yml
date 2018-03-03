@@ -14,11 +14,11 @@ produces:
 paths:
   /account/{provider_id}/{id}:
     parameters:
-      provider_id:
+      - name: provider_id
         in: path
         required: true
-        $ref: '#definitions/Account/properties/provider_id'
-      id:
+        $ref: '#/definitions/Account/properties/provider_id'
+      - name: id
         in: path
         required: true
         type: string

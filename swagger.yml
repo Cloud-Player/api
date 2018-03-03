@@ -418,41 +418,28 @@ definitions:
         type: integer
         format: int32
       provider:
-        $ref: '#/definitions/ProviderEnum'
+        $ref: '#/definitions/Provider'
       next:
         description: ''
         type: integer
         format: int32
       status:
-        $ref: '#/definitions/StatusEnum'
+        $ref: '#/definitions/Status'
     required:
-    - id
-    - timestamp
-    - progress
-    - track_id
-    - provider
-    - next
-  StatusEnum:
-    title: statusEnum
-    example: completed
-    x-enum-elements:
-    - name: completed
-      description: ''
-    - name: skipped
-      description: ''
-    - name: current
-      description: ''
-    - name: queued
-      description: ''
-    - name: suggested
-      description: ''
+      - id
+      - timestamp
+      - progress
+      - track_id
+      - provider
+      - next
+  Status:
     type: string
-    enum:
-    - completed
-    - skipped
-    - current
-    - queued
-    - suggested
+    enum: &STATUS
+      - completed
+      - skipped
+      - current
+      - queued
+      - suggested
   Playlist:
     title: Playlist
     type: object
@@ -464,7 +451,7 @@ definitions:
         description: ''
         type: string
       provider:
-        $ref: '#/definitions/ProviderEnum'
+        $ref: '#/definitions/Provider'
       public:
         description: ''
         type: boolean
@@ -498,8 +485,22 @@ definitions:
         description: 'Playlist item ID'
         type: string
       playlist_id:
-        description: 'Playlist ID'
         $ref: '#/definitions/Playlist/properties/id'
+      playlist_provider_id:
+        $ref: '#/definitions/Provider/properties/id'
+      rank:
+        description: 'Playlist item rank'
+      track_provider_id:
+        $ref: '#/definitions/Provider/properties/id'
+      track_id:
+        $ref: '#/definitions/Track/properties/id'
+    required:
+    - id
+    - playlist_id
+    - playlist_provider_id
+    - rank
+    - track_provider_id
+    - track_id
   Track:
     title: Track
     type: object
@@ -508,7 +509,7 @@ definitions:
         description: ''
         type: string
       provider:
-        $ref: '#/definitions/ProviderEnum'
+        $ref: '#/definitions/Provider'
       title:
         description: ''
         type: string

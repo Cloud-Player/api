@@ -14,17 +14,16 @@ produces:
 paths:
   /account/{provider_id}/{id}:
     parameters:
-      parameters:
-      - name: provider_id
-        in: path
-        required: true
-        type: string
-        description: 'Account provider ID'
-      - name: id
-        in: path
-        required: true
-        type: string
-        description: 'Account ID'
+    - name: provider_id
+      in: path
+      required: true
+      type: string
+      description: 'Account provider ID'
+    - name: id
+      in: path
+      required: true
+      type: string
+      description: 'Account ID'
     get:
       operationId: AccountEntityGet
       responses:

@@ -13,383 +13,320 @@ produces:
 - application/json
 paths:
   /account/{provider_id}/{id}:
-    parameters:
-    - name: provider_id
-      in: path
-      required: true
-      type: string
-      description: 'Account provider ID'
-    - name: id
-      in: path
-      required: true
-      type: string
-      description: 'Account ID'
     get:
       operationId: AccountEntityGet
       responses:
-        200:
-          description: 'OK'
+        '200':
+          description: OK
           schema:
             $ref: '#/definitions/Account'
-  /playlist/{playlist_provider_id}/{playlist_id}/{id}:
     parameters:
-      - name: playlist_provider_id
-        in: path
-        required: true
-        type: string
-        description: 'Playlist Provider ID'
-      - name: playlist_id
-        in: path
-        required: true
-        type: string
-        description: 'Playlist ID'
-      - name: id
-        in: path
-        required: true
-        type: string
-        description: 'Playlist Item ID'
-    get:
-      operationId: PlaylistItemEntityGet
-      parameters:
-      - name: q
-        in: path
-        required: true
-        type: string
-        description: ''
-      - name: account_id
-        in: path
-        required: true
-        type: string
-        description: ''
-      responses:
-        200:
-          description: 'OK'
-          schema:
-            $ref: '#/definitions/PlaylistItem'
-    put:
-      summary: PlaylistById
-      tags:
-      - playlist
-      operationId: PlaylistByIdPut
-      produces:
-      - application/json
-      parameters:
-      - name: provider_id
-        in: path
-        required: true
-        type: string
-        description: ''
-      - name: id
-        in: path
-        required: true
-        type: string
-        description: ''
-      - name: body
-        in: body
-        required: true
-        description: ''
-        schema:
-          $ref: '#/definitions/Playlist'
-      - name: q
-        in: path
-        required: true
-        type: string
-        description: ''
-      - name: account_id
-        in: path
-        required: true
-        type: string
-        description: ''
-      responses:
-        200:
-          description: ''
-          schema:
-            $ref: '#/definitions/Playlist'
-    delete:
-      summary: PlaylistById
-      tags:
-      - playlist
-      operationId: PlaylistByIdDelete
-      produces:
-      - application/json
-      parameters:
-      - name: provider_id
-        in: path
-        required: true
-        type: string
-        description: ''
-      - name: id
-        in: path
-        required: true
-        type: string
-        description: ''
-      - name: q
-        in: path
-        required: true
-        type: string
-        description: ''
-      - name: account_id
-        in: path
-        required: true
-        type: string
-        description: ''
-      responses:
-        204:
-          description: ''
-  /playlist:
-    get:
-      summary: Playlist
-      tags:
-      - playlist
-      operationId: PlaylistGet
-      produces:
-      - application/json
-      parameters:
-      - name: provider_id
-        in: path
-        required: true
-        type: string
-        description: ''
-      - name: q
-        in: path
-        required: true
-        type: string
-        description: ''
-      - name: account_id
-        in: path
-        required: true
-        type: string
-        description: ''
-      responses:
-        200:
-          description: ''
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/Playlist'
-    post:
-      summary: Playlist
-      tags:
-      - playlist
-      operationId: PlaylistPost
-      produces:
-      - application/json
-      parameters:
-      - name: provider_id
-        in: path
-        required: true
-        type: string
-        description: ''
-      - name: body
-        in: body
-        required: true
-        description: ''
-        schema:
-          $ref: '#/definitions/Playlist'
-      - name: q
-        in: path
-        required: true
-        type: string
-        description: ''
-      - name: account_id
-        in: path
-        required: true
-        type: string
-        description: ''
-      responses:
-        200:
-          description: ''
-          schema:
-            $ref: '#/definitions/Playlist'
-  /track/{id}:
-    get:
-      summary: TrackById
-      tags:
-      - track
-      operationId: TrackByIdGet
-      produces:
-      - application/json
-      parameters:
-      - name: id
-        in: path
-        required: true
-        type: string
-        description: ''
-      - name: q
-        in: path
-        required: true
-        type: string
-        description: ''
-      - name: account_id
-        in: path
-        required: true
-        type: string
-        description: ''
-      responses:
-        200:
-          description: ''
-          schema:
-            $ref: '#/definitions/Track'
-  /track:
-    get:
-      summary: Track
-      tags:
-      - track
-      operationId: TrackGet
-      produces:
-      - application/json
-      parameters:
-      - name: q
-        in: path
-        required: true
-        type: string
-        description: ''
-      - name: account_id
-        in: path
-        required: true
-        type: string
-        description: ''
-      responses:
-        200:
-          description: ''
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/Track'
-  /user/{id}:
-    get:
-      summary: UserById
-      tags:
-      - user
-      operationId: UserByIdGet
-      produces:
-      - application/json
-      parameters:
-      - name: id
-        in: path
-        required: true
-        type: string
-        description: ''
-      responses:
-        200:
-          description: ''
-          schema:
-            $ref: '#/definitions/User'
+    - description: Account provider ID
+      in: path
+      name: provider_id
+      required: true
+      type: string
+    - description: Account ID
+      in: path
+      name: id
+      required: true
+      type: string
   /history/{id}:
     get:
-      summary: HistoryById
-      tags:
-      - history
       operationId: HistoryByIdGet
-      produces:
-      - application/json
       parameters:
-      - name: id
+      - description: ''
         in: path
+        name: id
         required: true
         type: string
-        description: ''
+      produces:
+      - application/json
       responses:
-        200:
+        '200':
           description: ''
           schema:
             $ref: '#/definitions/History'
-  /queue/{id}:
+  /playlist:
     get:
-      summary: QueueById
-      tags:
-      - queue
-      operationId: QueueByIdGet
-      produces:
-      - application/json
+      operationId: PlaylistGet
       parameters:
-      - name: id
+      - description: ''
         in: path
+        name: provider_id
         required: true
         type: string
-        description: ''
+      - description: ''
+        in: path
+        name: q
+        required: true
+        type: string
+      - description: ''
+        in: path
+        name: account_id
+        required: true
+        type: string
+      produces:
+      - application/json
       responses:
-        200:
+        '200':
+          description: ''
+          schema:
+            items:
+              $ref: '#/definitions/Playlist'
+            type: array
+    post:
+      operationId: PlaylistPost
+      parameters:
+      - description: ''
+        in: path
+        name: provider_id
+        required: true
+        type: string
+      - description: ''
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/Playlist'
+      - description: ''
+        in: path
+        name: q
+        required: true
+        type: string
+      - description: ''
+        in: path
+        name: account_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/Playlist'
+  /playlist/{playlist_provider_id}/{playlist_id}/{id}:
+    delete:
+      operationId: PlaylistByIdDelete
+      parameters:
+      - description: ''
+        in: path
+        name: provider_id
+        required: true
+        type: string
+      - description: ''
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: ''
+        in: path
+        name: q
+        required: true
+        type: string
+      - description: ''
+        in: path
+        name: account_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        '204':
+          description: ''
+    get:
+      operationId: PlaylistItemEntityGet
+      parameters:
+      - description: ''
+        in: path
+        name: q
+        required: true
+        type: string
+      - description: ''
+        in: path
+        name: account_id
+        required: true
+        type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/PlaylistItem'
+    parameters:
+    - description: Playlist Provider ID
+      in: path
+      name: playlist_provider_id
+      required: true
+      type: string
+    - description: Playlist ID
+      in: path
+      name: playlist_id
+      required: true
+      type: string
+    - description: Playlist Item ID
+      in: path
+      name: id
+      required: true
+      type: string
+    put:
+      operationId: PlaylistByIdPut
+      parameters:
+      - description: ''
+        in: path
+        name: provider_id
+        required: true
+        type: string
+      - description: ''
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: ''
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/Playlist'
+      - description: ''
+        in: path
+        name: q
+        required: true
+        type: string
+      - description: ''
+        in: path
+        name: account_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/Playlist'
+  /queue/{id}:
+    get:
+      operationId: QueueByIdGet
+      parameters:
+      - description: ''
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        '200':
           description: ''
           schema:
             $ref: '#/definitions/Queue'
-  /youtube:
-    get:
-      summary: Youtube
-      tags:
-      - youtube
-      operationId: YoutubeGet
-      produces:
-      - application/json
-      parameters: []
-      responses:
-        200:
-          description: Callback endpoint that shows a popup closer
   /soundcloud:
     get:
-      summary: Soundcloud
-      tags:
-      - soundcloud
       operationId: SoundcloudGet
+      parameters: []
       produces:
       - application/json
-      parameters: []
       responses:
-        200:
+        '200':
+          description: Callback endpoint that shows a popup closer
+  /track:
+    get:
+      operationId: TrackGet
+      parameters:
+      - description: ''
+        in: path
+        name: q
+        required: true
+        type: string
+      - description: ''
+        in: path
+        name: account_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        '200':
+          description: ''
+          schema:
+            items:
+              $ref: '#/definitions/Track'
+            type: array
+  /track/{id}:
+    get:
+      operationId: TrackByIdGet
+      parameters:
+      - description: ''
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: ''
+        in: path
+        name: q
+        required: true
+        type: string
+      - description: ''
+        in: path
+        name: account_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/Track'
+  /user/{id}:
+    get:
+      operationId: UserByIdGet
+      parameters:
+      - description: ''
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        '200':
+          description: ''
+          schema:
+            $ref: '#/definitions/User'
+  /youtube:
+    get:
+      operationId: YoutubeGet
+      parameters: []
+      produces:
+      - application/json
+      responses:
+        '200':
           description: Callback endpoint that shows a popup closer
 definitions:
-  Image:
-    title: Image
-    type: object
-    properties:
-      id:
-        description: ''
-        type: string
-      small:
-        description: ''
-        type: string
-      medium:
-        description: ''
-        type: string
-      large:
-        description: ''
-        type: string
-    required:
-    - id
-    - small
-    - medium
-    - large
-  Provider:
-    title: Provider
-    type: object
-    properties:
-      id:
-        description: 'Provider ID'
-        type: string
   Account:
-    title: Account
-    type: object
     properties:
+      created:
+        description: ''
+        format: date-time
+        type: string
       id:
         description: ''
         type: string
+      image:
+        $ref: '#/definitions/Image'
+      provider:
+        $ref: '#/definitions/Provider'
       provider_id:
         $ref: '#/definitions/Provider/properties/id'
       title:
         description: ''
         type: string
-      image:
-        $ref: '#/definitions/Image'
-      created:
-        description: ''
-        type: string
-        format: date-time
       updated:
         description: ''
-        type: string
         format: date-time
-      provider:
-        $ref: '#/definitions/Provider'
+        type: string
     required:
     - id
     - title
@@ -397,77 +334,105 @@ definitions:
     - created
     - updated
     - provider
-  Playback:
-    title: Playback
+    title: Account
     type: object
+  History:
+    properties:
+      playbacks:
+        description: ''
+        items:
+          $ref: '#/definitions/Playback'
+        type: array
+      user_id:
+        description: ''
+        type: string
+    required:
+    - user_id
+    - playbacks
+    title: History
+    type: object
+  Image:
     properties:
       id:
         description: ''
-        type: integer
-        format: int32
-      timestamp:
+        type: string
+      large:
         description: ''
         type: string
-        format: date-time
-      progress:
+      medium:
         description: ''
-        type: integer
-        format: int32
-      track_id:
+        type: string
+      small:
         description: ''
-        type: integer
+        type: string
+    required:
+    - id
+    - small
+    - medium
+    - large
+    title: Image
+    type: object
+  Playback:
+    properties:
+      id:
+        description: ''
         format: int32
-      provider:
-        $ref: '#/definitions/Provider'
+        type: integer
       next:
         description: ''
-        type: integer
         format: int32
+        type: integer
+      progress:
+        description: ''
+        format: int32
+        type: integer
+      provider:
+        $ref: '#/definitions/Provider'
       status:
         $ref: '#/definitions/Status'
+      timestamp:
+        description: ''
+        format: date-time
+        type: string
+      track_id:
+        description: ''
+        format: int32
+        type: integer
     required:
-      - id
-      - timestamp
-      - progress
-      - track_id
-      - provider
-      - next
-  Status:
-    type: string
-    enum: &STATUS
-      - completed
-      - skipped
-      - current
-      - queued
-      - suggested
-  Playlist:
-    title: Playlist
+    - id
+    - timestamp
+    - progress
+    - track_id
+    - provider
+    - next
+    title: Playback
     type: object
+  Playlist:
     properties:
+      account:
+        $ref: '#/definitions/Account'
+      follower_count:
+        description: ''
+        format: int32
+        type: integer
       id:
         description: ''
         type: string
-      title:
-        description: ''
-        type: string
+      image:
+        $ref: '#/definitions/Image'
       provider:
         $ref: '#/definitions/Provider'
       public:
         description: ''
         type: boolean
-      image:
-        $ref: '#/definitions/Image'
-      follower_count:
+      title:
         description: ''
-        type: integer
-        format: int32
-      account:
-        $ref: '#/definitions/Account'
+        type: string
       tracks:
         description: ''
-        type: array
         items:
           $ref: '#/definitions/Track'
+        type: array
     required:
     - id
     - title
@@ -477,23 +442,23 @@ definitions:
     - follower_count
     - account
     - tracks
-  PlaylistItem:
-    title: PlaylistItem
+    title: Playlist
     type: object
+  PlaylistItem:
     properties:
       id:
-        description: 'Playlist item ID'
+        description: Playlist item ID
         type: string
       playlist_id:
         $ref: '#/definitions/Playlist/properties/id'
       playlist_provider_id:
         $ref: '#/definitions/Provider/properties/id'
       rank:
-        description: 'Playlist item rank'
-      track_provider_id:
-        $ref: '#/definitions/Provider/properties/id'
+        description: Playlist item rank
       track_id:
         $ref: '#/definitions/Track/properties/id'
+      track_provider_id:
+        $ref: '#/definitions/Provider/properties/id'
     required:
     - id
     - playlist_id
@@ -501,42 +466,72 @@ definitions:
     - rank
     - track_provider_id
     - track_id
-  Track:
-    title: Track
+    title: PlaylistItem
     type: object
+  Provider:
     properties:
+      id:
+        description: Provider ID
+        type: string
+    title: Provider
+    type: object
+  Queue:
+    properties:
+      playbacks:
+        description: ''
+        items:
+          $ref: '#/definitions/Playback'
+        type: array
+      user_id:
+        description: ''
+        type: string
+    required:
+    - user_id
+    - playbacks
+    title: Queue
+    type: object
+  Status:
+    enum:
+    - completed
+    - skipped
+    - current
+    - queued
+    - suggested
+    type: string
+  Track:
+    properties:
+      account:
+        $ref: '#/definitions/Account'
+      aspect_ratio:
+        description: ''
+        format: double
+        type: number
+      created:
+        description: ''
+        format: date-time
+        type: string
+      duration:
+        description: ''
+        format: int32
+        type: integer
+      favourite_count:
+        description: ''
+        format: int32
+        type: integer
       id:
         description: ''
         type: string
+      image:
+        $ref: '#/definitions/Image'
+      play_count:
+        description: ''
+        format: int32
+        type: integer
       provider:
         $ref: '#/definitions/Provider'
       title:
         description: ''
         type: string
-      account:
-        $ref: '#/definitions/Account'
-      play_count:
-        description: ''
-        type: integer
-        format: int32
-      favourite_count:
-        description: ''
-        type: integer
-        format: int32
-      aspect_ratio:
-        description: ''
-        type: number
-        format: double
-      created:
-        description: ''
-        type: string
-        format: date-time
-      duration:
-        description: ''
-        type: integer
-        format: int32
-      image:
-        $ref: '#/definitions/Image'
     required:
     - id
     - provider
@@ -548,58 +543,30 @@ definitions:
     - created
     - duration
     - image
-  User:
-    title: User
+    title: Track
     type: object
+  User:
     properties:
+      accounts:
+        description: ''
+        items:
+          $ref: '#/definitions/Account'
+        type: array
+      created:
+        description: ''
+        format: date-time
+        type: string
       id:
         description: ''
         type: string
-      accounts:
-        description: ''
-        type: array
-        items:
-          $ref: '#/definitions/Account'
-      created:
-        description: ''
-        type: string
-        format: date-time
       updated:
         description: ''
-        type: string
         format: date-time
+        type: string
     required:
     - id
     - accounts
     - created
     - updated
-  History:
-    title: History
+    title: User
     type: object
-    properties:
-      user_id:
-        description: ''
-        type: string
-      playbacks:
-        description: ''
-        type: array
-        items:
-          $ref: '#/definitions/Playback'
-    required:
-    - user_id
-    - playbacks
-  Queue:
-    title: Queue
-    type: object
-    properties:
-      user_id:
-        description: ''
-        type: string
-      playbacks:
-        description: ''
-        type: array
-        items:
-          $ref: '#/definitions/Playback'
-    required:
-    - user_id
-    - playbacks

@@ -1,5 +1,5 @@
 from .action import Anything, Create, Delete, Query, Read, Update
-from .fields import Available, Empty, Fields
+from .fields import Available, Fields
 from .policy import Policy, PolicyViolation
 from .principal import Child, Everyone, Owner, Parent
 from .rule import Allow, Deny

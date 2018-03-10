@@ -9,13 +9,12 @@
 
 class Fields(object):
 
-    def __init__(self, *args):
-        self._target = None
+    def __init__(self, *args, target=None):
         self._values = frozenset(args)
+        self._target = target
 
     def __call__(self, target):
-        self._target = target
-        return self
+        return Fields(*self._values, target=target)
 
     def __iter__(self):
         yield from self._values
@@ -33,18 +32,5 @@ class Available(Fields):
 
     def __call__(self, target):
         self._target = target
-        self._values = frozenset(target.__fields__)
+        self._values = frozenset(target.fields)
         return self
-
-
-class _Empty(Fields):
-
-    def __init__(self):
-        self._target = None
-        self._values = frozenset()
-
-    def __call__(self, *args):
-        return self
-
-
-Empty = _Empty()

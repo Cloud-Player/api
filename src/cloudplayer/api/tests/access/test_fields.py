@@ -1,6 +1,6 @@
 import mock
 
-from cloudplayer.api.access import Available, Empty, Fields
+from cloudplayer.api.access import Available, Fields
 
 
 def test_fields_should_be_eager_with_values_and_lazy_with_targets():
@@ -8,8 +8,8 @@ def test_fields_should_be_eager_with_values_and_lazy_with_targets():
     assert fields._target is None
     assert fields._values == {'one', 'two', 'six'}
     target = object()
-    assert fields is fields(target)
-    assert fields._target is target
+    assert fields in fields(target)
+    assert fields(target)._target is target
     assert set(fields) == {'one', 'two', 'six'}
 
 
@@ -27,17 +27,10 @@ def test_fields_should_check_field_containment_against_values():
 
 def test_available_fields_init_eagerly_and_extract_fields_from_target():
     target = mock.Mock()
-    target.__fields__ = ['ten', 'six', 'two']
+    target.fields = ('ten', 'six', 'two')
     f1 = Available(target)
     assert f1._target is target
     assert set(f1) == {'ten', 'six', 'two'}
     f2 = Available(target)(target)
     assert f2._target is target
     assert set(f2) == {'ten', 'six', 'two'}
-
-
-def test_fields_module_exposes_empty_fields_object():
-    assert len(list(Empty)) == 0
-    assert not Empty._target
-    assert not Empty._values
-    assert Empty() is Empty

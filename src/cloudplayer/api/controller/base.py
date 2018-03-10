@@ -9,14 +9,13 @@ import tornado.gen
 import tornado.options as opt
 
 from cloudplayer.api import APIException
-from cloudplayer.api.access import Policy
+from cloudplayer.api.access import Available, Policy
 from cloudplayer.api.controller.auth import create_controller
-from cloudplayer.api.model.account import Account
 
 
 class ControllerException(APIException):
 
-    def __init__(self, status_code=403, log_message='operation failed'):
+    def __init__(self, status_code=400, log_message='controller exception'):
         super().__init__(status_code, log_message)
 
 
@@ -64,6 +63,7 @@ class Controller(object):
     def accounts(self):
         # TODO: This should move up the food chain
         from sqlalchemy.orm.session import make_transient_to_detached
+        from cloudplayer.api.model.account import Account
         dict_ = {}
         for provider_id in opt.options['providers']:
             account = Account(
@@ -75,32 +75,33 @@ class Controller(object):
         return dict_
 
     @tornado.gen.coroutine
-    def create(self, ids, **kw):
+    def create(self, ids, kw, fields=Available):
         params = self._merge_ids_with_kw(ids, kw)
         entity = self.__model__(**params)
         account = self.accounts.get(entity.provider_id)
-        self.policy.grant_create(account, entity)
+        self.policy.grant_create(account, entity, params.keys())
         self.db.add(entity)
         self.db.commit()
+        self.policy.grant_read(account, entity, fields)
         return entity
 
     @tornado.gen.coroutine
-    def read(self, ids):
-        entity = self.db.query(self.__model__).filter_by(**ids).one_or_none()
-        if entity:
-            account = self.accounts.get(entity.provider_id)
-            self.policy.grant_read(account, entity)
-            return entity
-        else:
-            raise ControllerException(404)
-
-    @tornado.gen.coroutine
-    def update(self, ids, **kw):
+    def read(self, ids, fields=Available):
         entity = self.db.query(self.__model__).filter_by(**ids).one_or_none()
         if not entity:
-            raise ControllerException(404)
-        params = self._eject_ids_from_kw(ids, kw)
+            raise ControllerException(404, 'not found')
         account = self.accounts.get(entity.provider_id)
+        self.policy.grant_read(account, entity, fields)
+        return entity
+
+    @tornado.gen.coroutine
+    def update(self, ids, kw, fields=Available):
+        entity = self.db.query(self.__model__).filter_by(**ids).one_or_none()
+        if not entity:
+            raise ControllerException(404, 'not found')
+        account = self.accounts.get(entity.provider_id)
+        self.policy.grant_read(account, entity, fields)
+        params = self._eject_ids_from_kw(ids, kw)
         self.policy.grant_update(account, entity, params)
         self.db.query(self.__model__).filter_by(**ids).update(params)
         self.db.commit()
@@ -110,17 +111,17 @@ class Controller(object):
     def delete(self, ids):
         entity = self.db.query(self.__model__).filter_by(**ids).one_or_none()
         if not entity:
-            raise ControllerException(404)
+            raise ControllerException(404, 'not found')
         account = self.accounts.get(entity.provider_id)
         self.policy.grant_delete(account, entity)
         self.db.delete(entity)
         self.db.commit()
 
     @tornado.gen.coroutine
-    def query(self, ids, **kw):
+    def query(self, ids, kw):
+        account = self.accounts.get(ids['provider_id'])
+        self.policy.grant_query(account, self.__model__, kw)
         params = self._merge_ids_with_kw(ids, kw)
-        account = self.accounts.get(params.get('provider_id'), 'cloudplayer')
-        self.policy.grant_query(account, self.__model__, kw.keys())
         query = self.db.query(self.__model__)
         for field, value in params.items():
             expression = getattr(self.__model__, field) == value
@@ -128,11 +129,10 @@ class Controller(object):
         return query
 
     @tornado.gen.coroutine
-    def search(self, ids, **kw):
-        query = yield self.query(ids, **kw)
-        return query.all()
-
-    @tornado.gen.coroutine
-    def count(self, ids, **kw):
-        query = yield self.query(ids, **kw)
-        return query.count()
+    def search(self, ids, kw, fields=Available):
+        query = yield self.query(ids, kw)
+        entities = query.all()
+        account = self.accounts.get(ids['provider_id'])
+        for entity in entities:  # TODO: Find a better way
+            self.policy.grant_read(account, entity, fields)
+        return entities

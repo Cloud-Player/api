@@ -12,29 +12,57 @@ class Principal(object):
     def __init__(self, target):
         self._target = target
 
+    def __call__(self, target):
+        return type(self)(target)
+
+    @property
+    def account(self):
+        return self._target
+
     def __eq__(self, other):
-        raise NotImplementedError()  # pragma: no cover
+        if isinstance(other, Principal):
+            return (
+                self.account is not None and
+                other.account is not None and
+                (self.account.id == other.account.id) is True and
+                (self.account.provider_id == other.account.provider_id)
+                is True)
+        return super().__eq__(other)
 
 
 class Everyone(Principal):
 
+    @property
+    def account(self):
+        return
+
     def __eq__(self, other):
-        return True
+        if isinstance(other, Principal):
+            return True
+        return super().__eq__(other)
 
 
 class Owner(Principal):
 
-    def __eq__(self, other):
-        return self._target.account == other
+    @property
+    def account(self):
+        return self._target.account
 
 
 class Parent(Principal):
 
-    def __eq__(self, other):
-        return self._target.parent == other
+    @property
+    def account(self):
+        return self._target.parent.account
 
 
 class Child(Principal):
 
+    @property
+    def account(self):
+        return
+
     def __eq__(self, other):
-        return other in self._target.children
+        if isinstance(other, Principal):
+            return other.account in self._target.children
+        return super().__eq__(other)

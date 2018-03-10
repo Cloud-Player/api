@@ -5,7 +5,6 @@ import mock
 import pytest
 import tornado.gen
 
-from cloudplayer.api.model.account import Account
 from cloudplayer.api.controller.auth import (
     create_controller, AuthController,
     SoundcloudAuthController, YoutubeAuthController)

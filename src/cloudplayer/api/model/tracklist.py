@@ -31,6 +31,7 @@ class TracklistMixin(object):
 
     id = sql.Column(sql.String(96), default=functools.partial(
         cloudplayer.api.util.gen_token, 16))
+
     provider_id = sql.Column(sql.String(16), default='cloudplayer')
 
     @declared_attr

@@ -75,6 +75,7 @@ class HandlerMixin(object):
 class ControllerHandlerMixin(object):
 
     __controller__ = NotImplemented
+    fields = None
 
     @property
     def controller(self):
@@ -99,7 +100,7 @@ class EntityMixin(ControllerHandlerMixin):
 
     @tornado.gen.coroutine
     def patch(self, **ids):
-        entity = yield self.controller.update(ids, **self.body)
+        entity = yield self.controller.update(ids, self.body)
         yield self.write(entity)
 
     @tornado.gen.coroutine
@@ -116,10 +117,10 @@ class CollectionMixin(ControllerHandlerMixin):
     @tornado.gen.coroutine
     def get(self, **ids):
         query = dict(self.query_params)
-        entities = yield self.controller.search(ids, **query)
+        entities = yield self.controller.search(ids, query)
         yield self.write(entities)
 
     @tornado.gen.coroutine
     def post(self, **ids):
-        entity = yield self.controller.create(ids, **self.body)
+        entity = yield self.controller.create(ids, self.body)
         yield self.write(entity)

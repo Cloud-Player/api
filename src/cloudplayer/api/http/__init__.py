@@ -1,3 +1,7 @@
-__import__('pkg_resources').declare_namespace(__name__)
-
 from .base import HTTPException, HTTPHandler
+
+__all__ = [
+    'HTTPException',
+    'HTTPHandler'
+]
+__import__('pkg_resources').declare_namespace(__name__)

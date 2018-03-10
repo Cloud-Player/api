@@ -15,10 +15,3 @@ class Entity(EntityMixin, HTTPHandler):
     __controller__ = FavouriteController
 
     SUPPORTED_METHODS = ('GET', 'OPTIONS')
-
-
-class Collection(CollectionMixin, HTTPHandler):
-
-    __controller__ = FavouriteController
-
-    SUPPORTED_METHODS = ('GET', 'OPTIONS')

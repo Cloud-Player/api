@@ -1,9 +1,14 @@
+import functools
+import json
 import os
+import random
 import sys
 
 import jwt
 import pytest
 import pytest_redis.factories as redis_factories
+import tornado.escape
+import tornado.gen
 import tornado.options as opt
 
 import cloudplayer.api.app
@@ -33,6 +38,26 @@ def which(executable):  # pragma: no cover
                     return f
     else:
         return None
+
+
+def randstr(
+        length=10,
+        alphabet=[chr(c) for r in [
+            (0x0021, 0x0021),
+            (0x0023, 0x0026),
+            (0x0028, 0x007E),
+            (0x00A1, 0x00AC),
+            (0x00AE, 0x00FF),
+            (0x0100, 0x017F),
+            (0x0180, 0x024F),
+            (0x2C60, 0x2C7F),
+            (0x16A0, 0x16F0),
+            (0x0370, 0x0377),
+            (0x037A, 0x037E),
+            (0x0384, 0x038A),
+            (0x038C, 0x038C)
+        ] for c in range(r[0], r[1] + 1)]):  # pragma: no cover
+    return ''.join(random.choice(alphabet) for i in range(length))
 
 
 redis_proc = redis_factories.redis_proc(executable=which('redis-server'))
@@ -87,20 +112,36 @@ def db(app):
 
 
 @pytest.fixture(scope='function')
-def current_user(db):
-    from cloudplayer.api.model.account import Account
-    from cloudplayer.api.model.favourite import Favourite
+def user(db):
     from cloudplayer.api.model.user import User
     user = User()
     db.add(user)
     db.commit()
+    return user
+
+
+@pytest.fixture(scope='function')
+def account(db, user):
+    from cloudplayer.api.model.account import Account
+    from cloudplayer.api.model.favourite import Favourite
+    from cloudplayer.api.model.image import Image
     account = Account(
         id=str(user.id),
         provider_id='cloudplayer',
         favourite=Favourite(),
-        user_id=user.id)
+        user_id=user.id,
+        image=Image(
+            small='https://image.small/{}'.format(randstr()),
+            medium='https://image.medium/{}'.format(randstr()),
+            large='https://image.large/{}'.format(randstr())),
+        title=randstr())
     db.add(account)
     db.commit()
+    return account
+
+
+@pytest.fixture(scope='function')
+def current_user(account, user):
     return {
         'user_id': user.id,
         'cloudplayer': account.id,
@@ -119,17 +160,24 @@ def user_cookie(current_user):
 
 @pytest.fixture(scope='function')
 def user_fetch(user_cookie, http_client, base_url):
-    def fetch(req, **kw):
+
+    @tornado.gen.coroutine
+    def fetch(req, body=None, **kw):
         if isinstance(req, str):
             if not req.startswith(base_url):
                 req = '{}/{}'.format(base_url, req.lstrip('/'))
         else:
             if not req.url.startswith(base_url):
                 req.url = '{}/{}'.format(base_url, req.url.lstrip('/'))
+        if body is not None and not isinstance(body, str):
+            body = json.dumps(body, indent=2)
         headers = kw.get('headers', {})
         cookies = headers.get('Cookie', '')
         cookies = '{};{}'.format(cookies.rstrip(';'), user_cookie)
         headers['Cookie'] = cookies
         kw['headers'] = headers
-        return http_client.fetch(req, **kw)
+        response = yield http_client.fetch(req, body=body, **kw)
+        decode = functools.partial(tornado.escape.json_decode, response.body)
+        object.__setattr__(response, 'json', decode)
+        return response
     return fetch

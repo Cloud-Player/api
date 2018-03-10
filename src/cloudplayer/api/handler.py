@@ -85,11 +85,16 @@ class ControllerHandlerMixin(object):
 
 class EntityMixin(ControllerHandlerMixin):
 
-    SUPPORTED_METHODS = ('GET', 'PATCH', 'DELETE')
+    SUPPORTED_METHODS = ('GET', 'PUT', 'PATCH', 'DELETE')
 
     @tornado.gen.coroutine
     def get(self, **ids):
         entity = yield self.controller.read(ids)
+        yield self.write(entity)
+
+    @tornado.gen.coroutine
+    def put(self, **ids):
+        entity = yield self.controller.update(ids, self.body)
         yield self.write(entity)
 
     @tornado.gen.coroutine

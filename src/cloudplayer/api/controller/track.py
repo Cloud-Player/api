@@ -23,7 +23,7 @@ class SoundcloudTrackController(Controller):
     def read(self, ids):
         response = yield self.fetch(
             ids['provider_id'], '/tracks/{}'.format(ids['id']))
-        track = tornado.escape.json_decode(response.body)
+        track = response.json()
         account = track['user']
         if track.get('artwork_url'):
             image = Image(
@@ -33,29 +33,29 @@ class SoundcloudTrackController(Controller):
             )
         else:
             image = None
+        account = Account(
+            id=account['id'],
+            provider_id=ids['provider_id'],
+            image=Image(
+                small=account['avatar_url'],
+                medium=account['avatar_url'].replace('large', 't300x300'),
+                large=account['avatar_url'].replace('large', 't500x500')
+            ),
+            title=account['username']
+        )
         return {
             'id': ids['id'],
             'provider_id': ids['provider_id'],
-            'title': track['title'],
-            'account': Account(
-                id=account['id'],
-                provider_id=ids['provider_id'],
-                title=account['username'],
-                image=Image(
-                    small=account['avatar_url'],
-                    medium=account['avatar_url'].replace('large', 't300x300'),
-                    large=account['avatar_url'].replace('large', 't500x500')
-                )
-            ),
-            'account_id': track['user_id'],
-            'account_provider_id': ids['provider_id'],
-            'play_count': track.get('playback_count', 0),
-            'favourite_count': track.get('favoritings_count', 0),
+            'account': account,
             'aspect_ratio': 1.0,
+            'duration': int(track['duration'] / 1000.0),
+            'favourite_count': track.get('favoritings_count', 0),
+            'image': image,
+            'play_count': track.get('playback_count', 0),
+            'title': track['title'],
             'created': datetime.datetime.strptime(
                 track['created_at'], self.DATE_FORMAT),
-            'duration': int(track['duration'] / 1000.0),
-            'image': image
+            'updated': None
         }
 
 
@@ -66,11 +66,12 @@ class YoutubeTrackController(Controller):
     @tornado.gen.coroutine
     def read(self, ids):
         params = {
-            'id': ids['id'], 'part': 'snippet,player,contentDetails,statistics',
+            'id': ids['id'],
+            'part': 'snippet,player,contentDetails,statistics',
             'maxWidth': '320'}
         response = yield self.fetch(
             ids['provider_id'], '/videos', params=params)
-        track_list = tornado.escape.json_decode(response.body)
+        track_list = response.json()
         if not track_list['items']:
             return
         track = track_list['items'][0]
@@ -83,26 +84,24 @@ class YoutubeTrackController(Controller):
             medium=snippet['thumbnails']['medium']['url'],
             large=snippet['thumbnails']['high']['url']
         )
+        account = Account(
+            id=snippet['channelId'],
+            provider_id=ids['provider_id'],
+            image=None,
+            title=snippet['channelTitle']
+        )
         return {
             'id': ids['id'],
             'provider_id': ids['provider_id'],
-            'title': snippet['title'],
-            'account': Account(
-                id=snippet['channelId'],
-                provider_id=ids['provider_id'],
-                title=snippet['channelTitle'],
-            ),
-            'account_id': snippet['channelId'],
-            'account_provider_id': ids['provider_id'],
-            'play_count': statistics['viewCount'],
-            'favourite_count': statistics['favoriteCount'],
+            'account': account,
             'aspect_ratio': (
                 float(player['embedHeight']) / float(player['embedWidth'])),
+            'duration': int(duration.total_seconds()),
+            'favourite_count': statistics['favoriteCount'],
+            'image': image,
+            'play_count': statistics['viewCount'],
+            'title': snippet['title'],
             'created': datetime.datetime.strptime(
                 snippet['publishedAt'], self.DATE_FORMAT),
-            'duration': int(duration.total_seconds()),
-            'image': image
+            'updated': None
         }
-
-
-

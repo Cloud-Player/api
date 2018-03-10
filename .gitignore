@@ -3,6 +3,8 @@
 .eggs
 *.pyc
 *.pyo
+*.html.md
+*.html
 aws_upload
 bin
 build

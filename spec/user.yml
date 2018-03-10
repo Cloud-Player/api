@@ -1,0 +1,23 @@
+User:
+  title: User
+  type: object
+  properties:
+    id:
+      description: User id
+      type: string
+    accounts:
+      description: Connected accounts
+      type: array
+      items:
+        $ref: 'account.yml#/ListedAccount'
+    created:
+      description: User creation
+      format: date-time
+      type: string
+    updated:
+      description: User update
+      format: date-time
+      type: string
+  required:
+  - id
+  - accounts

@@ -1,0 +1,22 @@
+History:
+  type: object
+  tags:
+  - draft
+  properties:
+    id:
+      description: History id
+      type: string
+    account_id:
+      $ref: 'account.yml#/Account/properties/id'
+    account_provider_id:
+      $ref: 'provider.yml#/Provider/properties/id'
+    playbacks:
+      description: List of playbacks
+      items:
+        $ref: 'playback.yml#/Playback'
+      type: array
+  required:
+  - id
+  - account_id
+  - account_provider_id
+  - playbacks

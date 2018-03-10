@@ -1,0 +1,23 @@
+Favourite:
+  type: object
+  properties:
+    id:
+      description: Favourite id
+      type: string
+    provider_id:
+      $ref: 'provider.yml#/Provider/properties/id'
+    account_id:
+      $ref: 'account.yml#/Account/properties/id'
+    account_provider_id:
+      $ref: 'provider.yml#/Provider/properties/id'
+    items:
+      description: Favourite items
+      items:
+        $ref: 'favourite_item.yml#/FavouriteItem'
+      type: array
+  required:
+  - id
+  - provider_id
+  - account_id
+  - account_provider_id
+  - items

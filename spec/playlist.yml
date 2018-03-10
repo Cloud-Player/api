@@ -1,0 +1,47 @@
+Playlist:
+  type: object
+  properties:
+    id:
+      description: Playlist id
+      type: string
+    provider_id:
+      $ref: 'provider.yml#/Provider/properties/id'
+    account_id:
+      $ref: 'account.yml#/Account/properties/id'
+    account_provider_id:
+      $ref: 'provider.yml#/Provider/properties/id'
+    description:
+      description: Playlist description
+      type: string
+    follower_count:
+      description: Follower count
+      format: int32
+      type: integer
+    image:
+      $ref: 'image.yml#/EmbeddedImage'
+    items:
+      description: Playlist items
+      items:
+        $ref: 'playlist_item.yml#/PlaylistItem'
+      type: array
+    public:
+      description: Public state
+      type: boolean
+    title:
+      description: Playlist title
+      type: string
+    created:
+      description: Playlist creation
+      format: date-time
+      type: string
+    updated:
+      description: Playlist update
+      format: date-time
+      type: string
+  required:
+  - id
+  - provider_id
+  - account_id
+  - account_provider_id
+  - items
+  - title

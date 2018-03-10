@@ -1,0 +1,43 @@
+EmbeddedAccount:
+  type: object
+  properties:
+    id:
+      description: Account id
+      type: string
+    provider_id:
+      $ref: 'provider.yml#/Provider/properties/id'
+    image:
+      $ref: 'image.yml#/EmbeddedImage'
+    title:
+      description: Account title
+      type: string
+  required:
+  - id
+  - provider_id
+
+ListedAccount:
+  allOf:
+  - $ref: '#/EmbeddedAccount'
+  - type: object
+    properties:
+      connected:
+        description: Connection status
+        type: boolean
+
+Account:
+  allOf:
+  - $ref: '#/ListedAccount'
+  - type: object
+    properties:
+      user_id:
+        $ref: 'user.yml#/User/properties/id'
+      favourite_id:
+        $ref: 'favourite.yml#/Favourite/properties/id'
+      created:
+        description: Account creation
+        format: date-time
+        type: string
+      updated:
+        description: Account update
+        format: date-time
+        type: string

@@ -1,0 +1,36 @@
+Playback:
+  type: object
+  tags:
+  - draft
+  properties:
+    id:
+      description: Playback id
+      type: string
+    previous:
+      $ref: '#/Playback/properties/id'
+    next:
+      $ref: '#/Playback/properties/id'
+    progress:
+      description: Playback progress
+      format: double
+      type: number
+    status:
+      description: Playback status
+      type: string
+      enum:
+      - completed
+      - skipped
+      - current
+      - queued
+      - suggested
+    created:
+      description: Playback creation
+      format: date-time
+      type: string
+    updated:
+      description: Playback update
+      format: date-time
+      type: string
+  required:
+  - id
+  - status

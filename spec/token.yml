@@ -1,0 +1,20 @@
+Token:
+  title: Token
+  type: object
+  properties:
+    id:
+      description: Token id
+      type: string
+    claimed:
+      description: Claim status
+      type: boolean
+      default: False
+    account_id:
+        $ref: 'account.yml#/Account/properties/id'
+    account_provider_id:
+        $ref: 'provider.yml#/Provider/properties/id'
+  required:
+  - id
+  - claimed
+  - account_id
+  - account_provider_id

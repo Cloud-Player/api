@@ -1,0 +1,32 @@
+EmbeddedImage:
+  type: object
+  properties:
+    id:
+      description: Image id
+      type: string
+    large:
+      description: Large uri
+      type: string
+    medium:
+      description: Medium uri
+      type: string
+    small:
+      description: Small uri
+      type: string
+  required:
+  - id
+  - large
+
+Image:
+  allOf:
+  - $ref: '#/EmbeddedImage'
+  - type: object
+    properties:
+      created:
+        description: Image creation
+        format: date-time
+        type: string
+      updated:
+        description: Image update
+        format: date-time
+        type: string

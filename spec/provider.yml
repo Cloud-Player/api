@@ -1,0 +1,11 @@
+Provider:
+  type: object
+  properties:
+    id:
+      description: Provider id
+      type: string
+    client_id:
+      description: Provider client id
+      type: string
+  required:
+  - id

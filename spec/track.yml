@@ -1,0 +1,40 @@
+Track:
+  type: object
+  properties:
+    id:
+      description: Track id
+      type: string
+    provider_id:
+      $ref: 'provider.yml#/Provider/properties/id'
+    account:
+      $ref: 'account.yml#/EmbeddedAccount'
+    aspect_ratio:
+      description: Player aspect ratio
+      format: double
+      type: number
+    duration:
+      description: Track duration
+      format: int32
+      type: integer
+    favourite_count:
+      description: Favourite count
+      format: int32
+      type: integer
+    image:
+      $ref: 'image.yml#/EmbeddedImage'
+    play_count:
+      description: Play count
+      format: int32
+      type: integer
+    title:
+      description: Track title
+      type: string
+    created:
+      description: Track creation
+      format: date-time
+      type: string
+  required:
+  - id
+  - provider_id
+  - account
+  - title

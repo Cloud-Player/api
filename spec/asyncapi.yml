@@ -1,0 +1,68 @@
+asyncapi: '1.0.0'
+info:
+  title: Cloud-Player
+  version: '1.0'
+  description: cloud-player websocket channels
+servers:
+  - url: api.cloud-player.io
+    scheme: wss
+security:
+  - httpApiKey: []
+
+topics:
+  user.{id}:
+    publish:
+      $ref: '#/components/messages/userEntityRead'
+    subscribe:
+      $ref: '#/components/messages/onUserUpdate'
+
+components:
+  securitySchemes:
+    httpApiKey:
+      name: tok_v1
+      type: httpApiKey
+      in: cookie
+
+  messages:
+    userEntityRead:
+      headers:
+        type: object
+        properties:
+          channel:
+            title: channel
+            description: Channel descriptor
+            type: string
+          method:
+            title: method
+            description: Execution method
+            default: PUT
+            type: string
+            enum:
+            - GET
+            - POST
+            - PUT
+            - DELETE
+      payload:
+        items:
+          $ref: 'user.yml#/User'
+        type: array
+    onUserUpdate:
+      headers:
+        type: object
+        properties:
+          channel:
+            title: channel
+            description: Channel descriptor
+            type: string
+          method:
+            title: method
+            description: Execution method
+            default: PUT
+            type: string
+            enum:
+            - SUBSCRIBE
+            - UNSUBSCRIBE
+      payload:
+        type: array
+        items:
+          $ref: 'user.yml#/User'

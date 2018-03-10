@@ -1,0 +1,31 @@
+favouriteItem:
+  type: object
+  properties:
+    id:
+      description: favourite item id
+      type: string
+    favourite_id:
+      $ref: 'favourite.yml#/Favourite/properties/id'
+    favourite_provider_id:
+      $ref: 'provider.yml#/Provider/properties/id'
+    rank:
+      description: favourite item rank
+    track_id:
+      $ref: 'track.yml#/Track/properties/id'
+    track_provider_id:
+      $ref: 'provider.yml#/Provider/properties/id'
+    created:
+      description: favourite item creation
+      format: date-time
+      type: string
+    updated:
+      description: favourite item update
+      format: date-time
+      type: string
+  required:
+  - id
+  - favourite_id
+  - favourite_provider_id
+  - rank
+  - track_provider_id
+  - track_id

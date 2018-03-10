@@ -1,0 +1,439 @@
+swagger: '2.0'
+info:
+  title: Cloud-Player
+  version: '1.0'
+  description: cloud-player rest endpoints
+host: api.cloud-player.io
+schemes:
+- https
+securityDefinitions:
+  apiKey:
+    name: tok_v1
+    type: apiKey
+    in: cookie
+security:
+  - apiKey: []
+consumes:
+- application/json
+produces:
+- application/json
+
+paths:
+  /account/{provider_id}/{id}:
+    parameters:
+    - description: Account provider id
+      in: path
+      name: provider_id
+      required: true
+      type: string
+    - description: Account id
+      in: path
+      name: id
+      required: true
+      type: string
+    get:
+      operationId: accountRead
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: 'account.yml#/Account'
+
+  /history/{id}:
+    tags:
+    - draft
+    parameters:
+    - description: History id
+      in: path
+      name: id
+      required: true
+      type: string
+    get:
+      operationId: historyRead
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: 'history.yml#/History'
+
+  /playlist/{provider_id}:
+    parameters:
+    - description: Provider id
+      in: path
+      name: provider_id
+      required: true
+      type: string
+    get:
+      operationId: playlistSearch
+      parameters:
+      - description: Account id
+        in: query
+        name: account_id
+        required: true
+        type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            items:
+              $ref: 'playlist.yml#/Playlist'
+            type: array
+    post:
+      operationId: playlistCreate
+      - description: Playlist body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: 'playlist.yml#/Playlist'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: 'playlist.yml#/Playlist'
+
+  /playlist/{provider_id}/{id}:
+    parameters:
+    - description: Provider id
+      in: path
+      name: provider_id
+      required: true
+      type: string
+    - description: Playlist id
+      in: path
+      name: id
+      required: true
+      type: string
+    get:
+      operationId: playlistRead
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: 'playlist.yml#/Playlist'
+    put:
+      operationId: playlistUpdate
+      parameters:
+      - description: Playlist body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: 'playlist.yml#/Playlist'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: 'playlist.yml#/Playlist'
+    delete:
+      operationId: playlistDelete
+      responses:
+        '204':
+          description: No Content
+
+  /playlist/{playlist_provider_id}/{playlist_id}/item:
+     parameters:
+    - description: Playlist provider id
+      in: path
+      name: playlist_provider_id
+      required: true
+      type: string
+    - description: Playlist id
+      in: path
+      name: playlist_id
+      required: true
+      type: string
+    post:
+      operationId: playlistItemCreate
+      parameters:
+      - description: Playlist item body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: 'playlist_item.yml#/PlaylistItem'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: 'playlist_item.yml#/PlaylistItem'
+    get:
+      operationId: playlistItemSearch
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: 'playlist_item.yml#/PlaylistItem'
+
+  /playlist/{playlist_provider_id}/{playlist_id}/item/{id}:
+    parameters:
+    - description: Playlist provider id
+      in: path
+      name: playlist_provider_id
+      required: true
+      type: string
+    - description: Playlist id
+      in: path
+      name: playlist_id
+      required: true
+      type: string
+    - description: Playlist item id
+      in: path
+      name: id
+      required: true
+      type: string
+    get:
+      operationId: playlistItemRead
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: 'playlist_item.yml#/PlaylistItem'
+    put:
+      operationId: playlistItemUpdate
+      parameters:
+      - description: Playlist item body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: 'playlist_item.yml#/PlaylistItem'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: 'playlist_item.yml#/PlaylistItem'
+    delete:
+      operationId: playlistItemDelete
+      parameters:
+      responses:
+        '204':
+          description: No Content
+
+  /favourite/{provider_id}/{id}:
+    parameters:
+    - description: Provider id
+      in: path
+      name: provider_id
+      required: true
+      type: string
+    - description: Favourite id
+      in: path
+      name: id
+      required: true
+      type: string
+    get:
+      operationId: favouriteRead
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: 'favourite.yml#/Favourite'
+
+  /favourite/{favourite_provider_id}/{favourite_id}/item:
+     parameters:
+    - description: Favourite provider id
+      in: path
+      name: favourite_provider_id
+      required: true
+      type: string
+    - description: Favourite id
+      in: path
+      name: favourite_id
+      required: true
+      type: string
+    post:
+      operationId: favouriteItemCreate
+      parameters:
+      - description: Favourite item body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: 'favourite_item.yml#/FavouriteItem'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: 'favourite_item.yml#/FavouriteItem'
+    get:
+      operationId: favouriteItemSearch
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: 'favourite_item.yml#/FavouriteItem'
+
+  /favourite/{favourite_provider_id}/{favourite_id}/item/{id}:
+    parameters:
+    - description: Favourite provider id
+      in: path
+      name: favourite_provider_id
+      required: true
+      type: string
+    - description: Favourite id
+      in: path
+      name: favourite_id
+      required: true
+      type: string
+    - description: Favourite item id
+      in: path
+      name: id
+      required: true
+      type: string
+    get:
+      operationId: favouriteItemRead
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: 'favourite_item.yml#/FavouriteItem'
+    put:
+      operationId: favouriteItemUpdate
+      parameters:
+      - description: Favourite item body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: 'favourite_item.yml#/FavouriteItem'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: 'favourite_item.yml#/FavouriteItem'
+    delete:
+      operationId: favouriteItemDelete
+      parameters:
+      responses:
+        '204':
+          description: No Content
+
+  /provider:
+    get:
+      operationId: providerSearch
+      responses:
+        '200':
+          description: OK
+          items:
+            $ref: 'provider.yml#/Provider'
+          type: array
+
+  /provider/{id}:
+    parameters:
+    - description: Provider id
+      in: path
+      name: id
+      required: true
+      type: string
+    get:
+      operationId: providerRead
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: 'provider.yml#/Provider'
+
+  /queue/{id}:
+    tags:
+    - draft
+    parameters:
+    - description: Queue id
+      in: path
+      name: id
+      required: true
+      type: string
+    get:
+      operationId: queueRead
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: 'queue.yml#/Queue'
+
+  /token:
+    post:
+      operationId: tokenCreate
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: 'token.yml#/Token'
+
+  /token/{id}:
+    parameters:
+    - description: Token id
+      in: path
+      name: id
+      required: true
+      type: string
+    get:
+      operationId: tokenRead
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: 'token.yml#/Token'
+    put:
+      operationId: tokenUpdate
+      parameters:
+      - description: Token body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: 'token.yml#/Token'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: 'token.yml#/Token'
+
+  /track/{provider_id}/{id}:
+    parameters:
+    - description: Provider id
+      in: path
+      name: account_id
+      required: true
+      type: string
+    - description: Track id
+      in: path
+      name: id
+      required: true
+      type: string
+    get:
+      operationId: trackRead
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: 'track.yml#/Track'
+
+  /user/{id}:
+    parameters:
+    - description: User id
+      in: path
+      name: id
+      required: true
+      type: string
+    get:
+      operationId: userRead
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: 'user.yml#/User'
+
+  /soundcloud:
+    get:
+      operationId: soundcloudAuth
+      responses:
+        '200':
+          description: Callback endpoint that shows a popup closer
+
+  /youtube:
+    get:
+      operationId: youtubeAuth
+      responses:
+        '200':
+          description: Callback endpoint that shows a popup closer

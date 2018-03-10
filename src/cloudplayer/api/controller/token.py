@@ -8,8 +8,8 @@
 import datetime
 
 import tornado.gen
-import tornado.options as opt
 
+from cloudplayer.api.access import Policy, Available
 from cloudplayer.api.controller import Controller, ControllerException
 from cloudplayer.api.model.token import Token
 
@@ -19,12 +19,7 @@ class TokenController(Controller):
     __model__ = Token
 
     @tornado.gen.coroutine
-    def create(self, ids, **kw):
-        entity = yield super().create({})
-        return entity
-
-    @tornado.gen.coroutine
-    def read(self, ids):
+    def read(self, ids, fields=Available):
         threshold = datetime.datetime.utcnow() - datetime.timedelta(minutes=5)
         query = self.db.query(
             self.__model__).filter_by(**ids).filter(Token.created > threshold)
@@ -32,11 +27,10 @@ class TokenController(Controller):
         if not entity:
             raise ControllerException(404)
         account = self.accounts.get(entity.provider_id)
-        self.policy.grant_read(account, entity)
+        self.policy.grant_read(account, entity, fields)
         if entity.claimed:
+            self.current_user.clear()
             self.current_user['user_id'] = entity.account.user_id
-            for p in opt.options['providers']:
-                self.current_user[p] = None
             for a in entity.account.user.accounts:
                 self.current_user[a.provider_id] = a.id
             entity.account_id = None
@@ -45,10 +39,13 @@ class TokenController(Controller):
         return entity
 
     @tornado.gen.coroutine
-    def update(self, ids, **kw):
-        entity = yield super().update(
-            ids,
-            claimed=True,
-            account_id=self.current_user['cloudplayer'],
-            account_provider_id='cloudplayer')
+    def update(self, ids, kw, fields=Available):
+        token = {
+            'id': ids['id'],
+            'claimed': True,
+            'account_id': self.current_user['cloudplayer'],
+            'account_provider_id': 'cloudplayer'}
+        if kw != token:
+            raise ControllerException(404, 'invalid update')
+        entity = yield super().update(ids, kw, fields=fields)
         return entity

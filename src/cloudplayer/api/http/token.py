@@ -14,7 +14,7 @@ class Entity(EntityMixin, HTTPHandler):
 
     __controller__ = TokenController
 
-    SUPPORTED_METHODS = ('GET', 'PATCH', 'OPTIONS')
+    SUPPORTED_METHODS = ('GET', 'PUT', 'OPTIONS')
 
 
 class Collection(CollectionMixin, HTTPHandler):

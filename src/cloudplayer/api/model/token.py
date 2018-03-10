@@ -19,17 +19,16 @@ from cloudplayer.api.util import gen_token
 class Token(Base):
 
     __acl__ = (
-        Allow(Everyone, Create),
+        Allow(Everyone, Create, Fields()),
+        Allow(Everyone, Read, Fields(
+            'id',
+            'claimed'
+        )),
         Allow(Everyone, Update, Fields(
             'claimed',
             'account_id',
             'account_provider_id'
-        )),
-        Allow(Everyone, Read)
-    )
-    __fields__ = Fields(
-        'id',
-        'claimed'
+        ))
     )
     __table_args__ = (
         sql.PrimaryKeyConstraint(
@@ -45,5 +44,5 @@ class Token(Base):
 
     account_provider_id = sql.Column(sql.String(16))
     account_id = sql.Column(sql.String(32))
-    account = orm.relationship('Account')
+    account = orm.relation('Account')
     parent = orm.synonym('account')

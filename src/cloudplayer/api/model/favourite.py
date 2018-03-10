@@ -7,7 +7,7 @@
 """
 import sqlalchemy.orm as orm
 
-from cloudplayer.api.access import Allow, Deny, Fields, Owner, Read
+from cloudplayer.api.access import Allow, Fields, Owner, Read
 from cloudplayer.api.model import Base
 from cloudplayer.api.model.tracklist import TracklistMixin
 
@@ -15,18 +15,17 @@ from cloudplayer.api.model.tracklist import TracklistMixin
 class Favourite(TracklistMixin, Base):
 
     __acl__ = (
-        Allow(Owner, Read),
-        Deny()
-    )
-    __fields__ = Fields(
-        'id',
-        'account_id',
-        'provider_id',
-        'public',
-        'items'
+        Allow(Owner, Read, Fields(
+            'id',
+            'provider_id',
+            'account_id',
+            'account_provider_id',
+            'items'
+        )),
     )
 
-    account = orm.relationship(
+    account = orm.relation(
         'Account', back_populates='favourite', viewonly=True)
 
-    items = orm.relationship('FavouriteItem')
+    items = orm.relation(
+        'FavouriteItem', order_by='FavouriteItem.created')

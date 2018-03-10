@@ -11,6 +11,7 @@ import json
 import sqlalchemy as sql
 from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
+from sqlalchemy.orm import RelationshipProperty
 from sqlalchemy.sql import expression
 from sqlalchemy.types import DateTime
 
@@ -29,7 +30,6 @@ def pg_utcnow(element, compiler, **kw):
 class Model(object):
 
     __acl__ = (Deny(),)
-    __fields__ = Fields()
 
     @declared_attr
     def __tablename__(cls):
@@ -40,15 +40,41 @@ class Model(object):
     updated = sql.Column(
         sql.DateTime, server_default=utcnow(), onupdate=utcnow())
 
+    id = None
     account_id = None
     provider_id = None
     parent = None
 
     @property
+    def fields(self):
+        return getattr(self, '_fields', Fields())
+
+    @fields.setter
+    def fields(self, value):
+        tree = {}
+        flat = []
+        for field in value:
+            key, *path = field.split('.', 1)
+            flat.append(key)
+            if path:
+                tree[key] = tree.get(key, []) + list(path)
+        for field, paths in tree.items():
+            prop = getattr(type(self), field).property
+            if isinstance(prop, RelationshipProperty):
+                relations = getattr(self, field)
+                if not prop.uselist:
+                    relations = [relations]
+                for relation in relations:
+                    if isinstance(relation, Base):
+                        relation.fields = Fields(*paths)
+        self._fields = Fields(*flat)
+
+    @property
     def account(self):
         # XXX: Check session for this account id without querying
         from cloudplayer.api.model.account import Account
-        return Account(id=self.account_id, provider_id=self.provider_id)
+        if self.account_id and self.provider_id:
+            return Account(id=self.account_id, provider_id=self.provider_id)
 
 
 Base = declarative_base(cls=Model)
@@ -61,7 +87,7 @@ class Encoder(json.JSONEncoder):
             return json.JSONEncoder.default(self, obj)
         except:  # NOQA
             if isinstance(obj, Base):
-                dict_ = {c: getattr(obj, c) for c in obj.__fields__}
+                dict_ = {f: getattr(obj, f) for f in obj.fields}
                 if dict_.get('id'):  # TODO: There must be a better solution
                     dict_['id'] = str(dict_['id'])
                 return dict_

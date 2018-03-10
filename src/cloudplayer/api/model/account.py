@@ -8,7 +8,7 @@
 import sqlalchemy as sql
 import sqlalchemy.orm as orm
 
-from cloudplayer.api.access import (Allow, Everyone, Fields, Owner,
+from cloudplayer.api.access import (Allow, Deny, Everyone, Fields, Owner,
                                     Query, Read, Update)
 from cloudplayer.api.model import Base
 
@@ -16,32 +16,35 @@ from cloudplayer.api.model import Base
 class Account(Base):
 
     __acl__ = (
-        Allow(Owner, Read),
+        Allow(Owner, Read, Fields(
+            'id',
+            'provider_id',
+            'user_id',
+            'connected',
+            'favourite_id',
+            'image.id',
+            'image.large',
+            'image.medium',
+            'image.small',
+            'title',
+            'created',
+            'updated'
+        )),
         Allow(Owner, Update, Fields(
             'image',
             'title'
         )),
         Allow(Everyone, Read, Fields(
             'id',
-            'image',
             'provider_id',
+            'image',
             'title'
         )),
         Allow(Everyone, Query, Fields(
             'provider_id',
             'title'
-        ))
-    )
-    __fields__ = Fields(
-        'id',
-        'provider_id',
-        'user_id',
-        'connected',
-        'created',
-        'updated',
-        'favourite',
-        'title',
-        'image'
+        )),
+        Deny()
     )
     __table_args__ = (
         sql.PrimaryKeyConstraint(
@@ -54,27 +57,32 @@ class Account(Base):
             ['user.id']),
         sql.ForeignKeyConstraint(
             ['image_id'],
-            ['image.id']),
+            ['image.id'])
     )
 
     id = sql.Column(sql.String(32))
-
     account_id = orm.synonym('id')
 
     provider_id = sql.Column(sql.String(16), nullable=False)
-    provider = orm.relationship('Provider')
+    provider = orm.relation('Provider')
 
     user_id = sql.Column(sql.Integer, nullable=False)
-    user = orm.relationship('User', back_populates='accounts')
+    user = orm.relation('User', back_populates='accounts')
     parent = orm.synonym('user')
 
-    playlists = orm.relationship('Playlist', back_populates='account')
-    favourite = orm.relationship(
+    image_id = sql.Column(sql.Integer)
+    image = orm.relation('Image')
+
+    @property
+    def favourite_id(self):
+        return self.favourite.id
+
+    favourite = orm.relation(
         'Favourite', uselist=False, back_populates='account')
 
-    title = sql.Column('title', sql.String(64))
-    image_id = sql.Column(sql.Integer)
-    image = orm.relationship('Image')
+    playlists = orm.relation('Playlist', back_populates='account')
+
+    title = sql.Column('title', sql.Unicode(64))
 
     access_token = sql.Column(sql.String(256))
     refresh_token = sql.Column(sql.String(256))
@@ -84,9 +92,3 @@ class Account(Base):
     def connected(self):
         return self.provider_id == 'cloudplayer' or all([
             self.access_token, self.refresh_token])
-
-    def __eq__(self, other):
-        if isinstance(other, Account):
-            return (
-                self.provider_id == other.provider_id and self.id == other.id)
-        return super().__eq__(other)

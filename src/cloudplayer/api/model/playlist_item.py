@@ -17,23 +17,31 @@ from cloudplayer.api.model.tracklist_item import TracklistItemMixin
 class PlaylistItem(TracklistItemMixin, Base):
 
     __acl__ = (
-        Allow(Parent, Create),
-        Allow(Owner, Read),
+        Allow(Parent, Create, Fields(
+            'playlist_id',
+            'playlist_provider_id',
+            'rank',
+            'track_provider_id',
+            'track_id'
+        )),
+        Allow(Owner, Read, Fields(
+            'id',
+            'playlist_id',
+            'playlist_provider_id',
+            'rank',
+            'track_provider_id',
+            'track_id',
+            'created',
+            'updated'
+        )),
         Allow(Owner, Update, Fields(
             'rank'
         )),
         Allow(Owner, Delete),
         Allow(Owner, Query, Fields(
-            'rank',
-            'provider_id'
+            'playlist_id'
         )),
         Deny()
-    )
-    __fields__ = Fields(
-        'id',
-        'rank',
-        'track_provider_id',
-        'track_id'
     )
     __table_args__ = (
         sql.PrimaryKeyConstraint(
@@ -49,9 +57,11 @@ class PlaylistItem(TracklistItemMixin, Base):
             ['provider.id'])
     )
 
+    provider_id = orm.synonym('playlist_id')
+
     rank = sql.Column(sql.String(128), nullable=False)
 
-    playlist_provider_id = sql.Column(sql.String(16), nullable=False)
     playlist_id = sql.Column(sql.String(96), nullable=False)
-    playlist = orm.relationship('Playlist', back_populates='items')
+    playlist_provider_id = sql.Column(sql.String(16), nullable=False)
+    playlist = orm.relation('Playlist', back_populates='items')
     parent = orm.synonym('playlist')

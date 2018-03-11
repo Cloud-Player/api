@@ -18,7 +18,7 @@ setup(
     install_requires=[
         'bugsnag',
         'isodate',
-        'psycopg2',
+        'psycopg2-binary',
         'pycurl',
         'PyJWT',
         'redis',

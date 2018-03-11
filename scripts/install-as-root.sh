@@ -5,14 +5,19 @@ set -ex
 id -u cloudplayer &> /dev/null || useradd -m -U -d /srv/cloudplayer cloudplayer
 
 # update and install dependencies
+add-apt-repository -y \
+ppa:jonathonf/python-3.6
 apt-get update
 apt-get install -y \
 redis-server \
 supervisor \
 nginx \
-python3-venv \
+python3.6 \
+python3.6-venv \
+python3.6-dev \
 python3-pycurl \
-python3-dev \
+python-pip \
+python-pip-whl \
 libcurl4-openssl-dev \
 libssl-dev \
 postgresql

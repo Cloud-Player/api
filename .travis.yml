@@ -2,7 +2,7 @@ dist: trusty
 sudo: false
 language: python
 python:
-  - "3.5"
+  - "3.6"
 before_install:
   - wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
   - sudo apt-get update -q

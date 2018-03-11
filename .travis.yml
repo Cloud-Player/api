@@ -29,6 +29,8 @@ before_deploy:
   - mv latest.zip aws_upload/latest.zip
 deploy:
 - provider: pages
+  edge:
+    branch: v1.8.47
   skip_cleanup: true
   github_token: $GITHUB_TOKEN
   keep-history: true

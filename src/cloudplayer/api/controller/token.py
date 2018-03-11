@@ -9,7 +9,7 @@ import datetime
 
 import tornado.gen
 
-from cloudplayer.api.access import Policy, Available
+from cloudplayer.api.access import Available
 from cloudplayer.api.controller import Controller, ControllerException
 from cloudplayer.api.model.token import Token
 

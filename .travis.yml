@@ -21,8 +21,8 @@ after_success:
   - npm i -g shins widdershins
   - widdershins --omitBody --resolve spec/restapi.yml source/index.html.md
   - shins --minify --inline
-  - mkdir gh-pages
-  - mv index.html gh-pages
+  - mkdir shins
+  - mv index.html shins
 before_deploy:
   - zip -r latest *
   - mkdir -p aws_upload
@@ -31,7 +31,10 @@ deploy:
 - provider: pages
   skip_cleanup: true
   github_token: $GITHUB_TOKEN
-  local_dir: gh-pages
+  keep-history: true
+  allow-empty-commit: true
+  verbose: true
+  local_dir: shins
   on:
     branch: master
 - provider: s3

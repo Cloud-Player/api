@@ -80,12 +80,13 @@ paths:
             type: array
     post:
       operationId: playlistCreate
-      - description: Playlist body
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: 'playlist.yml#/Playlist'
+      parameters:
+        - description: Playlist body
+          in: body
+          name: body
+          required: true
+          schema:
+            $ref: 'playlist.yml#/Playlist'
       responses:
         '200':
           description: OK
@@ -132,7 +133,7 @@ paths:
           description: No Content
 
   /playlist/{playlist_provider_id}/{playlist_id}/item:
-     parameters:
+    parameters:
     - description: Playlist provider id
       in: path
       name: playlist_provider_id
@@ -231,7 +232,7 @@ paths:
             $ref: 'favourite.yml#/Favourite'
 
   /favourite/{favourite_provider_id}/{favourite_id}/item:
-     parameters:
+    parameters:
     - description: Favourite provider id
       in: path
       name: favourite_provider_id

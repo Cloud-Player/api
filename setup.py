@@ -24,7 +24,7 @@ setup(
         'redis',
         'setuptools',
         'sqlalchemy',
-        'tornado'
+        'tornado<5.0'
     ],
     extras_require={
         'test': [

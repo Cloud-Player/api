@@ -11,7 +11,7 @@ import tornado.web
 from cloudplayer.api.http import HTTPHandler
 
 
-class Proxy(HTTPHandler):
+class Proxy(HTTPHandler):  # pragma: no cover
 
     SUPPORTED_METHODS = ('GET', 'POST', 'PUT', 'DELETE', 'OPTIONS')
 

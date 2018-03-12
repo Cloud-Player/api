@@ -14,7 +14,6 @@ import tornado.web
 from tornado.log import app_log, gen_log
 
 from cloudplayer.api import APIException
-from cloudplayer.api.controller.auth import create_controller
 
 
 class HandlerMixin(object):
@@ -61,13 +60,6 @@ class HandlerMixin(object):
         else:
             app_log.error('uncaught exception %s', self._request_summary(),
                           exc_info=(type_, value, tb))
-
-    @tornado.gen.coroutine
-    def fetch(self, provider_id, path, **kw):
-        controller = create_controller(
-            provider_id, self.db, self.current_user)
-        response = yield controller.fetch(path, **kw)
-        return response
 
 
 class ControllerHandlerMixin(object):

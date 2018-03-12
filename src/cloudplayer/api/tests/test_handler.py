@@ -48,6 +48,16 @@ def test_handler_mixin_should_close_db_on_finish(app):
     assert handler.finished
 
 
+def test_handler_should_write_errors_to_out_proto():
+    class Handler(HandlerMixin):
+        write = mock.MagicMock()
+        _reason = 'we-are-not-gonna-take-it'
+
+    Handler().write_error(418)
+    Handler.write.assert_called_once_with(
+        {'status_code': 418, 'reason': Handler._reason})
+
+
 @pytest.mark.gen_test
 def test_handler_should_log_api_exceptions(req, monkeypatch, base_url):
     class Handler(HandlerMixin):

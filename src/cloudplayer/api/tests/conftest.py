@@ -71,11 +71,20 @@ def app(postgresql_proc, redis_proc):
     opt.define('request_timeout', default=3, group='httpclient')
     opt.define('max_redirects', default=1, group='httpclient')
     opt.define('youtube', group='app', default={
-        'key': 'yt-key', 'secret': 'yt-secret', 'api_key': 'yt-api-key'})
+        'key': 'yt-key',
+        'secret': 'yt-secret',
+        'redirect_uri': 'yt.to/auth',
+        'api_key': 'yt-api-key'})
     opt.define('cloudplayer', group='app', default={
-        'key': 'cp-key', 'secret': 'cp-secret', 'api_key': 'cp-api-key'})
+        'key': 'cp-key',
+        'secret': 'cp-secret',
+        'redirect_uri': 'cp.to/auth',
+        'api_key': 'cp-api-key'})
     opt.define('soundcloud', group='app', default={
-        'key': 'sc-key', 'secret': 'sc-secret', 'api_key': 'sc-api-key'})
+        'key': 'sc-key',
+        'secret': 'sc-secret',
+        'redirect_uri': 'sc.to/auth',
+        'api_key': 'sc-api-key'})
     opt.define('bugsnag', group='app', default={})
     opt.define('jwt_cookie', default='tok_v1', group='app')
     opt.define('jwt_expiration', default=1, group='app')

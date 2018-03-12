@@ -36,7 +36,10 @@ def test_auth_controller_should_provide_instance_args(db, current_user):
     assert controller.db is db
     assert controller.current_user == current_user
     assert controller.settings == {
-        'api_key': 'cp-api-key', 'key': 'cp-key', 'secret': 'cp-secret'}
+        'api_key': 'cp-api-key',
+        'key': 'cp-key',
+        'redirect_uri': 'cp.to/auth',
+        'secret': 'cp-secret'}
     assert controller.account.id == current_user['cloudplayer']
 
 

@@ -81,7 +81,7 @@ class AuthHandler(
         if self.get_argument('code', None) is not None:
             try:
                 yield self.provider_callback()
-            except:
+            except:  # NOQA
                 traceback.print_exc()
             finally:
                 self.redirect('/static/close.html')

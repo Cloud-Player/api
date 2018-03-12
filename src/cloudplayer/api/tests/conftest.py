@@ -176,6 +176,11 @@ def user_cookie(current_user):
 
 
 @pytest.fixture(scope='function')
+def http_client(http_client, db):
+    return http_client
+
+
+@pytest.fixture(scope='function')
 def user_fetch(user_cookie, http_client, base_url):
 
     @tornado.gen.coroutine

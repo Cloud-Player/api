@@ -36,6 +36,13 @@ def test_everyone_should_only_compare_to_principals():
     assert Everyone(mock.Mock()) != mock.Mock()
 
 
+def test_everyone_should_not_expose_target_as_account():
+    account = mock.Mock()
+    everyone = Everyone(account)
+    assert everyone.account is not account
+    assert everyone.account is None
+
+
 def test_ownership_should_be_inferred_by_account_property():
     account = Account(id=55)
     target = mock.Mock()
@@ -62,3 +69,10 @@ def test_descendancy_should_be_inferred_by_children_property():
 
 def test_child_should_only_compare_to_principals():
     assert Child(mock.Mock()) != mock.Mock()
+
+
+def test_child_should_not_expose_target_as_account():
+    account = mock.Mock()
+    child = Child(account)
+    assert child.account is not account
+    assert child.account is None

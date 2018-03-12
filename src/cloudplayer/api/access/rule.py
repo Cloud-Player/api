@@ -35,21 +35,17 @@ class Allow(Rule):
 
         proposed_principal = Principal(account)
         required_principal = self.principal(target)
-        if isinstance(proposed_principal, Everyone):
-            grant.principal = required_principal
         if required_principal != proposed_principal:
             return
 
         proposed_action = action(target)
         required_action = self.action(target)
-        if isinstance(proposed_action, Anything):
-            grant.action = required_action
         if required_action != proposed_action:
             return
 
         proposed_fields = fields(target)
         required_fields = self.fields(target)
-        if isinstance(proposed_fields, Available):
+        if fields is Available:
             grant.fields = required_fields
         if proposed_fields in required_fields:
             return grant

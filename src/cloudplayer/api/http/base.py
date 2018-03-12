@@ -148,9 +148,8 @@ class HTTPFallback(HTTPHandler):
 class HTTPHealth(HTTPHandler):
 
     SUPPORTED_METHODS = ('GET',)
-    HEALTH_CHECK = 'SELECT 1 = 1;'
 
     def get(self, *args, **kwargs):
-        self.cache.info()
-        self.db.execute(self.HEALTH_CHECK).first()
+        self.cache.info('server')
+        self.db.execute('SELECT 1 = 1;').first()
         self.write({'status_code': 200, 'reason': 'OK'})

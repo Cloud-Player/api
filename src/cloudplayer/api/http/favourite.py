@@ -6,7 +6,7 @@
     :license: GPL-3.0, see LICENSE for details
 """
 from cloudplayer.api.controller.favourite import FavouriteController
-from cloudplayer.api.handler import CollectionMixin, EntityMixin
+from cloudplayer.api.handler import EntityMixin
 from cloudplayer.api.http import HTTPHandler
 
 

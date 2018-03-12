@@ -1,5 +1,4 @@
 import pytest
-import mock
 import tornado.httpclient
 
 import cloudplayer.api.http.base

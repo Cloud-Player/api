@@ -1,4 +1,3 @@
-import pytest
 
 import tornado.httpclient
 
@@ -44,23 +43,3 @@ def test_handler_mixin_should_close_db_on_finish(app):
     assert handler.finished
 
 
-@pytest.mark.gen_test
-def test_http_handler_should_set_default_headers(http_client, base_url):
-    response = yield http_client.fetch('{}/health_check'.format(base_url))
-    headers = dict(response.headers)
-    headers.pop('X-Http-Reason', None)
-    assert headers.pop('Date')
-    assert headers.pop('Set-Cookie')
-    assert headers.pop('Etag')
-    assert headers.pop('Content-Length')
-    assert headers == {
-        'Access-Control-Allow-Credentials': 'true',
-        'Access-Control-Allow-Headers': 'Accept, Content-Type, Origin',
-        'Access-Control-Allow-Methods': 'GET',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Max-Age': '600',
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
-        'Content-Language': 'en-US',
-        'Content-Type': 'application/json',
-        'Pragma': 'no-cache',
-        'Server': 'cloudplayer'}

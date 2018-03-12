@@ -162,7 +162,7 @@ def user_cookie(current_user):
 def user_fetch(user_cookie, http_client, base_url):
 
     @tornado.gen.coroutine
-    def fetch(req, body=None, **kw):
+    def fetch(req, body=None, **kw):  # pragma: no cover
         if isinstance(req, str):
             if not req.startswith(base_url):
                 req = '{}/{}'.format(base_url, req.lstrip('/'))

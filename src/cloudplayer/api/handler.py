@@ -40,8 +40,6 @@ class HandlerMixin(object):
 
     def on_finish(self):
         if hasattr(self, '_db'):
-            if self._db.dirty:
-                self._db.rollback()  # XXX Is this good?
             self._db.close()
 
     def write_error(self, status_code, **kw):

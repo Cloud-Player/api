@@ -7,12 +7,12 @@
 """
 import tornado.gen
 
-import cloudplayer.api.controller
 from cloudplayer.api.access import Available
+from cloudplayer.api.controller import Controller
 from cloudplayer.api.model.account import Account
 
 
-class AccountController(cloudplayer.api.controller.Controller):
+class AccountController(Controller):
 
     __model__ = Account
 

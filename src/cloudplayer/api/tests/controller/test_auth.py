@@ -82,7 +82,7 @@ def test_auth_controller_should_reset_account_on_refresh_error(
     }, {
         'access_token': 'new-access-token',
         'refresh_token': 'old-refresh-token',
-        'token_expiration': '14/07/15 12:30'
+        'token_expiration': datetime.datetime(2015, 7, 14, 12, 30)
     }),
     ({
         'access_token': 'new-access-token',
@@ -90,7 +90,7 @@ def test_auth_controller_should_reset_account_on_refresh_error(
     }, {
         'access_token': 'new-access-token',
         'refresh_token': 'new-refresh-token',
-        'token_expiration': '14/07/15 12:30'
+        'token_expiration': datetime.datetime(2015, 7, 14, 12, 30)
     }),
     ({
         'access_token': 'new-access-token',
@@ -100,8 +100,7 @@ def test_auth_controller_should_reset_account_on_refresh_error(
         'access_token': 'new-access-token',
         'refresh_token': 'new-refresh-token',
         'token_expiration': (
-            datetime.datetime.utcnow() + datetime.timedelta(seconds=300)
-        ).strftime('%d/%m/%y %H:%M')
+            datetime.datetime.utcnow() + datetime.timedelta(seconds=300))
     })
 ])
 @pytest.mark.gen_test
@@ -126,8 +125,8 @@ def test_auth_controller_should_refresh_access_token(
 
     assert account.access_token == expect.get('access_token')
     assert account.refresh_token == expect.get('refresh_token')
-    assert account.token_expiration.strftime(
-        '%d/%m/%y %H:%M') == expect.get('token_expiration')
+    assert (expect.get('token_expiration') - account.token_expiration) < (
+        datetime.timedelta(seconds=1))
 
 
 @pytest.mark.gen_test

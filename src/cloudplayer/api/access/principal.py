@@ -12,9 +12,6 @@ class Principal(object):
     def __init__(self, target):
         self._target = target
 
-    def __call__(self, target):
-        return type(self)(target)
-
     @property
     def account(self):
         return self._target
@@ -27,7 +24,7 @@ class Principal(object):
                 (self.account.id == other.account.id) is True and
                 (self.account.provider_id == other.account.provider_id)
                 is True)
-        return super().__eq__(other)
+        return False
 
 
 class Everyone(Principal):
@@ -39,7 +36,7 @@ class Everyone(Principal):
     def __eq__(self, other):
         if isinstance(other, Principal):
             return True
-        return super().__eq__(other)
+        return False
 
 
 class Owner(Principal):
@@ -65,4 +62,4 @@ class Child(Principal):
     def __eq__(self, other):
         if isinstance(other, Principal):
             return other.account in self._target.children
-        return super().__eq__(other)
+        return False

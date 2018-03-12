@@ -65,7 +65,6 @@ class HandlerMixin(object):
 class ControllerHandlerMixin(object):
 
     __controller__ = NotImplemented
-    fields = None
 
     @property
     def controller(self):

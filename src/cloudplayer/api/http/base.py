@@ -24,7 +24,9 @@ from cloudplayer.api.model.user import User
 
 
 class HTTPException(APIException):
-    pass
+
+    def __init__(self, status_code=500, log_message='internal server error'):
+        super().__init__(status_code, log_message)
 
 
 class HTTPHandler(HandlerMixin, tornado.web.RequestHandler):

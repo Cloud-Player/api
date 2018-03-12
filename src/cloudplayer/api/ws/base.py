@@ -42,7 +42,7 @@ WS_CODES = {
 
 class WSException(APIException):
 
-    def __init__(self, status_code=1011, log_message='internal socket error'):
+    def __init__(self, status_code=1011, log_message='internal server error'):
         super().__init__(status_code, log_message)
 
 

@@ -141,7 +141,7 @@ class Soundcloud(AuthHandler):
 
     @property
     def _OAUTH_EXTRA_PARAMS(self):
-        return {'state': self.settings['menuflow_state']}
+        return {'state': self.settings['redirect_state']}
 
 
 class Youtube(AuthHandler):

@@ -6,6 +6,7 @@ sys.path.insert(0, __path__)
 debug = False
 xheaders = True
 static_path = '/srv/cloudplayer/static'
+redirect_state = 'v3'
 
 providers = [
     'youtube',

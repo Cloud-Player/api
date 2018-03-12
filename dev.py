@@ -6,7 +6,7 @@ sys.path.insert(0, __path__)
 debug = True
 xheaders = False
 static_path = 'static'
-menuflow_state = 'dev'
+redirect_state = 'dev'
 
 providers = [
     'youtube',

@@ -84,7 +84,7 @@ def app(postgresql_proc, redis_proc):
         'youtube', 'soundcloud', 'cloudplayer'], group='app')
     opt.define('allowed_origins', default=['*'], group='app')
     opt.define('num_executors', default=1, group='app')
-    opt.define('menuflow_state', default='dev', group='app')
+    opt.define('redirect_state', default='testing', group='app')
     opt.define('redis_host', default=redis_proc.host, group='app')
     opt.define('redis_port', default=redis_proc.port, group='app')
     opt.define('redis_db', default=0, group='app')

@@ -1,3 +1,5 @@
+import re
+
 import mock
 import pytest
 import tornado.web
@@ -9,6 +11,11 @@ from cloudplayer.api.routing import ProtocolMatches
 def test_protocol_matcher_should_ensure_regex_termination():
     matcher = ProtocolMatches('proto')
     assert matcher.protocol_pattern.pattern == 'proto$'
+
+
+def test_protocol_matcher_should_allow_regex_as_pattern():
+    matcher = ProtocolMatches(re.compile('^reg.*ex$'))
+    assert matcher.protocol_pattern.pattern == '^reg.*ex$'
 
 
 @pytest.mark.gen_test

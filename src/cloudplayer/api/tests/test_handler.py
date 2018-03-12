@@ -70,8 +70,6 @@ def test_handler_should_log_api_exceptions(req, monkeypatch, base_url):
         raise APIException(418, 'very-bad-exception')
     except APIException:
         handler.log_exception(*sys.exc_info())
-    else:
-        assert False
 
     cargs = logger.warning.call_args[0]
     expected = '418 HTTP GET %s (0.0.0.0): very-bad-exception' % base_url
@@ -90,8 +88,6 @@ def test_handler_should_log_arbitrary_exceptions(req, monkeypatch, base_url):
         raise ValueError('wild-value-error')
     except ValueError:
         handler.log_exception(*sys.exc_info())
-    else:
-        assert False
 
     cargs = logger.error.call_args[0]
     expected = 'uncaught exception HTTP GET %s (0.0.0.0)' % base_url

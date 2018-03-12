@@ -59,8 +59,8 @@ class HandlerMixin(object):
                         value.log_message % value.args)
                 gen_log.warning('%d %s: %s', *args)
         else:
-            app_log.error('uncaught exception %s\n%r', self._request_summary(),
-                          self.request, exc_info=(type_, value, tb))
+            app_log.error('uncaught exception %s', self._request_summary(),
+                          exc_info=(type_, value, tb))
 
     @tornado.gen.coroutine
     def fetch(self, provider_id, path, **kw):

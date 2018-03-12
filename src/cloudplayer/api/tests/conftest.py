@@ -3,8 +3,10 @@ import json
 import os
 import random
 import sys
+import urllib.parse
 
 import jwt
+import mock
 import pytest
 import pytest_redis.factories as redis_factories
 import tornado.escape
@@ -109,6 +111,21 @@ def db(app):
         session.execute(table.delete())
     session.commit()
     session.close()
+
+
+@pytest.fixture(scope='function')
+def req(base_url):
+    parse = urllib.parse.urlparse(base_url)
+    connection = mock.Mock()
+    connection.context.protocol = parse.scheme
+    connection.context.remote_ip = '0.0.0.0'
+    server_connection = mock.Mock()
+    return tornado.httputil.HTTPServerRequest(
+        method='GET',
+        uri=base_url,
+        connection=connection,
+        server_connection=server_connection,
+        headers={'Host': parse.netloc})
 
 
 @pytest.fixture(scope='function')

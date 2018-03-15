@@ -8,6 +8,7 @@
 import datetime
 
 import isodate
+import tornado.escape
 import tornado.gen
 
 from cloudplayer.api.controller import Controller
@@ -23,7 +24,7 @@ class SoundcloudTrackController(Controller):
     def read(self, ids):
         response = yield self.fetch(
             ids['provider_id'], '/tracks/{}'.format(ids['id']))
-        track = response.json()
+        track = tornado.escape.json_decode(response.body)
         account = track['user']
         if track.get('artwork_url'):
             image = Image(
@@ -71,7 +72,7 @@ class YoutubeTrackController(Controller):
             'maxWidth': '320'}
         response = yield self.fetch(
             ids['provider_id'], '/videos', params=params)
-        track_list = response.json()
+        track_list = tornado.escape.json_decode(response.body)
         if not track_list['items']:
             return
         track = track_list['items'][0]

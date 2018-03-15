@@ -21,3 +21,17 @@ def test_controller_merge_should_complain_about_conflicting_fields():
     kw = {'b': 2, 'same': 'bar'}
     with pytest.raises(ControllerException):
         Controller._merge_ids_with_kw(ids, kw)
+
+
+def test_controller_should_eject_ids_from_keywords():
+    ids = {'a': 1, 'b': 2}
+    kw = {'a': 1, 'b': 2, 'c': 3, 'd': 4}
+    params = Controller._eject_ids_from_kw(ids, kw)
+    assert params == {'c': 3, 'd': 4}
+
+
+def test_controller_eject_should_complain_about_conflicting_fields():
+    ids = {'a': 1, 'same': 'foo'}
+    kw = {'a': 1, 'b': 2, 'same': 'bar'}
+    with pytest.raises(ControllerException):
+        Controller._merge_ids_with_kw(ids, kw)

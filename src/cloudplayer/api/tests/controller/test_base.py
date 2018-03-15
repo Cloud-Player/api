@@ -98,3 +98,35 @@ def test_controller_should_read_entity_by_the_books(
         account, entity)
     assert set(controller.policy.grant_read.call_args[0][-1]) == {
         'provider_id', 'title'}
+
+
+@pytest.mark.gen_test
+def test_controller_should_raise_not_found_on_failed_update(
+        db, current_user):
+    controller = MyController(db, current_user, Account, mock.Mock())
+    ids = {'id': 'does-not-exist', 'provider_id': 'unheard-of'}
+    kw = {'title': 'foo', 'refresh_token': 'bar'}
+    with pytest.raises(ControllerException) as error:
+        yield controller.update(ids, kw, Fields('user_id', 'title'))
+    assert error.value.status_code == 404
+
+
+@pytest.mark.gen_test
+def test_controller_should_update_entity_and_read_result(
+        db, current_user, account, user):
+    controller = MyController(db, current_user, Account, mock.Mock())
+    ids = {'id': account.id, 'provider_id': account.provider_id}
+    kw = {'title': 'foo', 'refresh_token': 'bar'}
+    entity = yield controller.update(ids, kw, Fields('user_id', 'title'))
+    assert entity is account
+    assert sqlalchemy.orm.util.object_state(entity).persistent
+
+    assert controller.policy.grant_update.call_args[0][:-1] == (
+        account, entity)
+    assert set(controller.policy.grant_update.call_args[0][-1]) == {
+        'title', 'refresh_token'}
+
+    assert controller.policy.grant_read.call_args[0][:-1] == (
+        account, entity)
+    assert set(controller.policy.grant_read.call_args[0][-1]) == {
+        'user_id', 'title'}

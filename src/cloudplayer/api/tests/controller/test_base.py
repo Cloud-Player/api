@@ -74,3 +74,27 @@ def test_controller_should_create_entity_and_read_result(
         account, entity)
     assert set(controller.policy.grant_read.call_args[0][-1]) == {
         'id', 'title'}
+
+
+@pytest.mark.gen_test
+def test_controller_should_raise_not_found_on_failed_read(
+        db, current_user):
+    controller = MyController(db, current_user, Account, mock.Mock())
+    ids = {'id': 'does-not-exist', 'provider_id': 'unheard-of'}
+    with pytest.raises(ControllerException) as error:
+        yield controller.read(ids)
+    assert error.value.status_code == 404
+
+
+@pytest.mark.gen_test
+def test_controller_should_read_entity_by_the_books(
+        db, current_user, account):
+    controller = MyController(db, current_user, Account, mock.Mock())
+    ids = {'id': account.id, 'provider_id': account.provider_id}
+    entity = yield controller.read(ids, Fields('title', 'provider_id'))
+
+    assert entity is account
+    assert controller.policy.grant_read.call_args[0][:-1] == (
+        account, entity)
+    assert set(controller.policy.grant_read.call_args[0][-1]) == {
+        'provider_id', 'title'}

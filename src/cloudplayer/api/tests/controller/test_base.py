@@ -38,7 +38,7 @@ def test_controller_eject_should_complain_about_conflicting_fields():
     ids = {'a': 1, 'same': 'foo'}
     kw = {'a': 1, 'b': 2, 'same': 'bar'}
     with pytest.raises(ControllerException):
-        Controller._merge_ids_with_kw(ids, kw)
+        Controller._eject_ids_from_kw(ids, kw)
 
 
 class MyController(Controller):

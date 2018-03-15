@@ -61,7 +61,7 @@ class Controller(object):
 
     @property
     def accounts(self):
-        # TODO: This should move up the food chain
+        # TODO: Move detached accounts to current_user
         from sqlalchemy.orm.session import make_transient_to_detached
         from cloudplayer.api.model.account import Account
         dict_ = {}

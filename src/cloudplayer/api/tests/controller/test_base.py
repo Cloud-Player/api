@@ -23,8 +23,9 @@ def test_controller_should_merge_ids_into_keywords():
 def test_controller_merge_should_complain_about_conflicting_fields():
     ids = {'a': 1, 'same': 'foo'}
     kw = {'b': 2, 'same': 'bar'}
-    with pytest.raises(ControllerException):
+    with pytest.raises(ControllerException) as error:
         Controller._merge_ids_with_kw(ids, kw)
+    assert error.value.status_code == 400
 
 
 def test_controller_should_eject_ids_from_keywords():
@@ -37,8 +38,9 @@ def test_controller_should_eject_ids_from_keywords():
 def test_controller_eject_should_complain_about_conflicting_fields():
     ids = {'a': 1, 'same': 'foo'}
     kw = {'a': 1, 'b': 2, 'same': 'bar'}
-    with pytest.raises(ControllerException):
+    with pytest.raises(ControllerException) as error:
         Controller._eject_ids_from_kw(ids, kw)
+    assert error.value.status_code == 400
 
 
 class MyController(Controller):

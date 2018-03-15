@@ -8,7 +8,7 @@
 import tornado.gen
 import tornado.web
 
-from cloudplayer.api.controller.auth import create_controller
+from cloudplayer.api.controller import Controller
 from cloudplayer.api.http import HTTPHandler
 
 
@@ -18,7 +18,8 @@ class Proxy(HTTPHandler):  # pragma: no cover
 
     @tornado.gen.coroutine
     def proxy(self, method, provider, path, **kw):
-        response = yield self.fetch(
+        controller = Controller(self.db, self.current_user)
+        response = yield controller.fetch(
             provider, path, method=method, params=self.query_params,
             raise_error=False, **kw)
         if response.error:
@@ -28,13 +29,6 @@ class Proxy(HTTPHandler):  # pragma: no cover
     def write_str(self, data):
         tornado.web.RequestHandler.write(self, data)
         self.finish()
-
-    @tornado.gen.coroutine
-    def fetch(self, provider_id, path, **kw):
-        controller = create_controller(
-            provider_id, self.db, self.current_user)
-        response = yield controller.fetch(path, **kw)
-        return response
 
     @tornado.gen.coroutine
     def get(self, provider, path):

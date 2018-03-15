@@ -10,7 +10,6 @@ import tornado.options as opt
 
 from cloudplayer.api import APIException
 from cloudplayer.api.access import Available, Policy
-from cloudplayer.api.controller.auth import create_controller
 
 
 class ControllerException(APIException):
@@ -53,7 +52,8 @@ class Controller(object):
 
     @tornado.gen.coroutine
     def fetch(self, provider_id, path, **kw):
-        # XXX Can this go?
+        # TODO: Can authed fetching be generalized
+        from cloudplayer.api.controller.auth import create_controller
         controller = create_controller(
             provider_id, self.db, self.current_user)
         response = yield controller.fetch(path, **kw)

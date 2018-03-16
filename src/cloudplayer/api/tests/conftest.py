@@ -167,6 +167,11 @@ def account(db, user):
 
 
 @pytest.fixture(scope='function')
+def other(db):
+    return account(db, user(db))
+
+
+@pytest.fixture(scope='function')
 def current_user(account, user):
     return {
         'user_id': user.id,

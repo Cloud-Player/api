@@ -23,9 +23,9 @@ class Account(Base):
             'connected',
             'favourite_id',
             'image.id',
-            'image.large',
-            'image.medium',
             'image.small',
+            'image.medium',
+            'image.large',
             'title',
             'created',
             'updated'
@@ -37,7 +37,10 @@ class Account(Base):
         Allow(Everyone, Read, Fields(
             'id',
             'provider_id',
-            'image',
+            'image.id',
+            'image.small',
+            'image.medium',
+            'image.large',
             'title'
         )),
         Allow(Everyone, Query, Fields(

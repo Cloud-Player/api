@@ -7,11 +7,11 @@
 """
 import tornado.gen
 
+from cloudplayer.api.controller import Controller, ControllerException
 from cloudplayer.api.model.user import User
-import cloudplayer.api.controller
 
 
-class UserController(cloudplayer.api.controller.Controller):
+class UserController(Controller):
 
     __model__ = User
 
@@ -19,7 +19,10 @@ class UserController(cloudplayer.api.controller.Controller):
     def read(self, ids):
         if ids['id'] == 'me':
             ids['id'] = self.current_user['user_id']
-        entity = yield super().read(ids)
-        if not entity and ids['id'] == self.current_user['user_id']:
-            self.current_user.clear()
+        try:
+            entity = yield super().read(ids)
+        except ControllerException:
+            if ids['id'] == self.current_user['user_id']:
+                self.current_user.clear()
+            raise
         return entity

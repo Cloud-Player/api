@@ -153,3 +153,30 @@ def test_controller_should_delete_entity_and_not_return_anything(
 
     assert controller.policy.grant_delete.call_args[0] == (
         account, account)
+
+
+@pytest.mark.gen_test
+def test_controller_should_produce_model_query_with_arguments(
+        db, current_user, account):
+    controller = MyController(db, current_user, Account, mock.Mock())
+    ids = {'provider_id': 'cloudplayer'}
+    kw = {'title': 'foo'}
+    query = yield controller.query(ids, kw)
+    assert query.statement.froms[0].name == 'account'
+    assert str(query.whereclause) == (
+        'account.title = :title_1 AND account.provider_id = :provider_id_1')
+
+    assert controller.policy.grant_query.call_args[0] == (
+        account, Account, kw)
+
+
+@pytest.mark.gen_test
+def test_controller_should_search_using_query_and_read_all_entities(
+        db, current_user, account):
+    controller = MyController(db, current_user, Account, mock.Mock())
+    ids = {'id': account.id, 'provider_id': account.provider_id}
+    result = yield controller.search(ids, {}, Fields('id'))
+    entity = result[0]
+    assert controller.policy.grant_read.call_args[0][:-1] == (
+        account, entity)
+    assert set(controller.policy.grant_read.call_args[0][-1]) == {'id'}

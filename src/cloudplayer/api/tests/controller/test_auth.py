@@ -223,17 +223,21 @@ def test_auth_controller_syncs_cloudplayer_profile_from_account_info(
     account.image = None
 
     controller = CloudplayerController(db, current_user)
-    image = Image(large='image.co/large')
-    controller.account = Account(title='foo', image=image)
+    controller.account = Account(
+        id='bar', title='foo', image=Image(large='image.co/large'),
+        provider_id='soundcloud', user_id=current_user['user_id'])
+
     controller._sync_cloudplayer_profile()
     assert account.title == 'foo'
-    assert account.image is image
+    assert account.image.small == controller.account.image.small
+    assert account.image.medium == controller.account.image.medium
+    assert account.image.large == controller.account.image.large
 
     # Check that account with set attributes is left alone
     controller.account = Account(title='bar', image=None)
     controller._sync_cloudplayer_profile()
     assert account.title == 'foo'
-    assert account.image is image
+    assert account.image is not None
 
 
 def test_auth_controller_updates_account_from_info_dicts(db, current_user):

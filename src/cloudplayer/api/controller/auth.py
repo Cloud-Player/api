@@ -122,7 +122,10 @@ class AuthController(object):
         if not cloudplayer.title:
             cloudplayer.title = self.account.title
         if not cloudplayer.image:
-            cloudplayer.image = self.account.image
+            cloudplayer.image = Image(
+                small=self.account.image.small,
+                medium=self.account.image.medium,
+                large=self.account.image.large)
 
     def update_account(self, access_info, account_info):
         query = self.db.query(Account)

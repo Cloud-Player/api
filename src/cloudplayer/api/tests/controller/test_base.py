@@ -1,7 +1,9 @@
 import mock
 import pytest
 import sqlalchemy.orm.util
+import tornado.gen
 
+import cloudplayer.api.controller.auth
 from cloudplayer.api.access import Fields
 from cloudplayer.api.controller.base import Controller, ControllerException
 from cloudplayer.api.model.account import Account
@@ -50,6 +52,21 @@ class MyController(Controller):
         self.current_user = cu
         self.__model__ = model
         self.policy = policy
+
+
+def test_base_controller_should_delegate_provider_fetches_to_auth_controllers(
+        db, current_user, monkeypatch):
+    controller = MyController(db, current_user, mock.Mock(), mock.Mock())
+    fetch = mock.MagicMock()
+    mock_auth_controller = mock.Mock(
+        fetch=tornado.gen.coroutine(fetch))
+    create_controller = mock.MagicMock(return_value=mock_auth_controller)
+    monkeypatch.setattr(cloudplayer.api.controller.auth, 'create_controller',
+                        create_controller)
+    params = [('sort', True)]
+    controller.fetch('foo', '/path', params=params)
+    create_controller.assert_called_once_with('foo', db, current_user)
+    fetch.assert_called_once_with('/path', params=params)
 
 
 @pytest.mark.gen_test

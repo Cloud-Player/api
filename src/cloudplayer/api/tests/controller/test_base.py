@@ -113,7 +113,7 @@ def test_controller_should_raise_not_found_on_failed_update(
 
 @pytest.mark.gen_test
 def test_controller_should_update_entity_and_read_result(
-        db, current_user, account, user):
+        db, current_user, account):
     controller = MyController(db, current_user, Account, mock.Mock())
     ids = {'id': account.id, 'provider_id': account.provider_id}
     kw = {'title': 'foo', 'refresh_token': 'bar'}
@@ -130,3 +130,26 @@ def test_controller_should_update_entity_and_read_result(
         account, entity)
     assert set(controller.policy.grant_read.call_args[0][-1]) == {
         'user_id', 'title'}
+
+
+@pytest.mark.gen_test
+def test_controller_should_raise_not_found_on_failed_delete(
+        db, current_user):
+    controller = MyController(db, current_user, Account, mock.Mock())
+    ids = {'id': 'does-not-exist', 'provider_id': 'unheard-of'}
+    with pytest.raises(ControllerException) as error:
+        yield controller.delete(ids)
+    assert error.value.status_code == 404
+
+
+@pytest.mark.gen_test
+def test_controller_should_delete_entity_and_not_return_anything(
+        db, current_user, account):
+    controller = MyController(db, current_user, Account, mock.Mock())
+    ids = {'id': account.id, 'provider_id': account.provider_id}
+    result = yield controller.delete(ids)
+    assert result is None
+    assert sqlalchemy.orm.util.object_state(account).was_deleted
+
+    assert controller.policy.grant_delete.call_args[0] == (
+        account, account)

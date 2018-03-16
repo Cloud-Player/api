@@ -35,5 +35,10 @@ class User(Base):
     id = sql.Column(sql.Integer)
     provider_id = 'cloudplayer'
 
-    accounts = orm.relation('Account', back_populates='user')
+    accounts = orm.relation(
+        'Account',
+        back_populates='user',
+        uselist=True,
+        single_parent=True,
+        cascade='all, delete-orphan')
     children = orm.synonym('accounts')

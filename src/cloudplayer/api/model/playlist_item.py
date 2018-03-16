@@ -63,5 +63,7 @@ class PlaylistItem(TracklistItemMixin, Base):
 
     playlist_id = sql.Column(sql.String(96), nullable=False)
     playlist_provider_id = sql.Column(sql.String(16), nullable=False)
-    playlist = orm.relation('Playlist', back_populates='items')
+    playlist = orm.relation(
+        'Playlist',
+        back_populates='items')
     parent = orm.synonym('playlist')

@@ -36,7 +36,10 @@ class TracklistMixin(object):
 
     @declared_attr
     def provider(cls):
-        return orm.relation('Provider')
+        return orm.relation(
+            'Provider',
+            cascade=None,
+            viewonly=True)
 
     account_provider_id = sql.Column(sql.String(16), nullable=False)
     account_id = sql.Column(sql.String(32), nullable=False)

@@ -64,23 +64,43 @@ class Account(Base):
     account_id = orm.synonym('id')
 
     provider_id = sql.Column(sql.String(16), nullable=False)
-    provider = orm.relation('Provider')
+    provider = orm.relation(
+        'Provider',
+        cascade=None,
+        uselist=False,
+        viewonly=True)
 
     user_id = sql.Column(sql.Integer, nullable=False)
-    user = orm.relation('User', back_populates='accounts')
+    user = orm.relation(
+        'User',
+        back_populates='accounts',
+        uselist=False,
+        viewonly=True)
     parent = orm.synonym('user')
 
     image_id = sql.Column(sql.Integer)
-    image = orm.relation('Image')
+    image = orm.relation(
+        'Image',
+        cascade='all, delete-orphan',
+        single_parent=True,
+        uselist=False)
 
     @property
     def favourite_id(self):
         return self.favourite.id
 
     favourite = orm.relation(
-        'Favourite', uselist=False, back_populates='account')
+        'Favourite',
+        back_populates='account',
+        cascade='all, delete-orphan',
+        single_parent=True,
+        uselist=False)
 
-    playlists = orm.relation('Playlist', back_populates='account')
+    playlists = orm.relation(
+        'Playlist',
+        back_populates='account',
+        cascade='all, delete-orphan',
+        single_parent=True)
 
     title = sql.Column('title', sql.Unicode(64))
 

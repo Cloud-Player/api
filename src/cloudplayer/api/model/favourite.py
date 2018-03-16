@@ -25,7 +25,12 @@ class Favourite(TracklistMixin, Base):
     )
 
     account = orm.relation(
-        'Account', back_populates='favourite', viewonly=True)
+        'Account',
+        back_populates='favourite',
+        viewonly=True)
 
     items = orm.relation(
-        'FavouriteItem', order_by='FavouriteItem.created')
+        'FavouriteItem',
+        cascade='all, delete-orphan',
+        order_by='FavouriteItem.created',
+        single_parent=True)

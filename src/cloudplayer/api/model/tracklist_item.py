@@ -19,7 +19,9 @@ class TracklistItemMixin(object):
 
     @declared_attr
     def account(cls):
-        return orm.relation('Account')
+        return orm.relation(
+            'Account',
+            single_parent=True)
 
     track_provider_id = sql.Column(sql.String(16), nullable=False)
     track_id = sql.Column(sql.String(128), nullable=False)

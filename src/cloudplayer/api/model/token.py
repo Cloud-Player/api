@@ -44,5 +44,7 @@ class Token(Base):
 
     account_provider_id = sql.Column(sql.String(16))
     account_id = sql.Column(sql.String(32))
-    account = orm.relation('Account')
+    account = orm.relation(
+        'Account',
+        single_parent=True)
     parent = orm.synonym('account')

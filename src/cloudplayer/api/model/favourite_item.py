@@ -51,5 +51,8 @@ class FavouriteItem(TracklistItemMixin, Base):
 
     favourite_id = sql.Column(sql.String(96), nullable=False)
     favourite_provider_id = sql.Column(sql.String(16), nullable=False)
-    favourite = orm.relation('Favourite', back_populates='items')
+    favourite = orm.relation(
+        'Favourite',
+        back_populates='items',
+        viewonly=True)
     parent = orm.synonym('favourite')

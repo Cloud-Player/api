@@ -62,10 +62,16 @@ class Playlist(TracklistMixin, Base):
         )
 
     account = orm.relation(
-        'Account', back_populates='playlists', viewonly=True)
+        'Account',
+        back_populates='playlists',
+        viewonly=True)
     parent = orm.synonym('account')
 
-    items = orm.relation('PlaylistItem', order_by='PlaylistItem.rank')
+    items = orm.relation(
+        'PlaylistItem',
+        cascade='all, delete-orphan',
+        order_by='PlaylistItem.rank',
+        single_parent=True)
 
     description = sql.Column(sql.Unicode(5120), nullable=True)
     follower_count = sql.Column(sql.Integer, default=0)
@@ -73,4 +79,8 @@ class Playlist(TracklistMixin, Base):
     title = sql.Column(sql.Unicode(256), nullable=False)
 
     image_id = sql.Column(sql.Integer)
-    image = orm.relation('Image')
+    image = orm.relation(
+        'Image',
+        cascade='all, delete-orphan',
+        single_parent=True,
+        uselist=False)

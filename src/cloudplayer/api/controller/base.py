@@ -77,7 +77,10 @@ class Controller(object):
     @tornado.gen.coroutine
     def create(self, ids, kw, fields=Available):
         params = self._merge_ids_with_kw(ids, kw)
-        entity = self.__model__(**params)
+        try:
+            entity = self.__model__(**params)
+        except TypeError as error:
+            raise ControllerException(400, 'bad')
         account = self.accounts.get(entity.provider_id)
         self.policy.grant_create(account, entity, params.keys())
         self.db.add(entity)

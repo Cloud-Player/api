@@ -94,6 +94,17 @@ def test_controller_should_create_entity_and_read_result(
 
 
 @pytest.mark.gen_test
+def test_controller_should_raise_bad_request_on_failed_create(
+        db, current_user):
+    controller = MyController(db, current_user, Account, mock.Mock())
+    ids = {'id': '1234', 'provider_id': 'cloudplayer'}
+    kw = {'title': 'is-good', 'something': 'is-wrong'}
+    with pytest.raises(ControllerException) as error:
+        yield controller.create(ids, kw)
+    assert error.value.status_code == 400
+
+
+@pytest.mark.gen_test
 def test_controller_should_raise_not_found_on_failed_read(
         db, current_user):
     controller = MyController(db, current_user, Account, mock.Mock())

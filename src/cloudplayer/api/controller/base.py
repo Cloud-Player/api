@@ -123,7 +123,7 @@ class Controller(object):
 
     @tornado.gen.coroutine
     def query(self, ids, kw):
-        account = self.accounts.get(ids['provider_id'])
+        account = self.accounts.get(ids.get('provider_id', 'cloudplayer'))
         self.policy.grant_query(account, self.__model__, kw)
         params = self._merge_ids_with_kw(ids, kw)
         query = self.db.query(self.__model__)
@@ -136,7 +136,7 @@ class Controller(object):
     def search(self, ids, kw, fields=Available):
         query = yield self.query(ids, kw)
         entities = query.all()
-        account = self.accounts.get(ids['provider_id'])
+        account = self.accounts.get(ids.get('provider_id', 'cloudplayer'))
         for entity in entities:  # TODO: Find a better way
             self.policy.grant_read(account, entity, fields)
         return entities

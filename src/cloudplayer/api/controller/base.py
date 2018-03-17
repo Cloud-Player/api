@@ -81,9 +81,10 @@ class Controller(object):
             entity = self.__model__(**params)
         except TypeError as error:
             raise ControllerException(400, 'bad')
+        self.db.add(entity)
+        entity = self.db.merge(entity)
         account = self.accounts.get(entity.provider_id)
         self.policy.grant_create(account, entity, params.keys())
-        self.db.add(entity)
         self.db.commit()
         self.policy.grant_read(account, entity, fields)
         return entity

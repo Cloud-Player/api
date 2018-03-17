@@ -22,6 +22,9 @@ class Playlist(TracklistMixin, Base):
             'provider_id',
             'account_id',
             'account_provider_id',
+            'description',
+            'public',
+            'title'
         )),
         Allow(Owner, Read, Fields(
             'id',
@@ -42,6 +45,7 @@ class Playlist(TracklistMixin, Base):
         )),
         Allow(Owner, Update, Fields(
             'description',
+            'public',
             'title'
         )),
         Allow(Owner, Delete),
@@ -64,6 +68,7 @@ class Playlist(TracklistMixin, Base):
     account = orm.relation(
         'Account',
         back_populates='playlists',
+        cascade='all',
         viewonly=True)
     parent = orm.synonym('account')
 

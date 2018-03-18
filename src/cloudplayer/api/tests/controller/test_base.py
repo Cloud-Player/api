@@ -1,3 +1,5 @@
+import logging
+
 import mock
 import pytest
 import sqlalchemy.orm.util
@@ -94,11 +96,37 @@ def test_controller_should_create_entity_and_read_result(
 
 
 @pytest.mark.gen_test
-def test_controller_should_raise_bad_request_on_failed_create(
-        db, current_user):
+def test_controller_should_raise_bad_request_on_unknown_fields(
+        db, current_user, user):
     controller = MyController(db, current_user, Account, mock.Mock())
     ids = {'id': '1234', 'provider_id': 'cloudplayer'}
-    kw = {'title': 'is-good', 'something': 'is-wrong'}
+    kw = {'title': 'is-good', 'foo': 'type-error', 'user_id': user.id}
+    with pytest.raises(ControllerException) as error:
+        yield controller.create(ids, kw)
+    assert error.value.status_code == 400
+
+
+@pytest.mark.gen_test
+def test_controller_should_raise_bad_request_on_missing_not_null(
+        db, current_user, monkeypatch):
+    from sqlalchemy.sql import crud  # Silence warnings
+    monkeypatch.setattr(crud.util, 'warn', mock.MagicMock())
+    controller = MyController(db, current_user, Account, mock.Mock())
+    ids = {'provider_id': 'cloudplayer', 'id': '3456'}
+    kw = {'title': 'is-good'}
+    with pytest.raises(ControllerException) as error:
+        yield controller.create(ids, kw)
+    assert error.value.status_code == 400
+
+
+@pytest.mark.gen_test
+def test_controller_should_raise_bad_request_on_missing_primary_key(
+        db, current_user, user, monkeypatch):
+    from sqlalchemy.sql import crud  # Silence warnings
+    monkeypatch.setattr(crud.util, 'warn', mock.MagicMock())
+    controller = MyController(db, current_user, Account, mock.Mock())
+    ids = {'provider_id': 'cloudplayer'}
+    kw = {'title': 'is-good', 'user_id': current_user['user_id']}
     with pytest.raises(ControllerException) as error:
         yield controller.create(ids, kw)
     assert error.value.status_code == 400

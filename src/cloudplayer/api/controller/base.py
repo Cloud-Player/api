@@ -5,6 +5,7 @@
     :copyright: (c) 2018 by Nicolas Drebenstedt
     :license: GPL-3.0, see LICENSE for details
 """
+import sqlalchemy.exc
 import tornado.gen
 import tornado.options as opt
 
@@ -79,10 +80,10 @@ class Controller(object):
         params = self._merge_ids_with_kw(ids, kw)
         try:
             entity = self.__model__(**params)
-        except TypeError as error:
-            raise ControllerException(400, 'bad')
-        self.db.add(entity)
-        entity = self.db.merge(entity)
+            self.db.add(entity)
+            entity = self.db.merge(entity)
+        except (TypeError, sqlalchemy.exc.IntegrityError) as error:
+            raise ControllerException(400, 'bad request')
         account = self.accounts.get(entity.provider_id)
         self.policy.grant_create(account, entity, params.keys())
         self.db.commit()

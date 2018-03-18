@@ -29,7 +29,7 @@ class Controller(object):
 
     @staticmethod
     def _merge_ids_with_kw(ids, kw):
-        # XXX: This exposes entity existence
+        # XXX: This could expose entity existence
         params = kw.copy()
         for field, value in ids.items():
             if field in params and params[field] != value:
@@ -39,7 +39,7 @@ class Controller(object):
 
     @staticmethod
     def _eject_ids_from_kw(ids, kw):
-        # XXX: This exposes entity existence
+        # XXX: This could expose entity existence
         params = kw.copy()
         for field, value in ids.items():
             if field in params:
@@ -52,7 +52,7 @@ class Controller(object):
 
     @tornado.gen.coroutine
     def fetch(self, provider_id, path, **kw):
-        # TODO: Can authed fetching be generalized
+        # TODO: Can authed fetching be generalized?
         from cloudplayer.api.controller.auth import create_controller
         controller = create_controller(
             provider_id, self.db, self.current_user)

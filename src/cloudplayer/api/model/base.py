@@ -28,6 +28,11 @@ def pg_utcnow(element, compiler, **kw):
 
 
 class Model(object):
+    """Abstract model class serving as the sqlalchemy declarative base.
+
+    Defines sensible default values for commonly used attributes
+    such as timestamps, ownership, acl and nested field expansion.
+    """
 
     __acl__ = (Deny(),)
 
@@ -51,6 +56,30 @@ class Model(object):
 
     @fields.setter
     def fields(self, value):
+        """Fields can be a set of column names and include dotted syntax.
+
+        A dotted field notation like `foo.bar` instructs the model to look up
+        its `foo` relation and render its `bar` attribute.
+
+            {
+                'foo': {
+                    'bar': 42
+                }
+            }
+
+        If the `foo` relation is one to many, the `bar` attribute is rendered
+        from all the members in `foo`.
+
+            {
+                'foo': [
+                    {
+                        'bar': 73
+                    }, {
+                        'bar': 89
+                    }
+                ]
+            }
+        """
         tree = {}
         flat = []
         for field in value:
@@ -81,6 +110,7 @@ Base = declarative_base(cls=Model)
 
 
 class Encoder(json.JSONEncoder):
+    """Custom JSON encoder for rendering granted fields."""
 
     def default(self, obj):
         try:

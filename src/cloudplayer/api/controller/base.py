@@ -20,6 +20,11 @@ class ControllerException(APIException):
 
 
 class Controller(object):
+    """Protocol agnostic base controller to fulfil CRUD on model classes.
+
+    Implementations provide a model class attribute that allow CRUD methods
+    to dynamically adapt to the models field an ACL definitions.
+    """
 
     __model__ = NotImplemented
 
@@ -30,7 +35,7 @@ class Controller(object):
 
     @staticmethod
     def _merge_ids_with_kw(ids, kw):
-        # XXX: This could expose entity existence
+        # TODO: Could this expose entity existance?
         params = kw.copy()
         for field, value in ids.items():
             if field in params and params[field] != value:
@@ -40,7 +45,7 @@ class Controller(object):
 
     @staticmethod
     def _eject_ids_from_kw(ids, kw):
-        # XXX: This could expose entity existence
+        # TODO: Could this expose entity existance?
         params = kw.copy()
         for field, value in ids.items():
             if field in params:
@@ -53,6 +58,7 @@ class Controller(object):
 
     @tornado.gen.coroutine
     def fetch(self, provider_id, path, **kw):
+        """Convenience method for fetching from an upstream provider."""
         # TODO: Can authed fetching be generalized?
         from cloudplayer.api.controller.auth import create_controller
         controller = create_controller(

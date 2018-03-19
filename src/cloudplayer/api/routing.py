@@ -12,7 +12,7 @@ from tornado.util import basestring_type
 
 
 class ProtocolMatches(Matcher):
-    """Matches requests based on ``protocol_pattern`` regex."""
+    """Matches requests based on `protocol_pattern` regex."""
 
     def __init__(self, protocol_pattern):
         if isinstance(protocol_pattern, basestring_type):

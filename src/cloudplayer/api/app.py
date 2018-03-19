@@ -57,6 +57,7 @@ def define_options():  # pragma: no cover
 
 
 class Application(tornado.web.Application):
+    """Wraps routing configuration and data source connections."""
 
     http_routes = [
         (r'^/account/(?P<provider_id>[a-z]+)/(?P<id>[0-9a-zA-Z]+)$',
@@ -161,6 +162,7 @@ class Application(tornado.web.Application):
 
 
 class Database(object):
+    """Postgres database session factory that insures initialization."""
 
     def __init__(self, user, password, host, port, db):
         url = 'postgresql://{}:{}@{}:{}/{}'.format(

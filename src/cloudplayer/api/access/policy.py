@@ -19,6 +19,11 @@ class PolicyViolation(APIException):
 
 
 class Policy(object):
+    """Operator class that can verify the compliance of CRUD operations.
+
+    An intent is passed as a method call and a grant is issued upon compliance
+    or a violancion exception is raised on dissent.
+    """
 
     def __init__(self, db, current_user):
         self.db = db

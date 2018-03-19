@@ -12,6 +12,7 @@ from cloudplayer.api.access.principal import Everyone, Principal
 
 
 class Grant(object):
+    """Bundles metadata on a grant issued for an ACL intent."""
 
     def __init__(self, principal=None, action=None, target=None, fields=None):
         self.principal = principal
@@ -21,6 +22,7 @@ class Grant(object):
 
 
 class Rule(object):
+    """Main ACL entry declaring a certain action allowed or denied."""
 
     def __init__(self, principal=Everyone, action=Anything, fields=Available):
         self.principal = principal
@@ -29,6 +31,7 @@ class Rule(object):
 
 
 class Allow(Rule):
+    """Rule that allows an actor to act on a set of target fields."""
 
     def __call__(self, account, action, target, fields):
         grant = Grant(account, action, target, fields)
@@ -52,6 +55,7 @@ class Allow(Rule):
 
 
 class Deny(Rule):
+    """Rule that denies an actor to act on a set of target fields."""
 
     def __call__(self, account, action, target, fields):
         if self.principal(target) == Principal(account):

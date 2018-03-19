@@ -8,6 +8,21 @@
 
 
 class Fields(object):
+    """Component for fine-tuning column-level ACL rules.
+
+    Fields contain a set of column names that may restrict a CRUD operation.
+    E.g., the owner of an entity may read more attributes than a third party.
+
+    Column names are provided as positional arguments and can have a dotted
+    syntax to describe columns of related models.
+    The constructer accepts an additional target keyword to provide
+    compatibility with the `Available` fields class.
+
+    Calling a fields instance with a target entity creates a bound copy.
+
+    The `in` operator is implemented to check whether the intent applies
+    to the specified field restriction.
+    """
 
     def __init__(self, *args, target=None):
         self._values = frozenset(args)
@@ -26,6 +41,11 @@ class Fields(object):
 
 
 class Available(Fields):
+    """Wildcard fields class that unlocks all fields in an ACL rule.
+
+    Rules must reference the class uninstanciated and the target is bound
+    through the constructor.
+    """
 
     def __init__(self, target):
         self(target)

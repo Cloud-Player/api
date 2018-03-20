@@ -72,6 +72,7 @@ class Account(Base):
         cascade=None,
         uselist=False,
         viewonly=True)
+    account_provider_id = orm.synonym('provider_id')
 
     user_id = sql.Column(sql.Integer, nullable=False)
     user = orm.relation(

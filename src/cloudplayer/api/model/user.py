@@ -21,6 +21,7 @@ class User(Base):
             'accounts.id',
             'accounts.provider_id',
             'accounts.connected',
+            'accounts.favourite_id',
             'accounts.image',
             'accounts.title',
             'created',

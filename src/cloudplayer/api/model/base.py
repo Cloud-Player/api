@@ -61,24 +61,12 @@ class Model(object):
         A dotted field notation like `foo.bar` instructs the model to look up
         its `foo` relation and render its `bar` attribute.
 
-            {
-                'foo': {
-                    'bar': 42
-                }
-            }
+            {'foo': {'bar': 42}}
 
         If the `foo` relation is one to many, the `bar` attribute is rendered
         from all the members in `foo`.
 
-            {
-                'foo': [
-                    {
-                        'bar': 73
-                    }, {
-                        'bar': 89
-                    }
-                ]
-            }
+            {'foo': [{'bar': 73}, {'bar': 89}]}
         """
         tree = {}
         flat = []

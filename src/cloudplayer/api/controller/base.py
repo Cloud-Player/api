@@ -35,23 +35,23 @@ class Controller(object):
 
     @staticmethod
     def _merge_ids_with_kw(ids, kw):
-        # TODO: Could this expose entity existance?
         params = kw.copy()
         for field, value in ids.items():
             if field in params and params[field] != value:
+                # TODO: Could this error expose entity existance?
                 raise ControllerException(400, 'mismatch on {}'.format(field))
             params[field] = value
         return params
 
     @staticmethod
     def _eject_ids_from_kw(ids, kw):
-        # TODO: Could this expose entity existance?
         params = kw.copy()
         for field, value in ids.items():
             if field in params:
                 if params[field] == value:
                     del params[field]
                 else:
+                    # TODO: Could this error expose entity existance?
                     raise ControllerException(
                         400, 'mismatch on {}'.format(field))
         return params
@@ -88,9 +88,11 @@ class Controller(object):
             entity = self.__model__(**params)
             self.db.add(entity)
             entity = self.db.merge(entity)
-        except (TypeError, sqlalchemy.exc.IntegrityError) as error:
-            raise ControllerException(400, 'bad request')
-        account = self.accounts.get(entity.provider_id)
+        except TypeError as error:
+            raise ControllerException(400, 'consistency error %s' % error)
+        except sqlalchemy.exc.IntegrityError as error:
+            message = error.orig.diag.message_primary
+            raise ControllerException(400, 'integrity error %s' % message)
         self.policy.grant_create(account, entity, params.keys())
         self.db.commit()
         self.policy.grant_read(account, entity, fields)
@@ -100,7 +102,7 @@ class Controller(object):
     def read(self, ids, fields=Available):
         entity = self.db.query(self.__model__).filter_by(**ids).one_or_none()
         if not entity:
-            raise ControllerException(404, 'not found')
+            raise ControllerException(404, 'entity not found')
         account = self.accounts.get(entity.provider_id)
         self.policy.grant_read(account, entity, fields)
         return entity
@@ -109,7 +111,7 @@ class Controller(object):
     def update(self, ids, kw, fields=Available):
         entity = self.db.query(self.__model__).filter_by(**ids).one_or_none()
         if not entity:
-            raise ControllerException(404, 'not found')
+            raise ControllerException(404, 'updatable not found')
         account = self.accounts.get(entity.provider_id)
         self.policy.grant_read(account, entity, fields)
         params = self._eject_ids_from_kw(ids, kw)
@@ -122,7 +124,7 @@ class Controller(object):
     def delete(self, ids):
         entity = self.db.query(self.__model__).filter_by(**ids).one_or_none()
         if not entity:
-            raise ControllerException(404, 'not found')
+            raise ControllerException(404, 'deletable not found')
         account = self.accounts.get(entity.provider_id)
         self.policy.grant_delete(account, entity)
         self.db.delete(entity)

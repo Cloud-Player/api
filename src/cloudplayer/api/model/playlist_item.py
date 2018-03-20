@@ -57,7 +57,7 @@ class PlaylistItem(TracklistItemMixin, Base):
             ['provider.id'])
     )
 
-    provider_id = orm.synonym('playlist_id')
+    provider_id = orm.synonym('playlist_provider_id')
 
     rank = sql.Column(sql.String(128), nullable=False)
 

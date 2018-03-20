@@ -52,5 +52,5 @@ class Available(Fields):
 
     def __call__(self, target):
         self._target = target
-        self._values = frozenset(target.fields)
+        self._values = frozenset()
         return self

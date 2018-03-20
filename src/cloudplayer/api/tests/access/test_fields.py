@@ -25,12 +25,21 @@ def test_fields_should_check_field_containment_against_values():
     assert f3 in fields
 
 
-def test_available_fields_init_eagerly_and_extract_fields_from_target():
+def test_available_fields_init_eagerly_and_keep_empty_values():
     target = mock.Mock()
-    target.fields = ('ten', 'six', 'two')
     f1 = Available(target)
     assert f1._target is target
-    assert set(f1) == {'ten', 'six', 'two'}
+    assert len(list(f1)) == 0
     f2 = Available(target)(target)
     assert f2._target is target
-    assert set(f2) == {'ten', 'six', 'two'}
+    assert len(list(f2)) == 0
+
+
+def test_available_fields_are_always_contained_in_specific_fields():
+    target = mock.Mock()
+    f1 = Available(target)
+    f2 = Fields('ten', 'six', 'two')
+    assert f1 in f2
+    f1 = Available(target)
+    f2 = Fields()
+    assert f1 in f2

@@ -5,8 +5,6 @@
     :copyright: (c) 2018 by Nicolas Drebenstedt
     :license: GPL-3.0, see LICENSE for details
 """
-from sqlalchemy.orm.session import make_transient_to_detached
-
 from cloudplayer.api import APIException
 from cloudplayer.api.access.action import Create, Delete, Query, Read, Update
 from cloudplayer.api.access.fields import Available, Fields
@@ -58,9 +56,9 @@ class Policy(object):
         return self.grant(account, Delete, entity, Available)
 
     def grant_query(self, account, model, query):
-        entity = model(**query)
-        make_transient_to_detached(entity)
-        entity = self.db.merge(entity, load=False)
-        grant = self.grant(account, Query, entity, query.keys())
+        template = model(**query)
+        self.db.enable_relationship_loading(template)
+        grant = self.grant(account, Query, template, query.keys())
+        self.db.expunge(template)
         grant.target = model
         return grant

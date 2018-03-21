@@ -54,3 +54,6 @@ class Available(Fields):
         self._target = target
         self._values = frozenset()
         return self
+
+    def __contains__(self, item):
+        return True

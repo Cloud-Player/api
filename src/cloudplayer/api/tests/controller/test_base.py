@@ -1,5 +1,3 @@
-import logging
-
 import mock
 import pytest
 import sqlalchemy.orm.util
@@ -9,6 +7,7 @@ import cloudplayer.api.controller.auth
 from cloudplayer.api.access import Fields
 from cloudplayer.api.controller.base import Controller, ControllerException
 from cloudplayer.api.model.account import Account
+from cloudplayer.api.model.playlist import Playlist
 
 
 def test_controller_should_store_creation_args(db, current_user):
@@ -120,11 +119,9 @@ def test_controller_should_raise_bad_request_on_missing_not_null(
 
 
 @pytest.mark.gen_test
-def test_controller_should_raise_bad_request_on_missing_primary_key(
+def test_controller_should_raise_bad_request_on_mismatching_account_info(
         db, current_user, user, monkeypatch):
-    from sqlalchemy.sql import crud  # Silence warnings
-    monkeypatch.setattr(crud.util, 'warn', mock.MagicMock())
-    controller = MyController(db, current_user, Account, mock.Mock())
+    controller = MyController(db, current_user, Playlist, mock.Mock())
     ids = {'provider_id': 'cloudplayer'}
     kw = {'title': 'is-good', 'user_id': current_user['user_id']}
     with pytest.raises(ControllerException) as error:
@@ -222,8 +219,10 @@ def test_controller_should_produce_model_query_with_arguments(
     assert str(query.whereclause) == (
         'account.title = :title_1 AND account.provider_id = :provider_id_1')
 
-    assert controller.policy.grant_query.call_args[0] == (
-        account, Account, kw)
+    assert controller.policy.grant_query.call_args[0][:-1] == (
+        account, Account)
+    assert set(controller.policy.grant_query.call_args[0][-1]) == {
+        'title', 'provider_id'}
 
 
 @pytest.mark.gen_test

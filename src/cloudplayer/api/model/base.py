@@ -9,6 +9,7 @@ import datetime
 import json
 
 import sqlalchemy as sql
+import sqlalchemy.inspection
 from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy.orm import RelationshipProperty
@@ -93,6 +94,14 @@ class Model(object):
         from cloudplayer.api.model.account import Account
         if self.account_id and self.provider_id:
             return Account(id=self.account_id, provider_id=self.provider_id)
+
+    @classmethod
+    def requires_account(cls):
+        mapper = sqlalchemy.inspection.inspect(cls)
+        prop = mapper.relationships.get('account', None)
+        if prop:
+            return not all(c.nullable for c in prop.local_columns)
+        return False
 
 
 Base = declarative_base(cls=Model)

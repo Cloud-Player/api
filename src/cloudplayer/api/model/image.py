@@ -33,3 +33,9 @@ class Image(Base):
     small = sql.Column(sql.String(256))
     medium = sql.Column(sql.String(256))
     large = sql.Column(sql.String(256), nullable=False)
+
+    def copy(self):
+        return Image(
+            small=self.small,
+            medium=self.medium,
+            large=self.large)

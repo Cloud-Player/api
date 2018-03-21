@@ -119,6 +119,8 @@ class AuthController(object):
     def _sync_cloudplayer_profile(self):
         cloudplayer = self.db.query(Account).get((
             self.current_user['cloudplayer'], 'cloudplayer'))
+        if not cloudplayer:
+            return
         if not cloudplayer.title:
             cloudplayer.title = self.account.title
         if not cloudplayer.image:

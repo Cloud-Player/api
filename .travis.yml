@@ -1,6 +1,11 @@
 dist: trusty
 sudo: false
 language: python
+cache:
+  directories:
+    - $HOME/.cache/pip
+    - $HOME/.npm
+    - $HOME/node_modules
 python:
   - "3.6"
 before_install:
@@ -15,6 +20,8 @@ install:
   - pip install -e .
   - pip install -e .[test]
 script: pytest
+before_cache:
+  - rm -f $HOME/.cache/pip/log/debug.log
 after_success:
   - codecov
   - sudo apt-get install nodejs npm -y

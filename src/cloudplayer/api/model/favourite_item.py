@@ -18,19 +18,21 @@ class FavouriteItem(TracklistItemMixin, Base):
 
     __acl__ = (
         Allow(Parent, Create, Fields(
+            'favourite_id',
+            'favourite_provider_id',
             'account_id',
             'account_provider_id',
-            'track_provider_id',
-            'track_id'
+            'track_id',
+            'track_provider_id'
         )),
         Allow(Owner, Read, Fields(
             'id',
-            'track_provider_id',
-            'track_id'
+            'track_id',
+            'track_provider_id'
         )),
         Allow(Owner, Delete),
-        Allow(Owner, Query, Fields(
-            'favourite_id'
+        Allow(Parent, Query, Fields(
+            'favourite'
         ))
     )
     __table_args__ = (
@@ -53,6 +55,5 @@ class FavouriteItem(TracklistItemMixin, Base):
     favourite_provider_id = sql.Column(sql.String(16), nullable=False)
     favourite = orm.relation(
         'Favourite',
-        back_populates='items',
-        viewonly=True)
+        back_populates='items')
     parent = orm.synonym('favourite')

@@ -20,6 +20,8 @@ class PlaylistItem(TracklistItemMixin, Base):
         Allow(Parent, Create, Fields(
             'playlist_id',
             'playlist_provider_id',
+            'account_id',
+            'account_provider_id',
             'rank',
             'track_provider_id',
             'track_id'
@@ -38,8 +40,8 @@ class PlaylistItem(TracklistItemMixin, Base):
             'rank'
         )),
         Allow(Owner, Delete),
-        Allow(Owner, Query, Fields(
-            'playlist_id'
+        Allow(Parent, Query, Fields(
+            'playlist'
         )),
         Deny()
     )

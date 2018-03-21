@@ -21,7 +21,7 @@ class PlaylistController(Controller):
     def read(self, ids, fields=Available):
         if ids['id'] == 'random':
             provider_id = ids['provider_id']
-            account = self.accounts.get(provider_id)
+            account = self.get_account(provider_id)
             kw = dict(
                 account_id=account.id,
                 account_provider_id=account.provider_id,

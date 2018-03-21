@@ -25,8 +25,8 @@ class TokenController(Controller):
             self.__model__).filter_by(**ids).filter(Token.created > threshold)
         entity = query.one_or_none()
         if not entity:
-        account = self.accounts.get(entity.provider_id)
             raise ControllerException(404, 'token not found')
+        account = self.get_account(entity.provider_id)
         self.policy.grant_read(account, entity, fields)
         if entity.claimed:
             self.current_user.clear()

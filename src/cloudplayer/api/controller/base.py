@@ -7,7 +7,6 @@
 """
 import sqlalchemy.exc
 import tornado.gen
-import tornado.options as opt
 
 from cloudplayer.api import APIException
 from cloudplayer.api.access import Available, Policy
@@ -66,23 +65,30 @@ class Controller(object):
         response = yield controller.fetch(path, **kw)
         return response
 
-    @property
-    def accounts(self):
+    def get_account(self, provider_id):
         # TODO: Move detached accounts to current_user
         from sqlalchemy.orm.session import make_transient_to_detached
         from cloudplayer.api.model.account import Account
-        dict_ = {}
-        for provider_id in opt.options['providers']:
+        if not hasattr(self, '_accounts'):
+            self._accounts = {}
+        if provider_id not in self._accounts:
             account = Account(
                 id=self.current_user[provider_id],
                 provider_id=provider_id)
             make_transient_to_detached(account)
             account = self.db.merge(account, load=False)
-            dict_[provider_id] = account
-        return dict_
+            self._accounts[provider_id] = account
+        return self._accounts[provider_id]
 
     @tornado.gen.coroutine
     def create(self, ids, kw, fields=Available):
+        provider_id = ids.get('provider_id', 'cloudplayer')
+        account = self.get_account(provider_id)
+
+        if self.__model__.requires_account():
+            kw.setdefault('account_id', account.id)
+            kw.setdefault('account_provider_id', account.provider_id)
+
         params = self._merge_ids_with_kw(ids, kw)
         try:
             entity = self.__model__(**params)
@@ -103,7 +109,7 @@ class Controller(object):
         entity = self.db.query(self.__model__).filter_by(**ids).one_or_none()
         if not entity:
             raise ControllerException(404, 'entity not found')
-        account = self.accounts.get(entity.provider_id)
+        account = self.get_account(entity.provider_id)
         self.policy.grant_read(account, entity, fields)
         return entity
 
@@ -112,7 +118,7 @@ class Controller(object):
         entity = self.db.query(self.__model__).filter_by(**ids).one_or_none()
         if not entity:
             raise ControllerException(404, 'updatable not found')
-        account = self.accounts.get(entity.provider_id)
+        account = self.get_account(entity.provider_id)
         self.policy.grant_read(account, entity, fields)
         params = self._eject_ids_from_kw(ids, kw)
         self.policy.grant_update(account, entity, params)
@@ -125,7 +131,7 @@ class Controller(object):
         entity = self.db.query(self.__model__).filter_by(**ids).one_or_none()
         if not entity:
             raise ControllerException(404, 'deletable not found')
-        account = self.accounts.get(entity.provider_id)
+        account = self.get_account(entity.provider_id)
         self.policy.grant_delete(account, entity)
         self.db.delete(entity)
         self.db.commit()
@@ -145,7 +151,8 @@ class Controller(object):
     def search(self, ids, kw, fields=Available):
         query = yield self.query(ids, kw)
         entities = query.all()
-        account = self.accounts.get(ids.get('provider_id', 'cloudplayer'))
         for entity in entities:  # TODO: Find a better way
             self.policy.grant_read(account, entity, fields)
+        provider_id = ids.get('provider_id', 'cloudplayer')
+        account = self.get_account(provider_id)
         return entities

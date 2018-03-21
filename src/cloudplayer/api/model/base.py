@@ -47,7 +47,8 @@ class Model(object):
 
     id = None
     account_id = None
-    provider_id = None
+    account_provider_id = 'cloudplayer'
+    provider_id = 'cloudplayer'
     parent = None
 
     @property

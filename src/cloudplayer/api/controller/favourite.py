@@ -18,7 +18,7 @@ class FavouriteController(Controller):
     @tornado.gen.coroutine
     def read(self, ids):
         if ids['id'] == 'mine':
-            account = self.accounts[ids['provider_id']]
+            account = self.get_account(ids['provider_id'])
             ids['id'] = account.favourite.id
         entity = yield super().read(ids)
         return entity

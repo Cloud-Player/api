@@ -19,8 +19,7 @@ class Favourite(TracklistMixin, Base):
             'id',
             'provider_id',
             'account_id',
-            'account_provider_id',
-            'items'
+            'account_provider_id'
         )),
     )
 

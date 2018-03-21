@@ -37,7 +37,6 @@ class Playlist(TracklistMixin, Base):
             'image.small',
             'image.medium',
             'image.large',
-            'items',
             'public',
             'title',
             'created',

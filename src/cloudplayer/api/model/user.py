@@ -22,7 +22,10 @@ class User(Base):
             'accounts.provider_id',
             'accounts.connected',
             'accounts.favourite_id',
-            'accounts.image',
+            'accounts.image.id',
+            'accounts.image.small',
+            'accounts.image.medium',
+            'accounts.image.large',
             'accounts.title',
             'created',
             'updated'

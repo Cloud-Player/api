@@ -91,7 +91,8 @@ class Account(Base):
 
     @property
     def favourite_id(self):
-        return self.favourite.id
+        if self.favourite:
+            return self.favourite.id
 
     favourite = orm.relation(
         'Favourite',

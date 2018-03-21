@@ -56,13 +56,13 @@ class Controller(object):
         return params
 
     @tornado.gen.coroutine
-    def fetch(self, provider_id, path, **kw):
+    def fetch(self, provider_id, path, params=None, **kw):
         """Convenience method for fetching from an upstream provider."""
         # TODO: Can authed fetching be generalized?
-        from cloudplayer.api.controller.auth import create_controller
-        controller = create_controller(
+        from cloudplayer.api.controller.auth import create_auth_controller
+        controller = create_auth_controller(
             provider_id, self.db, self.current_user)
-        response = yield controller.fetch(path, **kw)
+        response = yield controller.fetch(path, params=params, **kw)
         return response
 
     def get_account(self, provider_id):

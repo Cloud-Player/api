@@ -16,6 +16,15 @@ from cloudplayer.api.model.account import Account
 from cloudplayer.api.model.image import Image
 
 
+def create_track_controller(provider_id, db, current_user=None):
+    if provider_id == 'soundcloud':
+        return SoundcloudTrackController(db, current_user)
+    elif provider_id == 'youtube':
+        return YoutubeTrackController(db, current_user)
+    else:
+        raise ValueError('unsupported provider')
+
+
 class SoundcloudTrackController(Controller):
 
     DATE_FORMAT = '%Y/%m/%d %H:%M:%S %z'

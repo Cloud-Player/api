@@ -24,7 +24,7 @@ from cloudplayer.api.model.provider import Provider
 from sqlalchemy.orm.session import make_transient_to_detached
 
 
-def create_controller(provider_id, db, current_user=None):
+def create_auth_controller(provider_id, db, current_user=None):
     if provider_id == 'soundcloud':
         return SoundcloudAuthController(db, current_user)
     elif provider_id == 'youtube':

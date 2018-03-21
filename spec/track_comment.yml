@@ -1,0 +1,28 @@
+TrackComment:
+  type: object
+  properties:
+    id:
+      description: Track comment id
+      type: string
+    provider_id:
+      $ref: 'provider.yml#/Provider/properties/id'
+    account:
+      $ref: 'account.yml#/EmbeddedAccount'
+    body:
+      description: Track comment body
+      type: string
+    timestamp:
+      description: Track comment timestamp
+      format: int32
+      type: integer
+    track_id:
+      $ref: 'track.yml#/Track/properties/id'
+    track_provider_id:
+      $ref: 'provider.yml#/Provider/properties/id'
+    created:
+      description: Track comment creation
+      format: date-time
+      type: string
+  required:
+  - id
+  - provider_id

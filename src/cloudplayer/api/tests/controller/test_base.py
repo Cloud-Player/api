@@ -231,9 +231,8 @@ def test_controller_should_search_using_query_and_read_all_entities(
         db, current_user, account):
     controller = MyController(db, current_user, Account, mock.Mock())
     ids = {'id': account.id, 'provider_id': account.provider_id}
-    result = yield controller.search(ids, {}, Fields('id'))
-    entity = result[0]
+    entities = yield controller.search(ids, {}, Fields('id'))
 
     assert controller.policy.grant_read.call_args[0][:-1] == (
-        account, entity)
+        account, entities)
     assert set(controller.policy.grant_read.call_args[0][-1]) == {'id'}

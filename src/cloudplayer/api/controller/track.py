@@ -36,7 +36,7 @@ class SoundcloudTrackController(Controller):
         response = yield self.fetch(
             ids['provider_id'], '/tracks/{}'.format(ids['id']))
         track = tornado.escape.json_decode(response.body)
-        artist = track['user']
+        user = track['user']
 
         if track.get('artwork_url'):
             image = Image(
@@ -48,13 +48,13 @@ class SoundcloudTrackController(Controller):
             image = None
 
         artist = Account(
-            id=artist['id'],
+            id=user['id'],
             provider_id=ids['provider_id'],
-            title=artist['username'],
+            title=user['username'],
             image=Image(
-                small=artist['avatar_url'],
-                medium=artist['avatar_url'].replace('large', 't300x300'),
-                large=artist['avatar_url'].replace('large', 't500x500')))
+                small=user['avatar_url'],
+                medium=user['avatar_url'].replace('large', 't300x300'),
+                large=user['avatar_url'].replace('large', 't500x500')))
 
         entity = Track(
             id=ids['id'],

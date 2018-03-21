@@ -40,8 +40,6 @@ paths:
             $ref: 'account.yml#/Account'
 
   /history/{id}:
-    tags:
-    - draft
     parameters:
     - description: History id
       in: path
@@ -49,6 +47,8 @@ paths:
       required: true
       type: string
     get:
+      tags:
+      - Draft
       operationId: historyRead
       responses:
         '200':
@@ -336,8 +336,6 @@ paths:
             $ref: 'provider.yml#/Provider'
 
   /queue/{id}:
-    tags:
-    - draft
     parameters:
     - description: Queue id
       in: path
@@ -345,6 +343,8 @@ paths:
       required: true
       type: string
     get:
+      tags:
+      - Draft
       operationId: queueRead
       responses:
         '200':
@@ -394,7 +394,7 @@ paths:
     parameters:
     - description: Provider id
       in: path
-      name: account_id
+      name: provider_id
       required: true
       type: string
     - description: Track id
@@ -409,6 +409,28 @@ paths:
           description: OK
           schema:
             $ref: 'track.yml#/Track'
+
+  /track/{track_provider_id}/{track_id}/comment:
+    parameters:
+    - description: Track provider id
+      in: path
+      name: track_provider_id
+      required: true
+      type: string
+    - description: Track id
+      in: path
+      name: track_id
+      required: true
+      type: string
+    get:
+      operationId: trackCommentSearch
+      responses:
+        '200':
+          description: OK
+          schema:
+            items:
+              $ref: 'track_comment.yml#/TrackComment'
+            type: array
 
   /user/{id}:
     parameters:

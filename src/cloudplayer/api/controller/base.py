@@ -9,7 +9,7 @@ import sqlalchemy.exc
 import tornado.gen
 
 from cloudplayer.api import APIException
-from cloudplayer.api.access import Available, Policy, PolicyViolation
+from cloudplayer.api.access import Available, Policy
 
 
 class ControllerException(APIException):
@@ -156,10 +156,5 @@ class Controller(object):
         entities = query.all()
         provider_id = ids.get('provider_id', 'cloudplayer')
         account = self.get_account(provider_id)
-        for entity in entities:
-            # TODO: Find a better way to grant multi read
-            try:
-                self.policy.grant_read(account, entity, fields)
-            except PolicyViolation:
-                continue
+        self.policy.grant_read(account, entities, fields)
         return entities

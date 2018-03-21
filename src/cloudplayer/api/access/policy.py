@@ -42,10 +42,24 @@ class Policy(object):
         entity.fields = grant.fields
         return grant
 
-    def grant_read(self, account, entity, fields):
+    def grant_read(self, account, entity_or_entities, fields):
+        # TODO: Find a better way to grant multi reads
+        if isinstance(entity_or_entities, list):
+            return self._grant_multi_read(account, entity_or_entities, fields)
+        else:
+            return self._grant_solo_read(account, entity_or_entities, fields)
+
+    def _grant_solo_read(self, account, entity, fields):
         grant = self.grant(account, Read, entity, fields)
         entity.fields = grant.fields
         return grant
+
+    def _grant_multi_read(self, account, entities, fields):
+        grants = []
+        for entity in entities:
+            grant = self._grant_solo_read(account, entity, fields)
+            grants.append(grant)
+        return grants
 
     def grant_update(self, account, entity, fields):
         grant = self.grant(account, Update, entity, fields)

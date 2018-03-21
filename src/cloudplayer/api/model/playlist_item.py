@@ -18,8 +18,7 @@ class PlaylistItem(TracklistItemMixin, Base):
 
     __acl__ = (
         Allow(Parent, Create, Fields(
-            'playlist_id',
-            'playlist_provider_id',
+            'playlist',
             'account_id',
             'account_provider_id',
             'rank',

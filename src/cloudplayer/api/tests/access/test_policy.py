@@ -78,7 +78,7 @@ def test_policy_should_grant_delete_for_available_fields():
     rule.assert_called_once_with(account, Delete, entity, Available)
 
 
-class Model(Base):
+class MyModel(Base):
     one = sql.Column(sql.Integer, primary_key=True)
     two = sql.Column(sql.Integer)
     six = sql.Column(sql.Integer)
@@ -87,14 +87,14 @@ class Model(Base):
 def test_policy_should_grant_query_for_specified_fields(db):
     account = mock.Mock()
     fields = Fields('one', 'two', 'six')
-    grant = Grant(account, Query, Model, fields)
+    grant = Grant(account, Query, MyModel, fields)
     rule = mock.MagicMock(return_value=grant)
-    Model.__acl__ = (rule,)
+    MyModel.__acl__ = (rule,)
     kw = {'one': 1, 'two': 2, 'six': 6}
     policy = Policy(db, None)
-    policy.grant_query(account, Model, kw)
+    policy.grant_query(account, MyModel, kw)
     c_principal, c_action, c_target, c_fields = rule.call_args[0]
     assert c_principal == account
     assert c_action == Query
-    assert isinstance(c_target, Model)
+    assert isinstance(c_target, MyModel)
     assert c_fields in Fields(*fields)

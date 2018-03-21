@@ -37,7 +37,7 @@ class Policy(object):
             grant = rule(account, action, target, fields)
             if grant:
                 return grant
-        raise PolicyViolation(404, 'not found')
+        raise PolicyViolation(404, 'no grant issued')
 
     def grant_create(self, account, entity, fields):
         grant = self.grant(account, Create, entity, fields)

@@ -148,8 +148,8 @@ def test_controller_should_read_entity_by_the_books(
     controller = MyController(db, current_user, Account, mock.Mock())
     ids = {'id': account.id, 'provider_id': account.provider_id}
     entity = yield controller.read(ids, Fields('title', 'provider_id'))
-
     assert entity is account
+
     assert controller.policy.grant_read.call_args[0][:-1] == (
         account, entity)
     assert set(controller.policy.grant_read.call_args[0][-1]) == {
@@ -233,6 +233,7 @@ def test_controller_should_search_using_query_and_read_all_entities(
     ids = {'id': account.id, 'provider_id': account.provider_id}
     result = yield controller.search(ids, {}, Fields('id'))
     entity = result[0]
+
     assert controller.policy.grant_read.call_args[0][:-1] == (
         account, entity)
     assert set(controller.policy.grant_read.call_args[0][-1]) == {'id'}

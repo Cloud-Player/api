@@ -75,6 +75,8 @@ class AuthController(object):
     def fetch(self, path, params=None, **kw):
         if not params:
             params = list()
+        elif isinstance(params, dict):
+            params = list(params.items())
 
         if self.account:
             if self._should_refresh:
@@ -167,8 +169,10 @@ class YoutubeAuthController(AuthController):
 
     @tornado.gen.coroutine
     def fetch(self, path, params=None, headers=None, **kw):
-        if not params:  # pragma: no cover
+        if not params:
             params = list()
+        elif isinstance(params, dict):
+            params = list(params.items())
 
         params.append(('prettyPrint', 'false'))
         user_hash = hashlib.md5(self.current_user['cloudplayer'].encode())

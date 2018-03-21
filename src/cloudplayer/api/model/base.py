@@ -28,29 +28,30 @@ def pg_utcnow(element, compiler, **kw):
     return "TIMEZONE('utc', CURRENT_TIMESTAMP)"
 
 
-class Model(object):
-    """Abstract model class serving as the sqlalchemy declarative base.
-
-    Defines sensible default values for commonly used attributes
-    such as timestamps, ownership, acl and nested field expansion.
-    """
+class Transient(object):
 
     __acl__ = (Deny(),)
 
-    @declared_attr
-    def __tablename__(cls):
-        return cls.__name__.lower()
-
-    created = sql.Column(
-        sql.DateTime, server_default=utcnow())
-    updated = sql.Column(
-        sql.DateTime, server_default=utcnow(), onupdate=utcnow())
+    def __init__(self, **kw):
+        for field, value in kw.items():
+            if hasattr(self, field):
+                setattr(self, field, value)
 
     id = None
     account_id = None
-    account_provider_id = 'cloudplayer'
     provider_id = 'cloudplayer'
+    account_provider_id = property(lambda self: self.provider_id)
     parent = None
+    created = None
+    updated = None
+
+    def _inspect_field(self, field):
+        attr = getattr(self, field)
+        is_list = isinstance(attr, list)
+        if not is_list:
+            attr = [attr]
+        should_expand = all(isinstance(a, Transient) for a in attr)
+        return should_expand, is_list
 
     @property
     def fields(self):
@@ -78,15 +79,49 @@ class Model(object):
             if path:
                 tree[key] = tree.get(key, []) + list(path)
         for field, paths in tree.items():
-            prop = getattr(type(self), field).property
-            if isinstance(prop, RelationshipProperty):
+            should_expand, is_list = self._inspect_field(field)
+            if should_expand:
                 relations = getattr(self, field)
-                if not prop.uselist:
+                if not is_list:
                     relations = [relations]
                 for relation in relations:
                     if isinstance(relation, Base):
                         relation.fields = Fields(*paths)
         self._fields = Fields(*flat)
+
+    @property
+    def account(self):
+        # XXX: Check session for this account id without querying
+        from cloudplayer.api.model.account import Account
+        if self.account_id and self.provider_id:
+            return Account(id=self.account_id, provider_id=self.provider_id)
+
+    @classmethod
+    def requires_account(cls):
+        return False
+
+
+class Model(Transient):
+    """Abstract model class serving as the sqlalchemy declarative base.
+
+    Defines sensible default values for commonly used attributes
+    such as timestamps, ownership, acl and nested field expansion.
+    """
+
+    @declared_attr
+    def __tablename__(cls):
+        return cls.__name__.lower()
+
+    created = sql.Column(
+        sql.DateTime, server_default=utcnow())
+    updated = sql.Column(
+        sql.DateTime, server_default=utcnow(), onupdate=utcnow())
+
+    def _inspect_field(self, field):
+        prop = getattr(type(self), field).property
+        should_expand = isinstance(prop, RelationshipProperty)
+        is_list = prop.uselist
+        return should_expand, is_list
 
     @property
     def account(self):
@@ -114,7 +149,7 @@ class Encoder(json.JSONEncoder):
         try:
             return json.JSONEncoder.default(self, obj)
         except:  # NOQA
-            if isinstance(obj, Base):
+            if isinstance(obj, Transient):
                 dict_ = {f: getattr(obj, f) for f in obj.fields}
                 if dict_.get('id'):  # TODO: There must be a better solution
                     dict_['id'] = str(dict_['id'])

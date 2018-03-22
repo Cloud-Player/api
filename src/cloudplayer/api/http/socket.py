@@ -42,9 +42,15 @@ class Handler(HTTPHandler, WebSocketHandler):
             message)
         delegate = self.application.find_handler(request)
         handler = delegate.request_callback(self.application, request)
-        yield handler()
-        handler.on_finish()
-        self.application.log_request(handler)
+        try:
+            yield handler()
+        except Exception as exception:
+            handler._handle_request_exception(exception)
+        else:
+            self.application.log_request(handler)
+        finally:
+            request.finish()
+            handler.on_finish()
 
     def listen(self):
         if self.pubsub.subscribed:

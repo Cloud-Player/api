@@ -94,15 +94,12 @@ class WSBase(object):
 
     @tornado.gen.coroutine
     def __call__(self):
-        try:
-            if self.request.method.upper() not in self.SUPPORTED_METHODS:
-                raise WSException(405)
-            method = getattr(self, self.request.method.lower())
-            result = yield method(*self.path_args, **self.path_kwargs)
-            if result is not None:
-                result = yield result
-        except Exception as exception:
-            self._handle_request_exception(exception)
+        if self.request.method.upper() not in self.SUPPORTED_METHODS:
+            raise WSException(405, 'method not allowed')
+        method = getattr(self, self.request.method.lower())
+        result = yield method(*self.path_args, **self.path_kwargs)
+        if result is not None:
+            result = yield result
 
     def decode_argument(self, value, name=None):
         try:

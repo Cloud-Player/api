@@ -7,6 +7,7 @@
 """
 import json
 import sys
+import time
 
 from tornado.log import app_log
 from tornado.escape import _unicode
@@ -56,16 +57,23 @@ class WSRequest(object):
         self.body = instruction.get('body', {})
         self.method = instruction.get('method', 'GET')
         self.query = instruction.get('query', {})
-        self.channel = self.path = instruction.get('channel', '')
+        self.channel = self.path = instruction.get('channel', 'null')
         self.sequence = instruction.get('sequence', 0)
+        self._start_time = time.time()
+        self._finish_time = None
 
     @property
     def uri(self):
         return self.channel
 
+    def finish(self):
+        self._finish_time = time.time()
+
     def request_time(self):
-        # TODO: Actually time ws requests
-        return 0.01
+        if self._finish_time is None:
+            return time.time() - self._start_time
+        else:
+            return self._finish_time - self._start_time
 
 
 class WSBase(object):

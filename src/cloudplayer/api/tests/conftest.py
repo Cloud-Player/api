@@ -12,6 +12,8 @@ import pytest_redis.factories as redis_factories
 import tornado.escape
 import tornado.gen
 import tornado.options as opt
+from tornado.httpclient import HTTPRequest
+from tornado.websocket import websocket_connect
 
 import cloudplayer.api.app
 
@@ -217,3 +219,36 @@ def user_fetch(user_cookie, http_client, base_url):
         object.__setattr__(response, 'json', decode)
         return response
     return fetch
+
+
+@pytest.fixture(scope='function')
+def user_ws(user_cookie, http_client, base_url):
+
+    @tornado.gen.coroutine
+    def connect(**kw):
+        request = HTTPRequest(
+            '{}/websocket'.format(base_url.replace('http', 'ws')),
+            headers={'Cookie': user_cookie}, **kw)
+        conn = yield websocket_connect(request)
+        return conn
+    yield connect
+
+
+@pytest.fixture(scope='function')
+def user_push(user_ws):
+
+    @tornado.gen.coroutine
+    def push(messages):
+        conn = yield user_ws()
+        single_message = not isinstance(messages, list)
+        if single_message:
+            messages = [messages]
+        responses = []
+        for message in messages:
+            yield conn.write_message(json.dumps(message))
+            response = yield conn.read_message()
+            response = json.loads(response)
+            responses.append(response)
+        conn.close()
+        return response if single_message else responses
+    return push

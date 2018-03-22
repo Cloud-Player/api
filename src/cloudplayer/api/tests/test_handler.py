@@ -111,7 +111,7 @@ def test_controller_handler_mixin_should_create_controller(db, current_user):
 
 
 def test_entity_mixin_supports_only_valid_methods():
-    methods = {'GET', 'PUT', 'PATCH', 'DELETE'}
+    methods = {'GET', 'PUT', 'PATCH', 'DELETE', 'SUB', 'UNSUB'}
     assert set(EntityMixin.SUPPORTED_METHODS) == methods
 
 

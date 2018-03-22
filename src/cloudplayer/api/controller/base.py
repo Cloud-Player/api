@@ -158,3 +158,11 @@ class Controller(object):
         account = self.get_account(provider_id)
         self.policy.grant_read(account, entities, fields)
         return entities
+
+    @tornado.gen.coroutine
+    def sub(self, ids, kw, fields=Available):
+        pass
+
+    @tornado.gen.coroutine
+    def unsub(self, ids, kw, fields=Available):
+        pass

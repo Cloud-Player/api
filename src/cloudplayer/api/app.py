@@ -132,6 +132,7 @@ class Application(tornado.web.Application):
     ws_routes = [
         (r'^user\.(?P<id>me|[0-9]+)$',
          'cloudplayer.api.ws.user.Entity'),
+
         (r'^.*$',
          'cloudplayer.api.ws.base.WSFallback'),
     ]

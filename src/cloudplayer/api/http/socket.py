@@ -34,6 +34,7 @@ class Handler(HTTPHandler, WebSocketHandler):
             assert isinstance(message, dict)
         except (AssertionError, ValueError):
             self.close(code=1003, reason='invalid json')
+            return
         request = WSRequest(
             self.ws_connection,
             self.current_user,

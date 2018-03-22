@@ -155,4 +155,4 @@ class WSFallback(WSHandler):
 
     @tornado.gen.coroutine
     def get(self, **kw):
-        raise WSException(404)
+        raise WSException(404, 'channel not found')

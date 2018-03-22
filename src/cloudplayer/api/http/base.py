@@ -144,7 +144,7 @@ class HTTPFallback(HTTPHandler):
     SUPPORTED_METHODS = ('GET',)
 
     def get(self, *args, **kwargs):
-        raise HTTPException(404)
+        raise HTTPException(404, 'endpoint not found')
 
 
 class HTTPHealth(HTTPHandler):

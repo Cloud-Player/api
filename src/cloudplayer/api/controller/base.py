@@ -67,17 +67,13 @@ class Controller(object):
         return response
 
     def get_account(self, provider_id):
-        # TODO: Move detached accounts to current_user
-        from sqlalchemy.orm.session import make_transient_to_detached
         from cloudplayer.api.model.account import Account
         if not hasattr(self, '_accounts'):
             self._accounts = {}
         if provider_id not in self._accounts:
-            account = Account(
-                id=self.current_user[provider_id],
-                provider_id=provider_id)
-            make_transient_to_detached(account)
-            account = self.db.merge(account, load=False)
+            account = self.db.query(Account).get((
+                self.current_user[provider_id],
+                provider_id))
             self._accounts[provider_id] = account
         return self._accounts[provider_id]
 

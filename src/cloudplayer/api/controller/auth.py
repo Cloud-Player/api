@@ -65,7 +65,8 @@ class AuthController(object):
             self.OAUTH_ACCESS_TOKEN_URL,
             method='POST', body=body, raise_error=False)
         if response.error:
-            raise ControllerException(403, 'refresh failed')
+            message = response.body.decode('utf-8')
+            raise ControllerException(403, message)
         access_info = tornado.escape.json_decode(response.body)
 
         self._update_access_info(access_info)

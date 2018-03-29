@@ -96,6 +96,13 @@ class Account(Base):
         viewonly=True)
     parent = orm.synonym('user')
 
+    sessions = orm.relation(
+        'Session',
+        back_populates='account',
+        cascade='all, delete-orphan',
+        single_parent=True,
+        uselist=True)
+
     image_id = sql.Column(sql.Integer)
     image = orm.relation(
         'Image',

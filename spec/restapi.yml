@@ -352,6 +352,20 @@ paths:
           schema:
             $ref: 'queue.yml#/Queue'
 
+  /session:
+    post:
+      operationId: sessionCreate
+      parameters:
+      - description: Session body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: 'session.yml#/Session'
+      responses:
+        '200':
+          description: OK
+
   /token:
     post:
       operationId: tokenCreate

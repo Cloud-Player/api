@@ -101,6 +101,9 @@ class Application(tornado.web.Application):
         (r'^/provider/(?P<id>[a-z]+)$',
          'cloudplayer.api.http.provider.Entity'),
 
+        (r'^/session$',
+         'cloudplayer.api.http.session.Collection'),
+
         (r'^/token$',
          'cloudplayer.api.http.token.Collection'),
         (r'^/token/(?P<id>[0-9a-z]+)$',

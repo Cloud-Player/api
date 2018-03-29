@@ -1,0 +1,17 @@
+Session:
+  title: Session
+  type: object
+  properties:
+    system:
+      description: Session system
+      type: string
+    browser:
+      description: Session browser
+      type: string
+    screen:
+      description: Session screen
+      type: string
+  required:
+  - system
+  - browser
+  - screen

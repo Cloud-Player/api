@@ -35,8 +35,9 @@ def create_auth_controller(provider_id, db, current_user=None):
 
 class AuthController(object):
 
-    def __init__(self, db, current_user=None):
+    def __init__(self, db, current_user=None, pubsub=None):
         self.db = db
+        self.pubsub = pubsub
         self.current_user = current_user
         self.http_client = tornado.httpclient.AsyncHTTPClient()
         self.settings = opt.options[self.PROVIDER_ID]

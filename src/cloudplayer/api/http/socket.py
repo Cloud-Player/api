@@ -20,8 +20,6 @@ class Handler(HTTPHandler, WebSocketHandler):
     def __init__(self, application, request):
         WebSocketHandler.__init__(self, application, request)
         HTTPHandler.__init__(self, application, request)
-        self.pubsub = self.cache.pubsub()
-        self.pubsub.subscribe(active=lambda _: True)
 
     def open(self):
         self.listener = tornado.ioloop.PeriodicCallback(self.listen, 100)

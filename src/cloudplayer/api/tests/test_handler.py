@@ -101,13 +101,15 @@ def test_controller_handler_mixin_should_create_controller(db, current_user):
     class ControllerHandler(ControllerHandlerMixin):
         __controller__ = mock.MagicMock(return_value=42)
 
-        def __init__(self, db, current_user):
+        def __init__(self, db, current_user=None, pubsub=None):
             self.db = db
+            self.pubsub = pubsub
             self.current_user = current_user
 
     handler = ControllerHandler(db, current_user)
     assert handler.controller == 42
-    ControllerHandler.__controller__.assert_called_once_with(db, current_user)
+    ControllerHandler.__controller__.assert_called_once_with(
+        db, current_user, None)
 
 
 def test_entity_mixin_supports_only_valid_methods():
@@ -120,6 +122,7 @@ class DummyHandler(object):
     def __init__(self, ctrl):
         self.__controller__ = ctrl
         self.db = None
+        self.pubsub = None
         self.current_user = None
 
     @tornado.gen.coroutine
@@ -135,8 +138,9 @@ class DummyHandler(object):
 
 class DummyController(object):
 
-    def __init__(self, db, current_user):
+    def __init__(self, db, current_user=None, pubsub=None):
         self.db = db
+        self.pubsub = pubsub
         self.current_user = current_user
 
     @tornado.gen.coroutine

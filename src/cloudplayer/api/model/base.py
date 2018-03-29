@@ -7,7 +7,10 @@
 """
 import datetime
 import json
+import time
 
+import redis
+import redis.exceptions
 import sqlalchemy as sql
 import sqlalchemy.inspection
 from sqlalchemy.ext.compiler import compiles
@@ -15,6 +18,7 @@ from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy.orm import RelationshipProperty
 from sqlalchemy.sql import expression
 from sqlalchemy.types import DateTime
+from tornado.log import app_log
 
 from cloudplayer.api.access import Deny, Fields
 
@@ -31,6 +35,8 @@ def pg_utcnow(element, compiler, **kw):
 class Transient(object):
 
     __acl__ = (Deny(),)
+    __channel__ = ()
+    __fields__ = ()
 
     def __init__(self, **kw):
         for field, value in kw.items():
@@ -125,7 +131,7 @@ class Model(Transient):
 
     @property
     def account(self):
-        # XXX: Check session for this account id without querying
+        # TODO: Check session for this account id without querying
         from cloudplayer.api.model.account import Account
         if self.account_id and self.provider_id:
             return Account(id=self.account_id, provider_id=self.provider_id)
@@ -137,6 +143,32 @@ class Model(Transient):
         if prop:
             return not all(c.nullable for c in prop.local_columns)
         return False
+
+    @staticmethod
+    def event_hook(redis_pool, method, mapper, connection, target):
+        target.fields = Fields(*target.__fields__)
+        cache = redis.Redis(connection_pool=redis_pool)
+        for pattern in target.__channel__:
+            channel = pattern.format(**target.__dict__)
+            message = json.dumps({
+                'channel': channel,
+                'method': method,
+                'body': target},
+                cls=Encoder)
+
+            start = time.time()
+            try:
+                cache.publish(channel, message)
+            except redis.exceptions.ConnectionError:
+                status_code = 503
+                host = '::1'
+            else:
+                status_code = 200
+                host = cache.connection_pool.connection_kwargs['host']
+
+            pub_time = 1000.0 * (time.time() - start)
+            app_log.info('{} REDIS {} {} ({}) {:.2f}ms'.format(
+                status_code, method.upper(), channel, host, pub_time))
 
 
 Base = declarative_base(cls=Model)

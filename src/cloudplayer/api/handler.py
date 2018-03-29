@@ -26,6 +26,13 @@ class HandlerMixin(object):
         return self._cache
 
     @property
+    def pubsub(self):
+        if not hasattr(self, '_pubsub'):
+            self._pubsub = self.cache.pubsub()
+            self._pubsub.subscribe(keep_alive=lambda _: True)
+        return self._pubsub
+
+    @property
     def http_client(self):
         if not hasattr(self, '_http_client'):
             self._http_client = tornado.httpclient.AsyncHTTPClient()
@@ -43,6 +50,9 @@ class HandlerMixin(object):
 
     def write_error(self, status_code, **kw):
         self.write({'status_code': status_code, 'reason': self._reason})
+
+    def forward(self, data):
+        app_log.error('unhandled forward')
 
     def _request_summary(self):
         return '%s %s %s (%s)' % (
@@ -69,7 +79,8 @@ class ControllerHandlerMixin(object):
     @property
     def controller(self):
         if not hasattr(self, '_controller'):
-            self._controller = self.__controller__(self.db, self.current_user)
+            self._controller = self.__controller__(
+                self.db, self.current_user, self.pubsub)
         return self._controller
 
 
@@ -100,13 +111,13 @@ class EntityMixin(ControllerHandlerMixin):
 
     @tornado.gen.coroutine
     def sub(self, **ids):
-        yield self.controller.sub(ids)
+        yield self.controller.sub(ids, {self.request.channel: self.forward})
         self.set_status(204)
         self.finish()
 
     @tornado.gen.coroutine
     def unsub(self, **ids):
-        yield self.controller.unsub(ids)
+        yield self.controller.unsub(ids, {self.request.channel: None})
         self.set_status(204)
         self.finish()
 

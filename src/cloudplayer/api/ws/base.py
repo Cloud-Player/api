@@ -78,7 +78,7 @@ class WSRequest(object):
 
 class WSBase(object):
 
-    SUPPORTED_METHODS = ('GET', 'PATCH', 'POST', 'DELETE', 'SUB', 'UNSUB')
+    SUPPORTED_METHODS = ('GET', 'PATCH', 'POST', 'DELETE')
 
     def __init__(self, application, request, path_args=[], path_kwargs={}):
         self.application = application
@@ -96,6 +96,7 @@ class WSBase(object):
     def __call__(self):
         if self.request.method.upper() not in self.SUPPORTED_METHODS:
             raise WSException(405, 'method not allowed')
+
         method = getattr(self, self.request.method.lower())
         result = yield method(*self.path_args, **self.path_kwargs)
         if result is not None:
@@ -115,6 +116,13 @@ class WSBase(object):
             cls=Encoder)
         self.request.connection.write_message(message)
         self.on_finish()
+
+    def forward(self, data):
+        message = json.dumps({data['channel']: json.loads(data['data'])})
+        self.request.connection.write_message(message)
+
+    def finish(self):
+        self.request.finish()
 
     def _handle_request_exception(self, exception):
         self.log_exception(*sys.exc_info())

@@ -27,8 +27,9 @@ class Controller(object):
 
     __model__ = NotImplemented
 
-    def __init__(self, db, current_user=None):
+    def __init__(self, db, current_user=None, pubsub=None):
         self.db = db
+        self.pubsub = pubsub
         self.current_user = current_user
         self.policy = Policy(db, current_user)
 

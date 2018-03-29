@@ -61,7 +61,7 @@ class Account(Base):
         'updated'
     )
     __channel__ = (
-        'acocunt.{provider_id}.{id}',
+        'account.{provider_id}.{id}',
     )
     __table_args__ = (
         sql.PrimaryKeyConstraint(

@@ -59,7 +59,7 @@ class Owner(Principal):
 
 
 class Parent(Principal):
-    """Principal component that applies to the owner of the targets parent."""
+    """Principal component applying to the owner of the target's parent."""
 
     @property
     def account(self):
@@ -67,9 +67,9 @@ class Parent(Principal):
 
 
 class Child(Principal):
-    """Principal component that applies to the owner of a targets child.
+    """Principal component that applies to the owner of a target's child.
 
-    The only use case for the child case are rules for the user model.
+    The only use case for the child principal are rules for the user model.
     """
 
     @property

@@ -5,6 +5,7 @@
     :copyright: (c) 2018 by Nicolas Drebenstedt
     :license: GPL-3.0, see LICENSE for details
 """
+import functools
 import signal
 import sys
 
@@ -17,6 +18,7 @@ import tornado.httpclient
 import tornado.ioloop
 import tornado.options as opt
 import tornado.web
+from sqlalchemy import event
 from tornado.log import app_log
 
 from cloudplayer.api.routing import ProtocolMatches
@@ -160,11 +162,11 @@ class Application(tornado.web.Application):
         self.executor = tornado.concurrent.futures.ThreadPoolExecutor(
             settings['num_executors'])
 
-        self.redis_pool = redis.ConnectionPool(
-            host=settings['redis_host'],
-            port=settings['redis_port'],
-            db=settings['redis_db'],
-            password=settings['redis_password'])
+        self.redis_pool = RedisPool.create(
+            settings['redis_host'],
+            settings['redis_port'],
+            settings['redis_db'],
+            settings['redis_password'])
 
         self.database = Database(
             settings['postgres_user'],
@@ -173,37 +175,101 @@ class Application(tornado.web.Application):
             settings['postgres_port'],
             settings['postgres_db'])
 
+        self.event_mapper = EventMapper(
+            self.database,
+            self.redis_pool)
+
+    def shutdown(self):
+        self.event_mapper.shutdown()
+        self.database.shutdown()
+        RedisPool.disconnect(self.redis_pool)
+
+
+class RedisPool(object):
+
+    @staticmethod
+    def create(host, port, db, password):
+        redis_pool = redis.ConnectionPool(
+            host=host, port=port, db=db, password=password)
+        app_log.info('connecting to {host}:{port}/{db}'.format(
+            **redis_pool.connection_kwargs))
+        return redis_pool
+
+    @staticmethod
+    def disconnect(redis_pool):
+        app_log.info('shutting down {host}:{port}/{db}'.format(
+            **redis_pool.connection_kwargs))
+        redis_pool.disconnect()
+
 
 class Database(object):
     """Postgres database session factory that insures initialization."""
 
     def __init__(self, user, password, host, port, db):
-        url = 'postgresql://{}:{}@{}:{}/{}'.format(
-            user, password, host, port, db)
-        self.engine = sql.create_engine(url, client_encoding='utf8')
+        self.address = '{}:{}/{}'.format(host, port, db)
+        uri = 'postgresql://{}:{}@{}'.format(user, password, self.address)
+        self.engine = sql.create_engine(uri, client_encoding='utf8')
         self.session_cls = orm.sessionmaker(bind=self.engine)
         self.initialize()
 
     def initialize(self):
+        app_log.info('connecting to {}'.format(self.address))
         self.ensure_tables()
         self.populate_providers()
 
     def ensure_tables(self):
-        import cloudplayer.api.model.base as model
-        model.Base.metadata.create_all(self.engine)
+        from cloudplayer.api.model.base import Base
+        Base.metadata.create_all(self.engine)
 
     def populate_providers(self):
-        from cloudplayer.api.model import provider
+        from cloudplayer.api.model.provider import Provider
         session = self.create_session()
         for provider_id in opt.options.providers:
-            if not session.query(provider.Provider).get(provider_id):
-                entity = provider.Provider(id=provider_id)
+            if not session.query(Provider).get(provider_id):
+                entity = Provider(id=provider_id)
                 session.add(entity)
         session.commit()
         session.close()
 
     def create_session(self):
         return self.session_cls()
+
+    def shutdown(self):
+        app_log.info('shutting down {}'.format(self.address))
+        self.engine.pool.dispose()
+
+
+class EventMapper(object):
+
+    def __init__(self, database, redis_pool):
+        self.database = database
+        self.redis_pool = redis_pool
+        self.listeners = []
+        self.hook_map = {
+            'after_insert': 'post',
+            'after_update': 'put',
+            'after_delete': 'delete'}
+        self.initialize()
+
+    def initialize(self):
+        from cloudplayer.api.model.base import Base
+        for model in Base._decl_class_registry.values():
+            if not getattr(model, '__channel__', None):
+                continue
+            for hook, method in self.hook_map.items():
+                func = functools.partial(
+                    model.event_hook,
+                    self.redis_pool,
+                    method)
+                event.listen(model, hook, func)
+                self.listeners.append((model, hook, func))
+
+        app_log.info('registered {} listeners'.format(len(self.listeners)))
+
+    def shutdown(self):
+        app_log.info('removing {} listeners'.format(len(self.listeners)))
+        for listener in self.listeners:
+            event.remove(*listener)
 
 
 def configure_httpclient():
@@ -226,10 +292,12 @@ def main():  # pragma: no cover
     app_log.info('server listening at 127.0.0.1:%s', opt.options.port)
     ioloop = tornado.ioloop.IOLoop.current()
 
-    def shutdown(*_):
+    def shutdown(*args):
         """Signal handler callback that shuts down the ioloop"""
         app_log.info('server shutting down')
+        app.shutdown()
         ioloop.stop()
+        app_log.info('exit')
         sys.exit(0)
 
     signal.signal(signal.SIGTERM, shutdown)

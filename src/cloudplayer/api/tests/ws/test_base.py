@@ -4,7 +4,7 @@ import pytest
 @pytest.mark.gen_test
 def test_websocket_connection_responds_with_fallback(user_push):
     not_found = yield user_push({'channel': 'cannot.be.found'})
-    assert not_found == {
+    assert not_found.json() == {
         'channel': 'cannot.be.found',
         'sequence': 0,
         'body': {

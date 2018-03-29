@@ -1,4 +1,5 @@
 import functools
+import io
 import json
 import os
 import random
@@ -242,11 +243,23 @@ def user_ws(user_cookie, http_client, base_url):
     yield connect
 
 
+class WSResponse(object):
+    """Dummy response mimicking `tornado.httplcient.HTTPResponse`"""
+
+    def __init__(self, connection, request, response):
+        self.connection = connection
+        self.request = request
+        self.body = response
+        self.json = lambda: response  # NOQA
+        self.body = json.dumps(response)
+        self.buffer = io.StringIO(self.body)
+
+
 @pytest.fixture(scope='function')
 def user_push(user_ws):
 
     @tornado.gen.coroutine
-    def push(messages):
+    def push(messages, keep_alive=False):
         conn = yield user_ws()
         single_message = not isinstance(messages, list)
         if single_message:
@@ -257,6 +270,9 @@ def user_push(user_ws):
             response = yield conn.read_message()
             response = json.loads(response)
             responses.append(response)
-        conn.close()
-        return response if single_message else responses
+        if not keep_alive:
+            conn.close()
+        if not single_message:
+            response = responses
+        return WSResponse(conn, message, response)
     return push

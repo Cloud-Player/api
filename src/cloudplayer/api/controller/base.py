@@ -161,9 +161,14 @@ class Controller(object):
         return entities
 
     @tornado.gen.coroutine
-    def sub(self, ids, kw, fields=Available):
-        pass
+    def sub(self, ids, kw):
+        provider_id = ids.get('provider_id', 'cloudplayer')
+        account = self.get_account(provider_id)
+        self.policy.grant_read(
+           account, self.__model__, self.__model__.__fields__)
+        self.pubsub.subscribe(**kw)
 
     @tornado.gen.coroutine
-    def unsub(self, ids, kw, fields=Available):
-        pass
+    def unsub(self, ids, kw):
+        for channel in kw:
+            self.pubsub.subscribe(channel)

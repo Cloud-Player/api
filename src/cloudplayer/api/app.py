@@ -139,6 +139,14 @@ class Application(tornado.web.Application):
     ]
 
     ws_routes = [
+        (r'^account\.(?P<provider_id>[a-z]+)'
+         r'\.(?P<id>[0-9a-zA-Z]+)$',
+         'cloudplayer.api.ws.account.Entity'),
+
+        (r'^playlist\.(?P<provider_id>[a-z]+)'
+         r'\.(?P<id>[0-9a-zA-Z]+)$',
+         'cloudplayer.api.ws.playlist.Entity'),
+
         (r'^user\.(?P<id>me|[0-9]+)$',
          'cloudplayer.api.ws.user.Entity'),
 

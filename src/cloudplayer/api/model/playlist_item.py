@@ -44,6 +44,19 @@ class PlaylistItem(TracklistItemMixin, Base):
         )),
         Deny()
     )
+    __channel__ = (
+        'playlist.{playlist_provider_id}.{playlist_id}.item',
+    )
+    __fields__ = (
+        'id',
+        'playlist_id',
+        'playlist_provider_id',
+        'rank',
+        'track_provider_id',
+        'track_id',
+        'created',
+        'updated'
+    )
     __table_args__ = (
         sql.PrimaryKeyConstraint(
             'id'),

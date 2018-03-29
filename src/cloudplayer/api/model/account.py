@@ -49,6 +49,20 @@ class Account(Base):
         )),
         Deny()
     )
+    __fields__ = (
+        'id',
+        'provider_id',
+        'user_id',
+        'connected',
+        'favourite_id',
+        'image_id',
+        'title',
+        'created',
+        'updated'
+    )
+    __channel__ = (
+        'acocunt.{provider_id}.{id}',
+    )
     __table_args__ = (
         sql.PrimaryKeyConstraint(
             'id', 'provider_id'),

@@ -55,6 +55,25 @@ class Playlist(TracklistMixin, Base):
         )),
         Deny()
     )
+    __channel__ = (
+        'playlist.{provider_id}.{id}',
+    )
+    __fields__ = (
+        'id',
+        'provider_id',
+        'account_id',
+        'account_provider_id',
+        'description',
+        'follower_count',
+        'image.id',
+        'image.small',
+        'image.medium',
+        'image.large',
+        'public',
+        'title',
+        'created',
+        'updated'
+    )
 
     @declared_attr
     def __table_args__(cls):

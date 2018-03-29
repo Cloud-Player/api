@@ -38,9 +38,7 @@ class Policy(object):
         raise PolicyViolation(404, 'no grant issued')
 
     def grant_create(self, account, entity, fields):
-        grant = self.grant(account, Create, entity, fields)
-        entity.fields = grant.fields
-        return grant
+        return self.grant(account, Create, entity, fields)
 
     def grant_read(self, account, entity_or_entities, fields):
         # TODO: Find a better way to grant multi reads
@@ -62,9 +60,7 @@ class Policy(object):
         return grants
 
     def grant_update(self, account, entity, fields):
-        grant = self.grant(account, Update, entity, fields)
-        entity.fields = grant.fields
-        return grant
+        return self.grant(account, Update, entity, fields)
 
     def grant_delete(self, account, entity):
         return self.grant(account, Delete, entity, Available)

@@ -25,7 +25,7 @@ class Controller(object):
     to dynamically adapt to the models field an ACL definitions.
     """
 
-    __model__ = NotImplemented
+    __model__ = None
 
     def __init__(self, db, current_user=None, pubsub=None):
         self.db = db

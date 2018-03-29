@@ -140,6 +140,14 @@ def req(base_url):
 
 
 @pytest.fixture(scope='function')
+def delay(db, io_loop):
+    def delayer(f, *args, **kw):
+        func = functools.partial(f, *args, **kw)
+        io_loop.call_later(0.1, func)
+    return delay
+
+
+@pytest.fixture(scope='function')
 def user(db):
     from cloudplayer.api.model.user import User
     user = User()

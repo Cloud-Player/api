@@ -119,7 +119,8 @@ class Account(Base):
         'Playlist',
         back_populates='account',
         cascade='all, delete-orphan',
-        single_parent=True)
+        single_parent=True,
+        uselist=True)
 
     title = sql.Column('title', sql.Unicode(64))
 

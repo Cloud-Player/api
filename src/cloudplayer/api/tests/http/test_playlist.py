@@ -1,5 +1,4 @@
 import pytest
-from sqlalchemy.orm.util import was_deleted
 
 from cloudplayer.api.model.playlist import Playlist
 from cloudplayer.api.model.playlist_item import PlaylistItem

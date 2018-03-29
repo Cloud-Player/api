@@ -44,11 +44,11 @@ def define_options():  # pragma: no cover
     opt.define('allowed_origins', type=list, group='app')
     opt.define('num_executors', type=int, default=1, group='app')
     opt.define('redirect_state', type=str, default='v3', group='app')
-    opt.define('redis_host', type=str, default='localhost', group='app')
+    opt.define('redis_host', type=str, default='127.0.0.1', group='app')
     opt.define('redis_port', type=int, default=6379, group='app')
     opt.define('redis_db', type=int, default=0, group='app')
     opt.define('redis_password', type=int, default=None, group='app')
-    opt.define('postgres_host', type=str, default='localhost', group='app')
+    opt.define('postgres_host', type=str, default='127.0.0.1', group='app')
     opt.define('postgres_port', type=int, default=5432, group='app')
     opt.define('postgres_db', type=str, default='cloudplayer', group='app')
     opt.define('postgres_user', type=str, default='api', group='app')
@@ -216,7 +216,7 @@ def main():  # pragma: no cover
     configure_httpclient()
     app = Application()
     app.listen(opt.options.port)
-    app_log.info('server listening at localhost:%s', opt.options.port)
+    app_log.info('server listening at 127.0.0.1:%s', opt.options.port)
     ioloop = tornado.ioloop.IOLoop.current()
 
     def shutdown(*_):

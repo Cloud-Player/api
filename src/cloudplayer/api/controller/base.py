@@ -82,7 +82,7 @@ class Controller(object):
         provider_id = ids.get('provider_id', 'cloudplayer')
         account = self.get_account(provider_id)
 
-        if self.__model__.requires_account():
+        if account and self.__model__.requires_account():
             kw.setdefault('account_id', account.id)
             kw.setdefault('account_provider_id', account.provider_id)
 

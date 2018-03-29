@@ -60,12 +60,14 @@ class Application(tornado.web.Application):
     """Wraps routing configuration and data source connections."""
 
     http_routes = [
-        (r'^/account/(?P<provider_id>[a-z]+)/(?P<id>[0-9a-zA-Z]+)$',
+        (r'^/account/(?P<provider_id>[a-z]+)'
+         r'/(?P<id>[0-9a-zA-Z]+)$',
          'cloudplayer.api.http.account.Entity'),
 
         (r'^/playlist/(?P<provider_id>[a-z]+)$',
          'cloudplayer.api.http.playlist.Collection'),
-        (r'^/playlist/(?P<provider_id>[a-z]+)/(?P<id>[0-9a-zA-Z]+)$',
+        (r'^/playlist/(?P<provider_id>[a-z]+)'
+         r'/(?P<id>[0-9a-zA-Z]+)$',
          'cloudplayer.api.http.playlist.Entity'),
 
         ((r'^/playlist/(?P<playlist_provider_id>[a-z]+)'
@@ -74,10 +76,12 @@ class Application(tornado.web.Application):
          'cloudplayer.api.http.playlist_item.Collection'),
         ((r'^/playlist/(?P<playlist_provider_id>[a-z]+)'
           r'/(?P<playlist_id>[0-9a-zA-Z]+)'
-          r'/item/(?P<id>[0-9]+)$'),
+          r'/item'
+          r'/(?P<id>[0-9]+)$'),
          'cloudplayer.api.http.playlist_item.Entity'),
 
-        (r'^/favourite/(?P<provider_id>[a-z]+)/(?P<id>[0-9a-zA-Z]+)$',
+        (r'^/favourite/(?P<provider_id>[a-z]+)'
+         r'/(?P<id>[0-9a-zA-Z]+)$',
          'cloudplayer.api.http.favourite.Entity'),
 
         ((r'^/favourite/(?P<favourite_provider_id>[a-z]+)'
@@ -86,7 +90,8 @@ class Application(tornado.web.Application):
          'cloudplayer.api.http.favourite_item.Collection'),
         ((r'^/favourite/(?P<favourite_provider_id>[a-z]+)'
           r'/(?P<favourite_id>[0-9a-zA-Z]+)'
-          r'/item/(?P<id>[0-9]+)$'),
+          r'/item'
+          r'/(?P<id>[0-9]+)$'),
          'cloudplayer.api.http.favourite_item.Entity'),
 
         (r'^/provider$',
@@ -99,9 +104,11 @@ class Application(tornado.web.Application):
         (r'^/token/(?P<id>[0-9a-z]+)$',
          'cloudplayer.api.http.token.Entity'),
 
-        (r'^/track/(?P<provider_id>soundcloud)/(?P<id>[0-9a-zA-Z]+)$',
+        (r'^/track/(?P<provider_id>soundcloud)'
+         r'/(?P<id>[0-9a-zA-Z]+)$',
          'cloudplayer.api.http.track.Soundcloud'),
-        (r'^/track/(?P<provider_id>youtube)/(?P<id>[0-9a-zA-Z-_]+)$',
+        (r'^/track/(?P<provider_id>youtube)'
+         r'/(?P<id>[0-9a-zA-Z-_]+)$',
          'cloudplayer.api.http.track.Youtube'),
 
         (r'^/track/(?P<track_provider_id>soundcloud)'

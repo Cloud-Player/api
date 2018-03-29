@@ -41,7 +41,6 @@ class PlaylistItemController(Controller):
         if not playlist.image:
             playlist.image = track.image.copy()
             self.db.add(playlist)
-            self.db.commit()
 
         entity = yield super().create(ids, kw, fields=fields)
         return entity

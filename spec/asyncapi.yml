@@ -21,6 +21,7 @@ components:
     httpApiKey:
       name: tok_v1
       type: httpApiKey
+      description: ''
       in: cookie
 
   messages:

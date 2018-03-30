@@ -49,9 +49,10 @@ class Playlist(TracklistMixin, Base):
         )),
         Allow(Owner, Delete),
         Allow(Owner, Query, Fields(
+            'id',
+            'provider_id',
             'account_id',
-            'account_provider_id',
-            'provider_id'
+            'account_provider_id'
         )),
         Deny()
     )

@@ -119,7 +119,8 @@ class Controller(object):
         self.policy.grant_read(account, entity, fields)
         params = self._eject_ids_from_kw(ids, kw)
         self.policy.grant_update(account, entity, params)
-        self.db.query(self.__model__).filter_by(**ids).update(params)
+        for field, value in params.items():
+            setattr(entity, field, value)
         self.db.commit()
         return entity
 

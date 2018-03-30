@@ -24,7 +24,7 @@ before_cache:
   - rm -f $HOME/.cache/pip/log/debug.log
 after_success:
   - codecov
-  - sudo apt-get install nodejs npm -y
+  - sudo apt-get install npm -y
   - npm i -g shins widdershins
   - widdershins --omitBody --resolve spec/restapi.yml source/index.html.md
   - shins --minify --inline

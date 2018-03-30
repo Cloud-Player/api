@@ -12,6 +12,7 @@ apt-get install -y \
 redis-server \
 supervisor \
 nginx \
+htop \
 python3.6 \
 python3.6-venv \
 python3.6-dev \

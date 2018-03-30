@@ -17,7 +17,6 @@ install:
   - sudo apt-get install redis-server postgresql-10 -y
   - sudo sed -i 's/port = 5433/port = 5432/' /etc/postgresql/10/main/postgresql.conf
   - sudo /etc/init.d/postgresql restart
-  - pip install -e .
   - pip install -e .[test]
 script: pytest
 before_cache:

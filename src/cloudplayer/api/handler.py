@@ -51,9 +51,6 @@ class HandlerMixin(object):
     def write_error(self, status_code, **kw):
         self.write({'status_code': status_code, 'reason': self._reason})
 
-    def forward(self, data):
-        app_log.error('unhandled forward')
-
     def _request_summary(self):
         return '%s %s %s (%s)' % (
             self.request.protocol.upper(),

@@ -58,13 +58,6 @@ class Handler(HTTPHandler, WebSocketHandler):
             if self.listener.is_running():
                 self.listener.stop()
 
-    def forward(self, data):
-        message = json.dumps({
-            'channel': data['channel'],
-            'body': json.loads(data['data']),
-            'method': 'PUT'})
-        self.ws_connection.write_message(message)
-
     def on_close(self):
         if self.pubsub:
             self.pubsub.unsubscribe()

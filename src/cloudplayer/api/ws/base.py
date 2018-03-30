@@ -121,7 +121,7 @@ class WSBase(object):
         self.on_finish()
 
     def forward(self, data):
-        message = json.dumps({data['channel']: json.loads(data['data'])})
+        message = data['data'].decode('utf-8')
         self.request.connection.write_message(message)
 
     def finish(self):

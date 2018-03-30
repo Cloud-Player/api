@@ -136,9 +136,9 @@ class Controller(object):
     @tornado.gen.coroutine
     def query(self, ids, kw):
         provider_id = ids.get('provider_id', 'cloudplayer')
+        account = self.get_account(provider_id)
         if 'account_id' in kw:
             kw.setdefault('account_provider_id', provider_id)
-        account = self.get_account(provider_id)
         params = self._merge_ids_with_kw(ids, kw)
         self.policy.grant_query(account, self.__model__, params)
         query = self.db.query(self.__model__)

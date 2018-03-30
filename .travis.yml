@@ -24,11 +24,7 @@ before_cache:
 after_success:
   - codecov
   - sudo apt-get install npm -y
-  - npm i -g shins widdershins
-  - widdershins --omitBody --resolve spec/restapi.yml source/index.html.md
-  - shins --minify --inline
-  - mkdir shins
-  - mv index.html shins
+  - make shins
 before_deploy:
   - zip -r latest *
   - mkdir -p aws_upload

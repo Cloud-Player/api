@@ -1,0 +1,13 @@
+{
+    "language_tabs": [
+        {
+            "http": "HTTP"
+        },
+        {
+            "javascript": "JavaScript"
+        },
+        {
+            "python": "Python"
+        }
+    ]
+}

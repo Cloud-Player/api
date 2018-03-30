@@ -7,18 +7,15 @@
 
 ## install
 ```
-python3 -m venv --upgrade --copies .
-bin/pip3 install -e .
+make
 ```
 
 ## develop
 ```
 bin/api
-open http://localhost:8040
 ```
 
 ## test
 ```
-bin/pip install -e .[test]
 bin/test
 ```

@@ -49,9 +49,11 @@ class WSException(APIException):
 
 class WSRequest(object):
 
-    def __init__(self, connection, current_user, http_request, instruction):
+    def __init__(self, connection, pubsub, current_user, http_request,
+                 instruction):
         self.protocol = 'ws'
         self.connection = connection
+        self.pubsub = pubsub
         self.current_user = current_user
         self.remote_ip = http_request.remote_ip
         self.body = instruction.get('body', {})
@@ -83,6 +85,7 @@ class WSBase(object):
     def __init__(self, application, request, path_args=[], path_kwargs={}):
         self.application = application
         self.request = request
+        self.pubsub = request.pubsub
         self.path_args = [self.decode_argument(arg) for arg in path_args]
         self.path_kwargs = dict((k, self.decode_argument(v, name=k))
                                 for (k, v) in path_kwargs.items())

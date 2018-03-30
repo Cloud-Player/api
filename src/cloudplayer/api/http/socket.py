@@ -35,6 +35,7 @@ class Handler(HTTPHandler, WebSocketHandler):
             return
         request = WSRequest(
             self.ws_connection,
+            self.pubsub,
             self.current_user,
             self.request,
             message)

@@ -32,6 +32,11 @@ class HandlerMixin(object):
             self._pubsub.subscribe(keep_alive=lambda _: True)
         return self._pubsub
 
+    @pubsub.setter
+    def pubsub(self, value):
+        self._pubsub = value
+        self._pubsub.subscribe(keep_alive=lambda _: True)
+
     @property
     def http_client(self):
         if not hasattr(self, '_http_client'):

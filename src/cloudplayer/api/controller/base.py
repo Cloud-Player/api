@@ -158,14 +158,18 @@ class Controller(object):
         return entities
 
     @tornado.gen.coroutine
-    def sub(self, ids, kw):
+    def sub(self, ids, registry):
         provider_id = ids.get('provider_id', 'cloudplayer')
         account = self.get_account(provider_id)
-        self.policy.grant_read(
-           account, self.__model__, self.__model__.__fields__)
-        self.pubsub.subscribe(**kw)
+        kw = {}
+        if account and self.__model__.requires_account():
+            kw.setdefault('account_id', account.id)
+            kw.setdefault('account_provider_id', account.provider_id)
+        params = self._merge_ids_with_kw(ids, kw)
+        self.policy.grant_query(account, self.__model__, params)
+        self.pubsub.subscribe(**registry)
 
     @tornado.gen.coroutine
-    def unsub(self, ids, kw):
-        for channel in kw:
+    def unsub(self, ids, registry):
+        for channel in registry:
             self.pubsub.subscribe(channel)

@@ -141,7 +141,7 @@ def req(base_url):
 
 
 @pytest.fixture(scope='function')
-def delay(db, io_loop):
+def delay(io_loop):
     def delayer(f, *args, **kw):
         func = functools.partial(f, *args, **kw)
         io_loop.call_later(0.1, func)
@@ -259,7 +259,7 @@ class WSResponse(object):
 def user_push(user_ws):
 
     @tornado.gen.coroutine
-    def push(messages, keep_alive=False):
+    def push(messages, keep_alive=False, await_reply=None):
         conn = yield user_ws()
         single_message = not isinstance(messages, list)
         if single_message:
@@ -267,9 +267,12 @@ def user_push(user_ws):
         responses = []
         for message in messages:
             yield conn.write_message(json.dumps(message))
-            response = yield conn.read_message()
-            response = json.loads(response)
-            responses.append(response)
+            response = None
+            if await_reply is None:
+                response = yield conn.read_message()
+                if response:
+                    response = json.loads(response)
+                    responses.append(response)
         if not keep_alive:
             conn.close()
         if not single_message:

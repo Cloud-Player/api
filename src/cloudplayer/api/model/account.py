@@ -44,6 +44,7 @@ class Account(Base):
             'title'
         )),
         Allow(Everyone, Query, Fields(
+            'id',
             'provider_id',
             'title'
         )),

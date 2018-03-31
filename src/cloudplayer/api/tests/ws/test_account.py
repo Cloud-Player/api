@@ -1,4 +1,8 @@
+import json
+
 import pytest
+
+from cloudplayer.api.http.account import Entity
 
 
 @pytest.mark.gen_test
@@ -11,18 +15,21 @@ def test_account_entity_should_be_available_over_websocket(user_push, account):
     assert result['body']['provider_id'] == account.provider_id
 
 
-@pytest.mark.skip(reason='race condition needs resolving')
-@pytest.mark.gen_test(run_sync=False)
+@pytest.mark.gen_test
 def test_account_entity_should_be_subscribable_over_websocket(
-        user_push, user_fetch, delay, db, account):
+        user_push, user_fetch, db, account, monkeypatch):
+    monkeypatch.setattr(Entity, 'SUPPORTED_METHODS', ('GET', 'PATCH'))
+    assert account.title != 'new title'
+
     message = {'channel': 'account.cloudplayer.{}'.format(account.id),
                'method': 'SUB'}
-    response = yield user_push(message, keep_alive=True)
-    assert response.json()['body']['status'] == 200
+    ws_resp = yield user_push(message, keep_alive=True, await_reply=False)
 
-    response = yield user_fetch(
+    http_resp = yield user_fetch(
         '/account/cloudplayer/{}'.format(account.id),
         method='PATCH', body={'title': 'new title'})
+    assert http_resp.code == 200
 
-    message = yield response.connection.read_message()
-    assert message == {}
+    ws_resp = yield ws_resp.connection.read_message()
+    message = json.loads(ws_resp)
+    assert message['body']['title'] == 'new title'

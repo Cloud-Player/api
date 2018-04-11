@@ -24,7 +24,9 @@ class Proxy(HTTPHandler):  # pragma: no cover
             raise_error=False, **kw)
         if response.error:
             self.set_status(response.error.code)
-        yield self.write_str(response.body)
+        body = response.body.replace(  # Get your TLS on, YouTube!
+            b'http://s.ytimg.com', b'https://s.ytimg.com')
+        yield self.write_str(body)
 
     def write_str(self, data):
         tornado.web.RequestHandler.write(self, data)

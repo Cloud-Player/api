@@ -1718,22 +1718,17 @@ e.Index.prototype.use=function(e){var t=Array.prototype.slice.call(arguments,1);
 <pre class="highlight tab tab-http"><code><span class="hljs-keyword">GET</span> <span class="hljs-string">https://api.cloud-player.io//account/{provider_id}/{id}</span> HTTP/1.1
 <span class="hljs-attribute">Host</span>: api.cloud-player.io
 
-<span class="http">
-<span class="hljs-attribute">Accept</span>: application/json
+<span class="http"><span class="hljs-attribute">Accept</span>: application/json
 
-<span class="undefined">
-</span></span></code></pre>
+<span class="undefined"></span></span></code></pre>
 <pre class="highlight tab tab-javascript"><code><span class="hljs-keyword">var</span> headers = {
   <span class="hljs-string">'Accept'</span>:<span class="hljs-string">'application/json'</span>
 
-
 };
-
 
 $.ajax({
   <span class="hljs-attr">url</span>: <span class="hljs-string">'https://api.cloud-player.io//account/{provider_id}/{id}'</span>,
   <span class="hljs-attr">method</span>: <span class="hljs-string">'get'</span>,
-
 
   <span class="hljs-attr">headers</span>: headers,
   <span class="hljs-attr">success</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>) </span>{
@@ -1741,22 +1736,17 @@ $.ajax({
   }
 })
 
-
 </code></pre>
 <pre class="highlight tab tab-python"><code><span class="hljs-keyword">import</span> requests
 headers = {
   <span class="hljs-string">'Accept'</span>: <span class="hljs-string">'application/json'</span>
 }
 
-
 r = requests.get(<span class="hljs-string">'https://api.cloud-player.io//account/{provider_id}/{id}'</span>, params={
-
 
 }, headers = headers)
 
-
 <span class="hljs-keyword">print</span> r.json()
-
 
 </code></pre>
 <p><code>GET /account/{provider_id}/{id}</code></p>
@@ -1795,8 +1785,8 @@ r = requests.get(<span class="hljs-string">'https://api.cloud-player.io//account
   <span class="hljs-attr">"connected"</span>: <span class="hljs-literal">true</span>,
   <span class="hljs-attr">"user_id"</span>: <span class="hljs-string">"string"</span>,
   <span class="hljs-attr">"favourite_id"</span>: <span class="hljs-string">"string"</span>,
-  <span class="hljs-attr">"created"</span>: <span class="hljs-string">"2018-03-31T14:27:03Z"</span>,
-  <span class="hljs-attr">"updated"</span>: <span class="hljs-string">"2018-03-31T14:27:03Z"</span>
+  <span class="hljs-attr">"created"</span>: <span class="hljs-string">"2018-04-11T19:36:06Z"</span>,
+  <span class="hljs-attr">"updated"</span>: <span class="hljs-string">"2018-04-11T19:36:06Z"</span>
 }
 </code></pre>
 <h3 id="accountRead-responses">Responses</h3>
@@ -1818,6 +1808,125 @@ r = requests.get(<span class="hljs-string">'https://api.cloud-player.io//account
 </tr>
 </tbody>
 </table>
+<h3 id="accountRead-responseschema">Response Schema</h3>
+<p>Status Code <strong>200</strong></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+<p><em>allOf</em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>» <em>anonymous</em></td>
+<td>any</td>
+<td>false</td>
+<td>No description</td>
+</tr>
+</tbody>
+</table>
+<p><em>allOf</em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>»» <em>anonymous</em></td>
+<td>any</td>
+<td>false</td>
+<td>No description</td>
+</tr>
+</tbody>
+</table>
+<p><em>and</em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>»» <em>anonymous</em></td>
+<td>object</td>
+<td>false</td>
+<td>No description</td>
+</tr>
+<tr>
+<td>»»» connected</td>
+<td>boolean</td>
+<td>false</td>
+<td>Connection status</td>
+</tr>
+</tbody>
+</table>
+<p><em>and</em></p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>»» <em>anonymous</em></td>
+<td>object</td>
+<td>false</td>
+<td>No description</td>
+</tr>
+<tr>
+<td>»»» user_id</td>
+<td>string</td>
+<td>false</td>
+<td>User id</td>
+</tr>
+<tr>
+<td>»»» favourite_id</td>
+<td>string</td>
+<td>false</td>
+<td>Favourite id</td>
+</tr>
+<tr>
+<td>»»» created</td>
+<td>string(date-time)</td>
+<td>false</td>
+<td>Account creation</td>
+</tr>
+<tr>
+<td>»»» updated</td>
+<td>string(date-time)</td>
+<td>false</td>
+<td>Account update</td>
+</tr>
+</tbody>
+</table>
 <aside class="warning">
 To perform this operation, you must be authenticated by means of one of the following methods:
 apiKey
@@ -1830,17 +1939,13 @@ apiKey
 <pre class="highlight tab tab-http"><code><span class="hljs-keyword">GET</span> <span class="hljs-string">https://api.cloud-player.io//playlist/{provider_id}?account_id=string</span> HTTP/1.1
 <span class="hljs-attribute">Host</span>: api.cloud-player.io
 
-<span class="http">
-<span class="hljs-attribute">Accept</span>: application/json
+<span class="http"><span class="hljs-attribute">Accept</span>: application/json
 
-<span class="undefined">
-</span></span></code></pre>
+<span class="undefined"></span></span></code></pre>
 <pre class="highlight tab tab-javascript"><code><span class="hljs-keyword">var</span> headers = {
   <span class="hljs-string">'Accept'</span>:<span class="hljs-string">'application/json'</span>
 
-
 };
-
 
 $.ajax({
   <span class="hljs-attr">url</span>: <span class="hljs-string">'https://api.cloud-player.io//playlist/{provider_id}'</span>,
@@ -1852,21 +1957,17 @@ $.ajax({
   }
 })
 
-
 </code></pre>
 <pre class="highlight tab tab-python"><code><span class="hljs-keyword">import</span> requests
 headers = {
   <span class="hljs-string">'Accept'</span>: <span class="hljs-string">'application/json'</span>
 }
 
-
 r = requests.get(<span class="hljs-string">'https://api.cloud-player.io//playlist/{provider_id}'</span>, params={
   <span class="hljs-string">'account_id'</span>: <span class="hljs-string">'string'</span>
 }, headers = headers)
 
-
 <span class="hljs-keyword">print</span> r.json()
-
 
 </code></pre>
 <p><code>GET /playlist/{provider_id}</code></p>
@@ -1923,14 +2024,14 @@ r = requests.get(<span class="hljs-string">'https://api.cloud-player.io//playlis
         <span class="hljs-attr">"rank"</span>: <span class="hljs-literal">null</span>,
         <span class="hljs-attr">"track_id"</span>: <span class="hljs-string">"string"</span>,
         <span class="hljs-attr">"track_provider_id"</span>: <span class="hljs-string">"string"</span>,
-        <span class="hljs-attr">"created"</span>: <span class="hljs-string">"2018-03-31T14:27:03Z"</span>,
-        <span class="hljs-attr">"updated"</span>: <span class="hljs-string">"2018-03-31T14:27:03Z"</span>
+        <span class="hljs-attr">"created"</span>: <span class="hljs-string">"2018-04-11T19:36:06Z"</span>,
+        <span class="hljs-attr">"updated"</span>: <span class="hljs-string">"2018-04-11T19:36:06Z"</span>
       }
     ],
     <span class="hljs-attr">"public"</span>: <span class="hljs-literal">true</span>,
     <span class="hljs-attr">"title"</span>: <span class="hljs-string">"string"</span>,
-    <span class="hljs-attr">"created"</span>: <span class="hljs-string">"2018-03-31T14:27:03Z"</span>,
-    <span class="hljs-attr">"updated"</span>: <span class="hljs-string">"2018-03-31T14:27:03Z"</span>
+    <span class="hljs-attr">"created"</span>: <span class="hljs-string">"2018-04-11T19:36:06Z"</span>,
+    <span class="hljs-attr">"updated"</span>: <span class="hljs-string">"2018-04-11T19:36:06Z"</span>
   }
 ]
 </code></pre>
@@ -2125,27 +2226,22 @@ apiKey
 <span class="hljs-attribute">Content-Type</span>: application/json
 <span class="hljs-attribute">Accept</span>: application/json
 
-<span class="undefined">
-</span></code></pre>
+<span class="undefined"></span></code></pre>
 <pre class="highlight tab tab-javascript"><code><span class="hljs-keyword">var</span> headers = {
   <span class="hljs-string">'Content-Type'</span>:<span class="hljs-string">'application/json'</span>,
   <span class="hljs-string">'Accept'</span>:<span class="hljs-string">'application/json'</span>
 
-
 };
-
 
 $.ajax({
   <span class="hljs-attr">url</span>: <span class="hljs-string">'https://api.cloud-player.io//playlist/{provider_id}'</span>,
   <span class="hljs-attr">method</span>: <span class="hljs-string">'post'</span>,
-
 
   <span class="hljs-attr">headers</span>: headers,
   <span class="hljs-attr">success</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>) </span>{
     <span class="hljs-built_in">console</span>.log(<span class="hljs-built_in">JSON</span>.stringify(data));
   }
 })
-
 
 </code></pre>
 <pre class="highlight tab tab-python"><code><span class="hljs-keyword">import</span> requests
@@ -2154,15 +2250,11 @@ headers = {
   <span class="hljs-string">'Accept'</span>: <span class="hljs-string">'application/json'</span>
 }
 
-
 r = requests.post(<span class="hljs-string">'https://api.cloud-player.io//playlist/{provider_id}'</span>, params={
-
 
 }, headers = headers)
 
-
 <span class="hljs-keyword">print</span> r.json()
-
 
 </code></pre>
 <p><code>POST /playlist/{provider_id}</code></p>
@@ -2190,14 +2282,14 @@ r = requests.post(<span class="hljs-string">'https://api.cloud-player.io//playli
       <span class="hljs-attr">"rank"</span>: <span class="hljs-literal">null</span>,
       <span class="hljs-attr">"track_id"</span>: <span class="hljs-string">"string"</span>,
       <span class="hljs-attr">"track_provider_id"</span>: <span class="hljs-string">"string"</span>,
-      <span class="hljs-attr">"created"</span>: <span class="hljs-string">"2018-03-31T14:27:03Z"</span>,
-      <span class="hljs-attr">"updated"</span>: <span class="hljs-string">"2018-03-31T14:27:03Z"</span>
+      <span class="hljs-attr">"created"</span>: <span class="hljs-string">"2018-04-11T19:36:06Z"</span>,
+      <span class="hljs-attr">"updated"</span>: <span class="hljs-string">"2018-04-11T19:36:06Z"</span>
     }
   ],
   <span class="hljs-attr">"public"</span>: <span class="hljs-literal">true</span>,
   <span class="hljs-attr">"title"</span>: <span class="hljs-string">"string"</span>,
-  <span class="hljs-attr">"created"</span>: <span class="hljs-string">"2018-03-31T14:27:03Z"</span>,
-  <span class="hljs-attr">"updated"</span>: <span class="hljs-string">"2018-03-31T14:27:03Z"</span>
+  <span class="hljs-attr">"created"</span>: <span class="hljs-string">"2018-04-11T19:36:06Z"</span>,
+  <span class="hljs-attr">"updated"</span>: <span class="hljs-string">"2018-04-11T19:36:06Z"</span>
 }
 </code></pre>
 <h3 id="playlistCreate-parameters">Parameters</h3>
@@ -2413,14 +2505,14 @@ r = requests.post(<span class="hljs-string">'https://api.cloud-player.io//playli
       <span class="hljs-attr">"rank"</span>: <span class="hljs-literal">null</span>,
       <span class="hljs-attr">"track_id"</span>: <span class="hljs-string">"string"</span>,
       <span class="hljs-attr">"track_provider_id"</span>: <span class="hljs-string">"string"</span>,
-      <span class="hljs-attr">"created"</span>: <span class="hljs-string">"2018-03-31T14:27:03Z"</span>,
-      <span class="hljs-attr">"updated"</span>: <span class="hljs-string">"2018-03-31T14:27:03Z"</span>
+      <span class="hljs-attr">"created"</span>: <span class="hljs-string">"2018-04-11T19:36:06Z"</span>,
+      <span class="hljs-attr">"updated"</span>: <span class="hljs-string">"2018-04-11T19:36:06Z"</span>
     }
   ],
   <span class="hljs-attr">"public"</span>: <span class="hljs-literal">true</span>,
   <span class="hljs-attr">"title"</span>: <span class="hljs-string">"string"</span>,
-  <span class="hljs-attr">"created"</span>: <span class="hljs-string">"2018-03-31T14:27:03Z"</span>,
-  <span class="hljs-attr">"updated"</span>: <span class="hljs-string">"2018-03-31T14:27:03Z"</span>
+  <span class="hljs-attr">"created"</span>: <span class="hljs-string">"2018-04-11T19:36:06Z"</span>,
+  <span class="hljs-attr">"updated"</span>: <span class="hljs-string">"2018-04-11T19:36:06Z"</span>
 }
 </code></pre>
 <h3 id="playlistCreate-responses">Responses</h3>
@@ -2612,22 +2704,17 @@ apiKey
 <pre class="highlight tab tab-http"><code><span class="hljs-keyword">GET</span> <span class="hljs-string">https://api.cloud-player.io//playlist/{provider_id}/{id}</span> HTTP/1.1
 <span class="hljs-attribute">Host</span>: api.cloud-player.io
 
-<span class="http">
-<span class="hljs-attribute">Accept</span>: application/json
+<span class="http"><span class="hljs-attribute">Accept</span>: application/json
 
-<span class="undefined">
-</span></span></code></pre>
+<span class="undefined"></span></span></code></pre>
 <pre class="highlight tab tab-javascript"><code><span class="hljs-keyword">var</span> headers = {
   <span class="hljs-string">'Accept'</span>:<span class="hljs-string">'application/json'</span>
 
-
 };
-
 
 $.ajax({
   <span class="hljs-attr">url</span>: <span class="hljs-string">'https://api.cloud-player.io//playlist/{provider_id}/{id}'</span>,
   <span class="hljs-attr">method</span>: <span class="hljs-string">'get'</span>,
-
 
   <span class="hljs-attr">headers</span>: headers,
   <span class="hljs-attr">success</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>) </span>{
@@ -2635,22 +2722,17 @@ $.ajax({
   }
 })
 
-
 </code></pre>
 <pre class="highlight tab tab-python"><code><span class="hljs-keyword">import</span> requests
 headers = {
   <span class="hljs-string">'Accept'</span>: <span class="hljs-string">'application/json'</span>
 }
 
-
 r = requests.get(<span class="hljs-string">'https://api.cloud-player.io//playlist/{provider_id}/{id}'</span>, params={
-
 
 }, headers = headers)
 
-
 <span class="hljs-keyword">print</span> r.json()
-
 
 </code></pre>
 <p><code>GET /playlist/{provider_id}/{id}</code></p>
@@ -2706,14 +2788,14 @@ r = requests.get(<span class="hljs-string">'https://api.cloud-player.io//playlis
       <span class="hljs-attr">"rank"</span>: <span class="hljs-literal">null</span>,
       <span class="hljs-attr">"track_id"</span>: <span class="hljs-string">"string"</span>,
       <span class="hljs-attr">"track_provider_id"</span>: <span class="hljs-string">"string"</span>,
-      <span class="hljs-attr">"created"</span>: <span class="hljs-string">"2018-03-31T14:27:03Z"</span>,
-      <span class="hljs-attr">"updated"</span>: <span class="hljs-string">"2018-03-31T14:27:03Z"</span>
+      <span class="hljs-attr">"created"</span>: <span class="hljs-string">"2018-04-11T19:36:06Z"</span>,
+      <span class="hljs-attr">"updated"</span>: <span class="hljs-string">"2018-04-11T19:36:06Z"</span>
     }
   ],
   <span class="hljs-attr">"public"</span>: <span class="hljs-literal">true</span>,
   <span class="hljs-attr">"title"</span>: <span class="hljs-string">"string"</span>,
-  <span class="hljs-attr">"created"</span>: <span class="hljs-string">"2018-03-31T14:27:03Z"</span>,
-  <span class="hljs-attr">"updated"</span>: <span class="hljs-string">"2018-03-31T14:27:03Z"</span>
+  <span class="hljs-attr">"created"</span>: <span class="hljs-string">"2018-04-11T19:36:06Z"</span>,
+  <span class="hljs-attr">"updated"</span>: <span class="hljs-string">"2018-04-11T19:36:06Z"</span>
 }
 </code></pre>
 <h3 id="playlistRead-responses">Responses</h3>
@@ -2907,27 +2989,22 @@ apiKey
 <span class="hljs-attribute">Content-Type</span>: application/json
 <span class="hljs-attribute">Accept</span>: application/json
 
-<span class="undefined">
-</span></code></pre>
+<span class="undefined"></span></code></pre>
 <pre class="highlight tab tab-javascript"><code><span class="hljs-keyword">var</span> headers = {
   <span class="hljs-string">'Content-Type'</span>:<span class="hljs-string">'application/json'</span>,
   <span class="hljs-string">'Accept'</span>:<span class="hljs-string">'application/json'</span>
 
-
 };
-
 
 $.ajax({
   <span class="hljs-attr">url</span>: <span class="hljs-string">'https://api.cloud-player.io//playlist/{provider_id}/{id}'</span>,
   <span class="hljs-attr">method</span>: <span class="hljs-string">'put'</span>,
-
 
   <span class="hljs-attr">headers</span>: headers,
   <span class="hljs-attr">success</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>) </span>{
     <span class="hljs-built_in">console</span>.log(<span class="hljs-built_in">JSON</span>.stringify(data));
   }
 })
-
 
 </code></pre>
 <pre class="highlight tab tab-python"><code><span class="hljs-keyword">import</span> requests
@@ -2936,15 +3013,11 @@ headers = {
   <span class="hljs-string">'Accept'</span>: <span class="hljs-string">'application/json'</span>
 }
 
-
 r = requests.put(<span class="hljs-string">'https://api.cloud-player.io//playlist/{provider_id}/{id}'</span>, params={
-
 
 }, headers = headers)
 
-
 <span class="hljs-keyword">print</span> r.json()
-
 
 </code></pre>
 <p><code>PUT /playlist/{provider_id}/{id}</code></p>
@@ -2972,14 +3045,14 @@ r = requests.put(<span class="hljs-string">'https://api.cloud-player.io//playlis
       <span class="hljs-attr">"rank"</span>: <span class="hljs-literal">null</span>,
       <span class="hljs-attr">"track_id"</span>: <span class="hljs-string">"string"</span>,
       <span class="hljs-attr">"track_provider_id"</span>: <span class="hljs-string">"string"</span>,
-      <span class="hljs-attr">"created"</span>: <span class="hljs-string">"2018-03-31T14:27:03Z"</span>,
-      <span class="hljs-attr">"updated"</span>: <span class="hljs-string">"2018-03-31T14:27:03Z"</span>
+      <span class="hljs-attr">"created"</span>: <span class="hljs-string">"2018-04-11T19:36:06Z"</span>,
+      <span class="hljs-attr">"updated"</span>: <span class="hljs-string">"2018-04-11T19:36:06Z"</span>
     }
   ],
   <span class="hljs-attr">"public"</span>: <span class="hljs-literal">true</span>,
   <span class="hljs-attr">"title"</span>: <span class="hljs-string">"string"</span>,
-  <span class="hljs-attr">"created"</span>: <span class="hljs-string">"2018-03-31T14:27:03Z"</span>,
-  <span class="hljs-attr">"updated"</span>: <span class="hljs-string">"2018-03-31T14:27:03Z"</span>
+  <span class="hljs-attr">"created"</span>: <span class="hljs-string">"2018-04-11T19:36:06Z"</span>,
+  <span class="hljs-attr">"updated"</span>: <span class="hljs-string">"2018-04-11T19:36:06Z"</span>
 }
 </code></pre>
 <h3 id="playlistUpdate-parameters">Parameters</h3>
@@ -3202,14 +3275,14 @@ r = requests.put(<span class="hljs-string">'https://api.cloud-player.io//playlis
       <span class="hljs-attr">"rank"</span>: <span class="hljs-literal">null</span>,
       <span class="hljs-attr">"track_id"</span>: <span class="hljs-string">"string"</span>,
       <span class="hljs-attr">"track_provider_id"</span>: <span class="hljs-string">"string"</span>,
-      <span class="hljs-attr">"created"</span>: <span class="hljs-string">"2018-03-31T14:27:03Z"</span>,
-      <span class="hljs-attr">"updated"</span>: <span class="hljs-string">"2018-03-31T14:27:03Z"</span>
+      <span class="hljs-attr">"created"</span>: <span class="hljs-string">"2018-04-11T19:36:06Z"</span>,
+      <span class="hljs-attr">"updated"</span>: <span class="hljs-string">"2018-04-11T19:36:06Z"</span>
     }
   ],
   <span class="hljs-attr">"public"</span>: <span class="hljs-literal">true</span>,
   <span class="hljs-attr">"title"</span>: <span class="hljs-string">"string"</span>,
-  <span class="hljs-attr">"created"</span>: <span class="hljs-string">"2018-03-31T14:27:03Z"</span>,
-  <span class="hljs-attr">"updated"</span>: <span class="hljs-string">"2018-03-31T14:27:03Z"</span>
+  <span class="hljs-attr">"created"</span>: <span class="hljs-string">"2018-04-11T19:36:06Z"</span>,
+  <span class="hljs-attr">"updated"</span>: <span class="hljs-string">"2018-04-11T19:36:06Z"</span>
 }
 </code></pre>
 <h3 id="playlistUpdate-responses">Responses</h3>
@@ -3401,33 +3474,25 @@ apiKey
 <pre class="highlight tab tab-http"><code><span class="hljs-keyword">DELETE</span> <span class="hljs-string">https://api.cloud-player.io//playlist/{provider_id}/{id}</span> HTTP/1.1
 <span class="hljs-attribute">Host</span>: api.cloud-player.io
 
-<span class="undefined">
-</span></code></pre>
+<span class="undefined"></span></code></pre>
 <pre class="highlight tab tab-javascript"><code>
-
 $.ajax({
   <span class="hljs-attr">url</span>: <span class="hljs-string">'https://api.cloud-player.io//playlist/{provider_id}/{id}'</span>,
   <span class="hljs-attr">method</span>: <span class="hljs-string">'delete'</span>,
-
 
   <span class="hljs-attr">success</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>) </span>{
     <span class="hljs-built_in">console</span>.log(<span class="hljs-built_in">JSON</span>.stringify(data));
   }
 })
 
-
 </code></pre>
 <pre class="highlight tab tab-python"><code><span class="hljs-keyword">import</span> requests
 
-
 r = requests.delete(<span class="hljs-string">'https://api.cloud-player.io//playlist/{provider_id}/{id}'</span>, params={
-
 
 )
 
-
 <span class="hljs-keyword">print</span> r.json()
-
 
 </code></pre>
 <p><code>DELETE /playlist/{provider_id}/{id}</code></p>
@@ -3492,27 +3557,22 @@ apiKey
 <span class="hljs-attribute">Content-Type</span>: application/json
 <span class="hljs-attribute">Accept</span>: application/json
 
-<span class="undefined">
-</span></code></pre>
+<span class="undefined"></span></code></pre>
 <pre class="highlight tab tab-javascript"><code><span class="hljs-keyword">var</span> headers = {
   <span class="hljs-string">'Content-Type'</span>:<span class="hljs-string">'application/json'</span>,
   <span class="hljs-string">'Accept'</span>:<span class="hljs-string">'application/json'</span>
 
-
 };
-
 
 $.ajax({
   <span class="hljs-attr">url</span>: <span class="hljs-string">'https://api.cloud-player.io//playlist/{playlist_provider_id}/{playlist_id}/item'</span>,
   <span class="hljs-attr">method</span>: <span class="hljs-string">'post'</span>,
-
 
   <span class="hljs-attr">headers</span>: headers,
   <span class="hljs-attr">success</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>) </span>{
     <span class="hljs-built_in">console</span>.log(<span class="hljs-built_in">JSON</span>.stringify(data));
   }
 })
-
 
 </code></pre>
 <pre class="highlight tab tab-python"><code><span class="hljs-keyword">import</span> requests
@@ -3521,15 +3581,11 @@ headers = {
   <span class="hljs-string">'Accept'</span>: <span class="hljs-string">'application/json'</span>
 }
 
-
 r = requests.post(<span class="hljs-string">'https://api.cloud-player.io//playlist/{playlist_provider_id}/{playlist_id}/item'</span>, params={
-
 
 }, headers = headers)
 
-
 <span class="hljs-keyword">print</span> r.json()
-
 
 </code></pre>
 <p><code>POST /playlist/{playlist_provider_id}/{playlist_id}/item</code></p>
@@ -3543,8 +3599,8 @@ r = requests.post(<span class="hljs-string">'https://api.cloud-player.io//playli
   <span class="hljs-attr">"rank"</span>: <span class="hljs-literal">null</span>,
   <span class="hljs-attr">"track_id"</span>: <span class="hljs-string">"string"</span>,
   <span class="hljs-attr">"track_provider_id"</span>: <span class="hljs-string">"string"</span>,
-  <span class="hljs-attr">"created"</span>: <span class="hljs-string">"2018-03-31T14:27:03Z"</span>,
-  <span class="hljs-attr">"updated"</span>: <span class="hljs-string">"2018-03-31T14:27:03Z"</span>
+  <span class="hljs-attr">"created"</span>: <span class="hljs-string">"2018-04-11T19:36:06Z"</span>,
+  <span class="hljs-attr">"updated"</span>: <span class="hljs-string">"2018-04-11T19:36:06Z"</span>
 }
 </code></pre>
 <h3 id="playlistItemCreate-parameters">Parameters</h3>
@@ -3641,8 +3697,8 @@ r = requests.post(<span class="hljs-string">'https://api.cloud-player.io//playli
   <span class="hljs-attr">"rank"</span>: <span class="hljs-literal">null</span>,
   <span class="hljs-attr">"track_id"</span>: <span class="hljs-string">"string"</span>,
   <span class="hljs-attr">"track_provider_id"</span>: <span class="hljs-string">"string"</span>,
-  <span class="hljs-attr">"created"</span>: <span class="hljs-string">"2018-03-31T14:27:03Z"</span>,
-  <span class="hljs-attr">"updated"</span>: <span class="hljs-string">"2018-03-31T14:27:03Z"</span>
+  <span class="hljs-attr">"created"</span>: <span class="hljs-string">"2018-04-11T19:36:06Z"</span>,
+  <span class="hljs-attr">"updated"</span>: <span class="hljs-string">"2018-04-11T19:36:06Z"</span>
 }
 </code></pre>
 <h3 id="playlistItemCreate-responses">Responses</h3>
@@ -3738,22 +3794,17 @@ apiKey
 <pre class="highlight tab tab-http"><code><span class="hljs-keyword">GET</span> <span class="hljs-string">https://api.cloud-player.io//playlist/{playlist_provider_id}/{playlist_id}/item</span> HTTP/1.1
 <span class="hljs-attribute">Host</span>: api.cloud-player.io
 
-<span class="http">
-<span class="hljs-attribute">Accept</span>: application/json
+<span class="http"><span class="hljs-attribute">Accept</span>: application/json
 
-<span class="undefined">
-</span></span></code></pre>
+<span class="undefined"></span></span></code></pre>
 <pre class="highlight tab tab-javascript"><code><span class="hljs-keyword">var</span> headers = {
   <span class="hljs-string">'Accept'</span>:<span class="hljs-string">'application/json'</span>
 
-
 };
-
 
 $.ajax({
   <span class="hljs-attr">url</span>: <span class="hljs-string">'https://api.cloud-player.io//playlist/{playlist_provider_id}/{playlist_id}/item'</span>,
   <span class="hljs-attr">method</span>: <span class="hljs-string">'get'</span>,
-
 
   <span class="hljs-attr">headers</span>: headers,
   <span class="hljs-attr">success</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>) </span>{
@@ -3761,22 +3812,17 @@ $.ajax({
   }
 })
 
-
 </code></pre>
 <pre class="highlight tab tab-python"><code><span class="hljs-keyword">import</span> requests
 headers = {
   <span class="hljs-string">'Accept'</span>: <span class="hljs-string">'application/json'</span>
 }
 
-
 r = requests.get(<span class="hljs-string">'https://api.cloud-player.io//playlist/{playlist_provider_id}/{playlist_id}/item'</span>, params={
-
 
 }, headers = headers)
 
-
 <span class="hljs-keyword">print</span> r.json()
-
 
 </code></pre>
 <p><code>GET /playlist/{playlist_provider_id}/{playlist_id}/item</code></p>
@@ -3818,8 +3864,8 @@ r = requests.get(<span class="hljs-string">'https://api.cloud-player.io//playlis
   <span class="hljs-attr">"rank"</span>: <span class="hljs-literal">null</span>,
   <span class="hljs-attr">"track_id"</span>: <span class="hljs-string">"string"</span>,
   <span class="hljs-attr">"track_provider_id"</span>: <span class="hljs-string">"string"</span>,
-  <span class="hljs-attr">"created"</span>: <span class="hljs-string">"2018-03-31T14:27:03Z"</span>,
-  <span class="hljs-attr">"updated"</span>: <span class="hljs-string">"2018-03-31T14:27:03Z"</span>
+  <span class="hljs-attr">"created"</span>: <span class="hljs-string">"2018-04-11T19:36:06Z"</span>,
+  <span class="hljs-attr">"updated"</span>: <span class="hljs-string">"2018-04-11T19:36:06Z"</span>
 }
 </code></pre>
 <h3 id="playlistItemSearch-responses">Responses</h3>
@@ -3915,22 +3961,17 @@ apiKey
 <pre class="highlight tab tab-http"><code><span class="hljs-keyword">GET</span> <span class="hljs-string">https://api.cloud-player.io//playlist/{playlist_provider_id}/{playlist_id}/item/{id}</span> HTTP/1.1
 <span class="hljs-attribute">Host</span>: api.cloud-player.io
 
-<span class="http">
-<span class="hljs-attribute">Accept</span>: application/json
+<span class="http"><span class="hljs-attribute">Accept</span>: application/json
 
-<span class="undefined">
-</span></span></code></pre>
+<span class="undefined"></span></span></code></pre>
 <pre class="highlight tab tab-javascript"><code><span class="hljs-keyword">var</span> headers = {
   <span class="hljs-string">'Accept'</span>:<span class="hljs-string">'application/json'</span>
 
-
 };
-
 
 $.ajax({
   <span class="hljs-attr">url</span>: <span class="hljs-string">'https://api.cloud-player.io//playlist/{playlist_provider_id}/{playlist_id}/item/{id}'</span>,
   <span class="hljs-attr">method</span>: <span class="hljs-string">'get'</span>,
-
 
   <span class="hljs-attr">headers</span>: headers,
   <span class="hljs-attr">success</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>) </span>{
@@ -3938,22 +3979,17 @@ $.ajax({
   }
 })
 
-
 </code></pre>
 <pre class="highlight tab tab-python"><code><span class="hljs-keyword">import</span> requests
 headers = {
   <span class="hljs-string">'Accept'</span>: <span class="hljs-string">'application/json'</span>
 }
 
-
 r = requests.get(<span class="hljs-string">'https://api.cloud-player.io//playlist/{playlist_provider_id}/{playlist_id}/item/{id}'</span>, params={
-
 
 }, headers = headers)
 
-
 <span class="hljs-keyword">print</span> r.json()
-
 
 </code></pre>
 <p><code>GET /playlist/{playlist_provider_id}/{playlist_id}/item/{id}</code></p>
@@ -4002,8 +4038,8 @@ r = requests.get(<span class="hljs-string">'https://api.cloud-player.io//playlis
   <span class="hljs-attr">"rank"</span>: <span class="hljs-literal">null</span>,
   <span class="hljs-attr">"track_id"</span>: <span class="hljs-string">"string"</span>,
   <span class="hljs-attr">"track_provider_id"</span>: <span class="hljs-string">"string"</span>,
-  <span class="hljs-attr">"created"</span>: <span class="hljs-string">"2018-03-31T14:27:03Z"</span>,
-  <span class="hljs-attr">"updated"</span>: <span class="hljs-string">"2018-03-31T14:27:03Z"</span>
+  <span class="hljs-attr">"created"</span>: <span class="hljs-string">"2018-04-11T19:36:06Z"</span>,
+  <span class="hljs-attr">"updated"</span>: <span class="hljs-string">"2018-04-11T19:36:06Z"</span>
 }
 </code></pre>
 <h3 id="playlistItemRead-responses">Responses</h3>
@@ -4101,27 +4137,22 @@ apiKey
 <span class="hljs-attribute">Content-Type</span>: application/json
 <span class="hljs-attribute">Accept</span>: application/json
 
-<span class="undefined">
-</span></code></pre>
+<span class="undefined"></span></code></pre>
 <pre class="highlight tab tab-javascript"><code><span class="hljs-keyword">var</span> headers = {
   <span class="hljs-string">'Content-Type'</span>:<span class="hljs-string">'application/json'</span>,
   <span class="hljs-string">'Accept'</span>:<span class="hljs-string">'application/json'</span>
 
-
 };
-
 
 $.ajax({
   <span class="hljs-attr">url</span>: <span class="hljs-string">'https://api.cloud-player.io//playlist/{playlist_provider_id}/{playlist_id}/item/{id}'</span>,
   <span class="hljs-attr">method</span>: <span class="hljs-string">'put'</span>,
-
 
   <span class="hljs-attr">headers</span>: headers,
   <span class="hljs-attr">success</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>) </span>{
     <span class="hljs-built_in">console</span>.log(<span class="hljs-built_in">JSON</span>.stringify(data));
   }
 })
-
 
 </code></pre>
 <pre class="highlight tab tab-python"><code><span class="hljs-keyword">import</span> requests
@@ -4130,15 +4161,11 @@ headers = {
   <span class="hljs-string">'Accept'</span>: <span class="hljs-string">'application/json'</span>
 }
 
-
 r = requests.put(<span class="hljs-string">'https://api.cloud-player.io//playlist/{playlist_provider_id}/{playlist_id}/item/{id}'</span>, params={
-
 
 }, headers = headers)
 
-
 <span class="hljs-keyword">print</span> r.json()
-
 
 </code></pre>
 <p><code>PUT /playlist/{playlist_provider_id}/{playlist_id}/item/{id}</code></p>
@@ -4152,8 +4179,8 @@ r = requests.put(<span class="hljs-string">'https://api.cloud-player.io//playlis
   <span class="hljs-attr">"rank"</span>: <span class="hljs-literal">null</span>,
   <span class="hljs-attr">"track_id"</span>: <span class="hljs-string">"string"</span>,
   <span class="hljs-attr">"track_provider_id"</span>: <span class="hljs-string">"string"</span>,
-  <span class="hljs-attr">"created"</span>: <span class="hljs-string">"2018-03-31T14:27:03Z"</span>,
-  <span class="hljs-attr">"updated"</span>: <span class="hljs-string">"2018-03-31T14:27:03Z"</span>
+  <span class="hljs-attr">"created"</span>: <span class="hljs-string">"2018-04-11T19:36:06Z"</span>,
+  <span class="hljs-attr">"updated"</span>: <span class="hljs-string">"2018-04-11T19:36:06Z"</span>
 }
 </code></pre>
 <h3 id="playlistItemUpdate-parameters">Parameters</h3>
@@ -4257,8 +4284,8 @@ r = requests.put(<span class="hljs-string">'https://api.cloud-player.io//playlis
   <span class="hljs-attr">"rank"</span>: <span class="hljs-literal">null</span>,
   <span class="hljs-attr">"track_id"</span>: <span class="hljs-string">"string"</span>,
   <span class="hljs-attr">"track_provider_id"</span>: <span class="hljs-string">"string"</span>,
-  <span class="hljs-attr">"created"</span>: <span class="hljs-string">"2018-03-31T14:27:03Z"</span>,
-  <span class="hljs-attr">"updated"</span>: <span class="hljs-string">"2018-03-31T14:27:03Z"</span>
+  <span class="hljs-attr">"created"</span>: <span class="hljs-string">"2018-04-11T19:36:06Z"</span>,
+  <span class="hljs-attr">"updated"</span>: <span class="hljs-string">"2018-04-11T19:36:06Z"</span>
 }
 </code></pre>
 <h3 id="playlistItemUpdate-responses">Responses</h3>
@@ -4354,33 +4381,25 @@ apiKey
 <pre class="highlight tab tab-http"><code><span class="hljs-keyword">DELETE</span> <span class="hljs-string">https://api.cloud-player.io//playlist/{playlist_provider_id}/{playlist_id}/item/{id}</span> HTTP/1.1
 <span class="hljs-attribute">Host</span>: api.cloud-player.io
 
-<span class="undefined">
-</span></code></pre>
+<span class="undefined"></span></code></pre>
 <pre class="highlight tab tab-javascript"><code>
-
 $.ajax({
   <span class="hljs-attr">url</span>: <span class="hljs-string">'https://api.cloud-player.io//playlist/{playlist_provider_id}/{playlist_id}/item/{id}'</span>,
   <span class="hljs-attr">method</span>: <span class="hljs-string">'delete'</span>,
-
 
   <span class="hljs-attr">success</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>) </span>{
     <span class="hljs-built_in">console</span>.log(<span class="hljs-built_in">JSON</span>.stringify(data));
   }
 })
 
-
 </code></pre>
 <pre class="highlight tab tab-python"><code><span class="hljs-keyword">import</span> requests
 
-
 r = requests.delete(<span class="hljs-string">'https://api.cloud-player.io//playlist/{playlist_provider_id}/{playlist_id}/item/{id}'</span>, params={
-
 
 )
 
-
 <span class="hljs-keyword">print</span> r.json()
-
 
 </code></pre>
 <p><code>DELETE /playlist/{playlist_provider_id}/{playlist_id}/item/{id}</code></p>
@@ -4450,22 +4469,17 @@ apiKey
 <pre class="highlight tab tab-http"><code><span class="hljs-keyword">GET</span> <span class="hljs-string">https://api.cloud-player.io//favourite/{provider_id}/{id}</span> HTTP/1.1
 <span class="hljs-attribute">Host</span>: api.cloud-player.io
 
-<span class="http">
-<span class="hljs-attribute">Accept</span>: application/json
+<span class="http"><span class="hljs-attribute">Accept</span>: application/json
 
-<span class="undefined">
-</span></span></code></pre>
+<span class="undefined"></span></span></code></pre>
 <pre class="highlight tab tab-javascript"><code><span class="hljs-keyword">var</span> headers = {
   <span class="hljs-string">'Accept'</span>:<span class="hljs-string">'application/json'</span>
 
-
 };
-
 
 $.ajax({
   <span class="hljs-attr">url</span>: <span class="hljs-string">'https://api.cloud-player.io//favourite/{provider_id}/{id}'</span>,
   <span class="hljs-attr">method</span>: <span class="hljs-string">'get'</span>,
-
 
   <span class="hljs-attr">headers</span>: headers,
   <span class="hljs-attr">success</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>) </span>{
@@ -4473,22 +4487,17 @@ $.ajax({
   }
 })
 
-
 </code></pre>
 <pre class="highlight tab tab-python"><code><span class="hljs-keyword">import</span> requests
 headers = {
   <span class="hljs-string">'Accept'</span>: <span class="hljs-string">'application/json'</span>
 }
 
-
 r = requests.get(<span class="hljs-string">'https://api.cloud-player.io//favourite/{provider_id}/{id}'</span>, params={
-
 
 }, headers = headers)
 
-
 <span class="hljs-keyword">print</span> r.json()
-
 
 </code></pre>
 <p><code>GET /favourite/{provider_id}/{id}</code></p>
@@ -4609,19 +4618,15 @@ apiKey
 <span class="hljs-attribute">Host</span>: api.cloud-player.io
 <span class="hljs-attribute">Content-Type</span>: application/json
 
-<span class="undefined">
-</span></code></pre>
+<span class="undefined"></span></code></pre>
 <pre class="highlight tab tab-javascript"><code><span class="hljs-keyword">var</span> headers = {
   <span class="hljs-string">'Content-Type'</span>:<span class="hljs-string">'application/json'</span>
 
-
 };
-
 
 $.ajax({
   <span class="hljs-attr">url</span>: <span class="hljs-string">'https://api.cloud-player.io//favourite/{favourite_provider_id}/{favourite_id}/item'</span>,
   <span class="hljs-attr">method</span>: <span class="hljs-string">'post'</span>,
-
 
   <span class="hljs-attr">headers</span>: headers,
   <span class="hljs-attr">success</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>) </span>{
@@ -4629,22 +4634,17 @@ $.ajax({
   }
 })
 
-
 </code></pre>
 <pre class="highlight tab tab-python"><code><span class="hljs-keyword">import</span> requests
 headers = {
   <span class="hljs-string">'Content-Type'</span>: <span class="hljs-string">'application/json'</span>
 }
 
-
 r = requests.post(<span class="hljs-string">'https://api.cloud-player.io//favourite/{favourite_provider_id}/{favourite_id}/item'</span>, params={
-
 
 }, headers = headers)
 
-
 <span class="hljs-keyword">print</span> r.json()
-
 
 </code></pre>
 <p><code>POST /favourite/{favourite_provider_id}/{favourite_id}/item</code></p>
@@ -4712,33 +4712,25 @@ apiKey
 <pre class="highlight tab tab-http"><code><span class="hljs-keyword">GET</span> <span class="hljs-string">https://api.cloud-player.io//favourite/{favourite_provider_id}/{favourite_id}/item</span> HTTP/1.1
 <span class="hljs-attribute">Host</span>: api.cloud-player.io
 
-<span class="undefined">
-</span></code></pre>
+<span class="undefined"></span></code></pre>
 <pre class="highlight tab tab-javascript"><code>
-
 $.ajax({
   <span class="hljs-attr">url</span>: <span class="hljs-string">'https://api.cloud-player.io//favourite/{favourite_provider_id}/{favourite_id}/item'</span>,
   <span class="hljs-attr">method</span>: <span class="hljs-string">'get'</span>,
-
 
   <span class="hljs-attr">success</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>) </span>{
     <span class="hljs-built_in">console</span>.log(<span class="hljs-built_in">JSON</span>.stringify(data));
   }
 })
 
-
 </code></pre>
 <pre class="highlight tab tab-python"><code><span class="hljs-keyword">import</span> requests
 
-
 r = requests.get(<span class="hljs-string">'https://api.cloud-player.io//favourite/{favourite_provider_id}/{favourite_id}/item'</span>, params={
-
 
 )
 
-
 <span class="hljs-keyword">print</span> r.json()
-
 
 </code></pre>
 <p><code>GET /favourite/{favourite_provider_id}/{favourite_id}/item</code></p>
@@ -4801,33 +4793,25 @@ apiKey
 <pre class="highlight tab tab-http"><code><span class="hljs-keyword">GET</span> <span class="hljs-string">https://api.cloud-player.io//favourite/{favourite_provider_id}/{favourite_id}/item/{id}</span> HTTP/1.1
 <span class="hljs-attribute">Host</span>: api.cloud-player.io
 
-<span class="undefined">
-</span></code></pre>
+<span class="undefined"></span></code></pre>
 <pre class="highlight tab tab-javascript"><code>
-
 $.ajax({
   <span class="hljs-attr">url</span>: <span class="hljs-string">'https://api.cloud-player.io//favourite/{favourite_provider_id}/{favourite_id}/item/{id}'</span>,
   <span class="hljs-attr">method</span>: <span class="hljs-string">'get'</span>,
-
 
   <span class="hljs-attr">success</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>) </span>{
     <span class="hljs-built_in">console</span>.log(<span class="hljs-built_in">JSON</span>.stringify(data));
   }
 })
 
-
 </code></pre>
 <pre class="highlight tab tab-python"><code><span class="hljs-keyword">import</span> requests
 
-
 r = requests.get(<span class="hljs-string">'https://api.cloud-player.io//favourite/{favourite_provider_id}/{favourite_id}/item/{id}'</span>, params={
-
 
 )
 
-
 <span class="hljs-keyword">print</span> r.json()
-
 
 </code></pre>
 <p><code>GET /favourite/{favourite_provider_id}/{favourite_id}/item/{id}</code></p>
@@ -4898,19 +4882,15 @@ apiKey
 <span class="hljs-attribute">Host</span>: api.cloud-player.io
 <span class="hljs-attribute">Content-Type</span>: application/json
 
-<span class="undefined">
-</span></code></pre>
+<span class="undefined"></span></code></pre>
 <pre class="highlight tab tab-javascript"><code><span class="hljs-keyword">var</span> headers = {
   <span class="hljs-string">'Content-Type'</span>:<span class="hljs-string">'application/json'</span>
 
-
 };
-
 
 $.ajax({
   <span class="hljs-attr">url</span>: <span class="hljs-string">'https://api.cloud-player.io//favourite/{favourite_provider_id}/{favourite_id}/item/{id}'</span>,
   <span class="hljs-attr">method</span>: <span class="hljs-string">'put'</span>,
-
 
   <span class="hljs-attr">headers</span>: headers,
   <span class="hljs-attr">success</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>) </span>{
@@ -4918,22 +4898,17 @@ $.ajax({
   }
 })
 
-
 </code></pre>
 <pre class="highlight tab tab-python"><code><span class="hljs-keyword">import</span> requests
 headers = {
   <span class="hljs-string">'Content-Type'</span>: <span class="hljs-string">'application/json'</span>
 }
 
-
 r = requests.put(<span class="hljs-string">'https://api.cloud-player.io//favourite/{favourite_provider_id}/{favourite_id}/item/{id}'</span>, params={
-
 
 }, headers = headers)
 
-
 <span class="hljs-keyword">print</span> r.json()
-
 
 </code></pre>
 <p><code>PUT /favourite/{favourite_provider_id}/{favourite_id}/item/{id}</code></p>
@@ -5008,33 +4983,25 @@ apiKey
 <pre class="highlight tab tab-http"><code><span class="hljs-keyword">DELETE</span> <span class="hljs-string">https://api.cloud-player.io//favourite/{favourite_provider_id}/{favourite_id}/item/{id}</span> HTTP/1.1
 <span class="hljs-attribute">Host</span>: api.cloud-player.io
 
-<span class="undefined">
-</span></code></pre>
+<span class="undefined"></span></code></pre>
 <pre class="highlight tab tab-javascript"><code>
-
 $.ajax({
   <span class="hljs-attr">url</span>: <span class="hljs-string">'https://api.cloud-player.io//favourite/{favourite_provider_id}/{favourite_id}/item/{id}'</span>,
   <span class="hljs-attr">method</span>: <span class="hljs-string">'delete'</span>,
-
 
   <span class="hljs-attr">success</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>) </span>{
     <span class="hljs-built_in">console</span>.log(<span class="hljs-built_in">JSON</span>.stringify(data));
   }
 })
 
-
 </code></pre>
 <pre class="highlight tab tab-python"><code><span class="hljs-keyword">import</span> requests
 
-
 r = requests.delete(<span class="hljs-string">'https://api.cloud-player.io//favourite/{favourite_provider_id}/{favourite_id}/item/{id}'</span>, params={
-
 
 )
 
-
 <span class="hljs-keyword">print</span> r.json()
-
 
 </code></pre>
 <p><code>DELETE /favourite/{favourite_provider_id}/{favourite_id}/item/{id}</code></p>
@@ -5104,33 +5071,25 @@ apiKey
 <pre class="highlight tab tab-http"><code><span class="hljs-keyword">GET</span> <span class="hljs-string">https://api.cloud-player.io//provider</span> HTTP/1.1
 <span class="hljs-attribute">Host</span>: api.cloud-player.io
 
-<span class="undefined">
-</span></code></pre>
+<span class="undefined"></span></code></pre>
 <pre class="highlight tab tab-javascript"><code>
-
 $.ajax({
   <span class="hljs-attr">url</span>: <span class="hljs-string">'https://api.cloud-player.io//provider'</span>,
   <span class="hljs-attr">method</span>: <span class="hljs-string">'get'</span>,
-
 
   <span class="hljs-attr">success</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>) </span>{
     <span class="hljs-built_in">console</span>.log(<span class="hljs-built_in">JSON</span>.stringify(data));
   }
 })
 
-
 </code></pre>
 <pre class="highlight tab tab-python"><code><span class="hljs-keyword">import</span> requests
 
-
 r = requests.get(<span class="hljs-string">'https://api.cloud-player.io//provider'</span>, params={
-
 
 )
 
-
 <span class="hljs-keyword">print</span> r.json()
-
 
 </code></pre>
 <p><code>GET /provider</code></p>
@@ -5165,22 +5124,17 @@ apiKey
 <pre class="highlight tab tab-http"><code><span class="hljs-keyword">GET</span> <span class="hljs-string">https://api.cloud-player.io//provider/{id}</span> HTTP/1.1
 <span class="hljs-attribute">Host</span>: api.cloud-player.io
 
-<span class="http">
-<span class="hljs-attribute">Accept</span>: application/json
+<span class="http"><span class="hljs-attribute">Accept</span>: application/json
 
-<span class="undefined">
-</span></span></code></pre>
+<span class="undefined"></span></span></code></pre>
 <pre class="highlight tab tab-javascript"><code><span class="hljs-keyword">var</span> headers = {
   <span class="hljs-string">'Accept'</span>:<span class="hljs-string">'application/json'</span>
 
-
 };
-
 
 $.ajax({
   <span class="hljs-attr">url</span>: <span class="hljs-string">'https://api.cloud-player.io//provider/{id}'</span>,
   <span class="hljs-attr">method</span>: <span class="hljs-string">'get'</span>,
-
 
   <span class="hljs-attr">headers</span>: headers,
   <span class="hljs-attr">success</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>) </span>{
@@ -5188,22 +5142,17 @@ $.ajax({
   }
 })
 
-
 </code></pre>
 <pre class="highlight tab tab-python"><code><span class="hljs-keyword">import</span> requests
 headers = {
   <span class="hljs-string">'Accept'</span>: <span class="hljs-string">'application/json'</span>
 }
 
-
 r = requests.get(<span class="hljs-string">'https://api.cloud-player.io//provider/{id}'</span>, params={
-
 
 }, headers = headers)
 
-
 <span class="hljs-keyword">print</span> r.json()
-
 
 </code></pre>
 <p><code>GET /provider/{id}</code></p>
@@ -5294,19 +5243,15 @@ apiKey
 <span class="hljs-attribute">Host</span>: api.cloud-player.io
 <span class="hljs-attribute">Content-Type</span>: application/json
 
-<span class="undefined">
-</span></code></pre>
+<span class="undefined"></span></code></pre>
 <pre class="highlight tab tab-javascript"><code><span class="hljs-keyword">var</span> headers = {
   <span class="hljs-string">'Content-Type'</span>:<span class="hljs-string">'application/json'</span>
 
-
 };
-
 
 $.ajax({
   <span class="hljs-attr">url</span>: <span class="hljs-string">'https://api.cloud-player.io//session'</span>,
   <span class="hljs-attr">method</span>: <span class="hljs-string">'post'</span>,
-
 
   <span class="hljs-attr">headers</span>: headers,
   <span class="hljs-attr">success</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>) </span>{
@@ -5314,22 +5259,17 @@ $.ajax({
   }
 })
 
-
 </code></pre>
 <pre class="highlight tab tab-python"><code><span class="hljs-keyword">import</span> requests
 headers = {
   <span class="hljs-string">'Content-Type'</span>: <span class="hljs-string">'application/json'</span>
 }
 
-
 r = requests.post(<span class="hljs-string">'https://api.cloud-player.io//session'</span>, params={
-
 
 }, headers = headers)
 
-
 <span class="hljs-keyword">print</span> r.json()
-
 
 </code></pre>
 <p><code>POST /session</code></p>
@@ -5408,22 +5348,17 @@ apiKey
 <pre class="highlight tab tab-http"><code><span class="hljs-keyword">POST</span> <span class="hljs-string">https://api.cloud-player.io//token</span> HTTP/1.1
 <span class="hljs-attribute">Host</span>: api.cloud-player.io
 
-<span class="http">
-<span class="hljs-attribute">Accept</span>: application/json
+<span class="http"><span class="hljs-attribute">Accept</span>: application/json
 
-<span class="undefined">
-</span></span></code></pre>
+<span class="undefined"></span></span></code></pre>
 <pre class="highlight tab tab-javascript"><code><span class="hljs-keyword">var</span> headers = {
   <span class="hljs-string">'Accept'</span>:<span class="hljs-string">'application/json'</span>
 
-
 };
-
 
 $.ajax({
   <span class="hljs-attr">url</span>: <span class="hljs-string">'https://api.cloud-player.io//token'</span>,
   <span class="hljs-attr">method</span>: <span class="hljs-string">'post'</span>,
-
 
   <span class="hljs-attr">headers</span>: headers,
   <span class="hljs-attr">success</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>) </span>{
@@ -5431,22 +5366,17 @@ $.ajax({
   }
 })
 
-
 </code></pre>
 <pre class="highlight tab tab-python"><code><span class="hljs-keyword">import</span> requests
 headers = {
   <span class="hljs-string">'Accept'</span>: <span class="hljs-string">'application/json'</span>
 }
 
-
 r = requests.post(<span class="hljs-string">'https://api.cloud-player.io//token'</span>, params={
-
 
 }, headers = headers)
 
-
 <span class="hljs-keyword">print</span> r.json()
-
 
 </code></pre>
 <p><code>POST /token</code></p>
@@ -5481,6 +5411,7 @@ r = requests.post(<span class="hljs-string">'https://api.cloud-player.io//token'
 </table>
 <h3 id="tokenCreate-responseschema">Response Schema</h3>
 <p>Status Code <strong>200</strong></p>
+<p><em>Token</em></p>
 <table>
 <thead>
 <tr>
@@ -5529,22 +5460,17 @@ apiKey
 <pre class="highlight tab tab-http"><code><span class="hljs-keyword">GET</span> <span class="hljs-string">https://api.cloud-player.io//token/{id}</span> HTTP/1.1
 <span class="hljs-attribute">Host</span>: api.cloud-player.io
 
-<span class="http">
-<span class="hljs-attribute">Accept</span>: application/json
+<span class="http"><span class="hljs-attribute">Accept</span>: application/json
 
-<span class="undefined">
-</span></span></code></pre>
+<span class="undefined"></span></span></code></pre>
 <pre class="highlight tab tab-javascript"><code><span class="hljs-keyword">var</span> headers = {
   <span class="hljs-string">'Accept'</span>:<span class="hljs-string">'application/json'</span>
 
-
 };
-
 
 $.ajax({
   <span class="hljs-attr">url</span>: <span class="hljs-string">'https://api.cloud-player.io//token/{id}'</span>,
   <span class="hljs-attr">method</span>: <span class="hljs-string">'get'</span>,
-
 
   <span class="hljs-attr">headers</span>: headers,
   <span class="hljs-attr">success</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>) </span>{
@@ -5552,22 +5478,17 @@ $.ajax({
   }
 })
 
-
 </code></pre>
 <pre class="highlight tab tab-python"><code><span class="hljs-keyword">import</span> requests
 headers = {
   <span class="hljs-string">'Accept'</span>: <span class="hljs-string">'application/json'</span>
 }
 
-
 r = requests.get(<span class="hljs-string">'https://api.cloud-player.io//token/{id}'</span>, params={
-
 
 }, headers = headers)
 
-
 <span class="hljs-keyword">print</span> r.json()
-
 
 </code></pre>
 <p><code>GET /token/{id}</code></p>
@@ -5623,6 +5544,7 @@ r = requests.get(<span class="hljs-string">'https://api.cloud-player.io//token/{
 </table>
 <h3 id="tokenRead-responseschema">Response Schema</h3>
 <p>Status Code <strong>200</strong></p>
+<p><em>Token</em></p>
 <table>
 <thead>
 <tr>
@@ -5673,27 +5595,22 @@ apiKey
 <span class="hljs-attribute">Content-Type</span>: application/json
 <span class="hljs-attribute">Accept</span>: application/json
 
-<span class="undefined">
-</span></code></pre>
+<span class="undefined"></span></code></pre>
 <pre class="highlight tab tab-javascript"><code><span class="hljs-keyword">var</span> headers = {
   <span class="hljs-string">'Content-Type'</span>:<span class="hljs-string">'application/json'</span>,
   <span class="hljs-string">'Accept'</span>:<span class="hljs-string">'application/json'</span>
 
-
 };
-
 
 $.ajax({
   <span class="hljs-attr">url</span>: <span class="hljs-string">'https://api.cloud-player.io//token/{id}'</span>,
   <span class="hljs-attr">method</span>: <span class="hljs-string">'put'</span>,
-
 
   <span class="hljs-attr">headers</span>: headers,
   <span class="hljs-attr">success</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>) </span>{
     <span class="hljs-built_in">console</span>.log(<span class="hljs-built_in">JSON</span>.stringify(data));
   }
 })
-
 
 </code></pre>
 <pre class="highlight tab tab-python"><code><span class="hljs-keyword">import</span> requests
@@ -5702,15 +5619,11 @@ headers = {
   <span class="hljs-string">'Accept'</span>: <span class="hljs-string">'application/json'</span>
 }
 
-
 r = requests.put(<span class="hljs-string">'https://api.cloud-player.io//token/{id}'</span>, params={
-
 
 }, headers = headers)
 
-
 <span class="hljs-keyword">print</span> r.json()
-
 
 </code></pre>
 <p><code>PUT /token/{id}</code></p>
@@ -5804,6 +5717,7 @@ r = requests.put(<span class="hljs-string">'https://api.cloud-player.io//token/{
 </table>
 <h3 id="tokenUpdate-responseschema">Response Schema</h3>
 <p>Status Code <strong>200</strong></p>
+<p><em>Token</em></p>
 <table>
 <thead>
 <tr>
@@ -5852,22 +5766,17 @@ apiKey
 <pre class="highlight tab tab-http"><code><span class="hljs-keyword">GET</span> <span class="hljs-string">https://api.cloud-player.io//track/{provider_id}/{id}</span> HTTP/1.1
 <span class="hljs-attribute">Host</span>: api.cloud-player.io
 
-<span class="http">
-<span class="hljs-attribute">Accept</span>: application/json
+<span class="http"><span class="hljs-attribute">Accept</span>: application/json
 
-<span class="undefined">
-</span></span></code></pre>
+<span class="undefined"></span></span></code></pre>
 <pre class="highlight tab tab-javascript"><code><span class="hljs-keyword">var</span> headers = {
   <span class="hljs-string">'Accept'</span>:<span class="hljs-string">'application/json'</span>
 
-
 };
-
 
 $.ajax({
   <span class="hljs-attr">url</span>: <span class="hljs-string">'https://api.cloud-player.io//track/{provider_id}/{id}'</span>,
   <span class="hljs-attr">method</span>: <span class="hljs-string">'get'</span>,
-
 
   <span class="hljs-attr">headers</span>: headers,
   <span class="hljs-attr">success</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>) </span>{
@@ -5875,22 +5784,17 @@ $.ajax({
   }
 })
 
-
 </code></pre>
 <pre class="highlight tab tab-python"><code><span class="hljs-keyword">import</span> requests
 headers = {
   <span class="hljs-string">'Accept'</span>: <span class="hljs-string">'application/json'</span>
 }
 
-
 r = requests.get(<span class="hljs-string">'https://api.cloud-player.io//track/{provider_id}/{id}'</span>, params={
-
 
 }, headers = headers)
 
-
 <span class="hljs-keyword">print</span> r.json()
-
 
 </code></pre>
 <p><code>GET /track/{provider_id}/{id}</code></p>
@@ -5950,7 +5854,7 @@ r = requests.get(<span class="hljs-string">'https://api.cloud-player.io//track/{
   },
   <span class="hljs-attr">"play_count"</span>: <span class="hljs-number">0</span>,
   <span class="hljs-attr">"title"</span>: <span class="hljs-string">"string"</span>,
-  <span class="hljs-attr">"created"</span>: <span class="hljs-string">"2018-03-31T14:27:03Z"</span>
+  <span class="hljs-attr">"created"</span>: <span class="hljs-string">"2018-04-11T19:36:06Z"</span>
 }
 </code></pre>
 <h3 id="trackRead-responses">Responses</h3>
@@ -6130,22 +6034,17 @@ apiKey
 <pre class="highlight tab tab-http"><code><span class="hljs-keyword">GET</span> <span class="hljs-string">https://api.cloud-player.io//track/{track_provider_id}/{track_id}/comment</span> HTTP/1.1
 <span class="hljs-attribute">Host</span>: api.cloud-player.io
 
-<span class="http">
-<span class="hljs-attribute">Accept</span>: application/json
+<span class="http"><span class="hljs-attribute">Accept</span>: application/json
 
-<span class="undefined">
-</span></span></code></pre>
+<span class="undefined"></span></span></code></pre>
 <pre class="highlight tab tab-javascript"><code><span class="hljs-keyword">var</span> headers = {
   <span class="hljs-string">'Accept'</span>:<span class="hljs-string">'application/json'</span>
 
-
 };
-
 
 $.ajax({
   <span class="hljs-attr">url</span>: <span class="hljs-string">'https://api.cloud-player.io//track/{track_provider_id}/{track_id}/comment'</span>,
   <span class="hljs-attr">method</span>: <span class="hljs-string">'get'</span>,
-
 
   <span class="hljs-attr">headers</span>: headers,
   <span class="hljs-attr">success</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>) </span>{
@@ -6153,22 +6052,17 @@ $.ajax({
   }
 })
 
-
 </code></pre>
 <pre class="highlight tab tab-python"><code><span class="hljs-keyword">import</span> requests
 headers = {
   <span class="hljs-string">'Accept'</span>: <span class="hljs-string">'application/json'</span>
 }
 
-
 r = requests.get(<span class="hljs-string">'https://api.cloud-player.io//track/{track_provider_id}/{track_id}/comment'</span>, params={
-
 
 }, headers = headers)
 
-
 <span class="hljs-keyword">print</span> r.json()
-
 
 </code></pre>
 <p><code>GET /track/{track_provider_id}/{track_id}/comment</code></p>
@@ -6222,7 +6116,7 @@ r = requests.get(<span class="hljs-string">'https://api.cloud-player.io//track/{
     <span class="hljs-attr">"timestamp"</span>: <span class="hljs-number">0</span>,
     <span class="hljs-attr">"track_id"</span>: <span class="hljs-string">"string"</span>,
     <span class="hljs-attr">"track_provider_id"</span>: <span class="hljs-string">"string"</span>,
-    <span class="hljs-attr">"created"</span>: <span class="hljs-string">"2018-03-31T14:27:03Z"</span>
+    <span class="hljs-attr">"created"</span>: <span class="hljs-string">"2018-04-11T19:36:06Z"</span>
   }
 ]
 </code></pre>
@@ -6367,22 +6261,17 @@ apiKey
 <pre class="highlight tab tab-http"><code><span class="hljs-keyword">GET</span> <span class="hljs-string">https://api.cloud-player.io//user/{id}</span> HTTP/1.1
 <span class="hljs-attribute">Host</span>: api.cloud-player.io
 
-<span class="http">
-<span class="hljs-attribute">Accept</span>: application/json
+<span class="http"><span class="hljs-attribute">Accept</span>: application/json
 
-<span class="undefined">
-</span></span></code></pre>
+<span class="undefined"></span></span></code></pre>
 <pre class="highlight tab tab-javascript"><code><span class="hljs-keyword">var</span> headers = {
   <span class="hljs-string">'Accept'</span>:<span class="hljs-string">'application/json'</span>
 
-
 };
-
 
 $.ajax({
   <span class="hljs-attr">url</span>: <span class="hljs-string">'https://api.cloud-player.io//user/{id}'</span>,
   <span class="hljs-attr">method</span>: <span class="hljs-string">'get'</span>,
-
 
   <span class="hljs-attr">headers</span>: headers,
   <span class="hljs-attr">success</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>) </span>{
@@ -6390,22 +6279,17 @@ $.ajax({
   }
 })
 
-
 </code></pre>
 <pre class="highlight tab tab-python"><code><span class="hljs-keyword">import</span> requests
 headers = {
   <span class="hljs-string">'Accept'</span>: <span class="hljs-string">'application/json'</span>
 }
 
-
 r = requests.get(<span class="hljs-string">'https://api.cloud-player.io//user/{id}'</span>, params={
-
 
 }, headers = headers)
 
-
 <span class="hljs-keyword">print</span> r.json()
-
 
 </code></pre>
 <p><code>GET /user/{id}</code></p>
@@ -6449,8 +6333,8 @@ r = requests.get(<span class="hljs-string">'https://api.cloud-player.io//user/{i
       <span class="hljs-attr">"connected"</span>: <span class="hljs-literal">true</span>
     }
   ],
-  <span class="hljs-attr">"created"</span>: <span class="hljs-string">"2018-03-31T14:27:03Z"</span>,
-  <span class="hljs-attr">"updated"</span>: <span class="hljs-string">"2018-03-31T14:27:03Z"</span>
+  <span class="hljs-attr">"created"</span>: <span class="hljs-string">"2018-04-11T19:36:06Z"</span>,
+  <span class="hljs-attr">"updated"</span>: <span class="hljs-string">"2018-04-11T19:36:06Z"</span>
 }
 </code></pre>
 <h3 id="userRead-responses">Responses</h3>
@@ -6474,6 +6358,7 @@ r = requests.get(<span class="hljs-string">'https://api.cloud-player.io//user/{i
 </table>
 <h3 id="userRead-responseschema">Response Schema</h3>
 <p>Status Code <strong>200</strong></p>
+<p><em>User</em></p>
 <table>
 <thead>
 <tr>
@@ -6499,21 +6384,122 @@ r = requests.get(<span class="hljs-string">'https://api.cloud-player.io//user/{i
 </tbody>
 </table>
 <p><em>allOf</em></p>
-<p>|»» <em>anonymous</em>|object|false|No description|
-|»»» id|string|true|Account id|
-|»»» provider_id|string|true|Provider id|
-|»»» image|object|false|No description|
-|»»»» id|string|true|Image id|
-|»»»» large|string|true|Large uri|
-|»»»» medium|string|false|Medium uri|
-|»»»» small|string|false|Small uri|
-|»»» title|string|false|Account title|</p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>»» <em>anonymous</em></td>
+<td>object</td>
+<td>false</td>
+<td>No description</td>
+</tr>
+<tr>
+<td>»»» id</td>
+<td>string</td>
+<td>true</td>
+<td>Account id</td>
+</tr>
+<tr>
+<td>»»» provider_id</td>
+<td>string</td>
+<td>true</td>
+<td>Provider id</td>
+</tr>
+<tr>
+<td>»»» image</td>
+<td>object</td>
+<td>false</td>
+<td>No description</td>
+</tr>
+<tr>
+<td>»»»» id</td>
+<td>string</td>
+<td>true</td>
+<td>Image id</td>
+</tr>
+<tr>
+<td>»»»» large</td>
+<td>string</td>
+<td>true</td>
+<td>Large uri</td>
+</tr>
+<tr>
+<td>»»»» medium</td>
+<td>string</td>
+<td>false</td>
+<td>Medium uri</td>
+</tr>
+<tr>
+<td>»»»» small</td>
+<td>string</td>
+<td>false</td>
+<td>Small uri</td>
+</tr>
+<tr>
+<td>»»» title</td>
+<td>string</td>
+<td>false</td>
+<td>Account title</td>
+</tr>
+</tbody>
+</table>
 <p><em>and</em></p>
-<p>|»» <em>anonymous</em>|object|false|No description|
-|»»» connected|boolean|false|Connection status|</p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>»» <em>anonymous</em></td>
+<td>object</td>
+<td>false</td>
+<td>No description</td>
+</tr>
+<tr>
+<td>»»» connected</td>
+<td>boolean</td>
+<td>false</td>
+<td>Connection status</td>
+</tr>
+</tbody>
+</table>
 <p><em>continued</em></p>
-<p>|»» created|string(date-time)|false|User creation|
-|»» updated|string(date-time)|false|User update|</p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Required</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>»» created</td>
+<td>string(date-time)</td>
+<td>false</td>
+<td>User creation</td>
+</tr>
+<tr>
+<td>»» updated</td>
+<td>string(date-time)</td>
+<td>false</td>
+<td>User update</td>
+</tr>
+</tbody>
+</table>
 <aside class="warning">
 To perform this operation, you must be authenticated by means of one of the following methods:
 apiKey
@@ -6526,33 +6512,25 @@ apiKey
 <pre class="highlight tab tab-http"><code><span class="hljs-keyword">GET</span> <span class="hljs-string">https://api.cloud-player.io//soundcloud</span> HTTP/1.1
 <span class="hljs-attribute">Host</span>: api.cloud-player.io
 
-<span class="undefined">
-</span></code></pre>
+<span class="undefined"></span></code></pre>
 <pre class="highlight tab tab-javascript"><code>
-
 $.ajax({
   <span class="hljs-attr">url</span>: <span class="hljs-string">'https://api.cloud-player.io//soundcloud'</span>,
   <span class="hljs-attr">method</span>: <span class="hljs-string">'get'</span>,
-
 
   <span class="hljs-attr">success</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>) </span>{
     <span class="hljs-built_in">console</span>.log(<span class="hljs-built_in">JSON</span>.stringify(data));
   }
 })
 
-
 </code></pre>
 <pre class="highlight tab tab-python"><code><span class="hljs-keyword">import</span> requests
 
-
 r = requests.get(<span class="hljs-string">'https://api.cloud-player.io//soundcloud'</span>, params={
-
 
 )
 
-
 <span class="hljs-keyword">print</span> r.json()
-
 
 </code></pre>
 <p><code>GET /soundcloud</code></p>
@@ -6587,33 +6565,25 @@ apiKey
 <pre class="highlight tab tab-http"><code><span class="hljs-keyword">GET</span> <span class="hljs-string">https://api.cloud-player.io//youtube</span> HTTP/1.1
 <span class="hljs-attribute">Host</span>: api.cloud-player.io
 
-<span class="undefined">
-</span></code></pre>
+<span class="undefined"></span></code></pre>
 <pre class="highlight tab tab-javascript"><code>
-
 $.ajax({
   <span class="hljs-attr">url</span>: <span class="hljs-string">'https://api.cloud-player.io//youtube'</span>,
   <span class="hljs-attr">method</span>: <span class="hljs-string">'get'</span>,
-
 
   <span class="hljs-attr">success</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>) </span>{
     <span class="hljs-built_in">console</span>.log(<span class="hljs-built_in">JSON</span>.stringify(data));
   }
 })
 
-
 </code></pre>
 <pre class="highlight tab tab-python"><code><span class="hljs-keyword">import</span> requests
 
-
 r = requests.get(<span class="hljs-string">'https://api.cloud-player.io//youtube'</span>, params={
-
 
 )
 
-
 <span class="hljs-keyword">print</span> r.json()
-
 
 </code></pre>
 <p><code>GET /youtube</code></p>
@@ -6649,22 +6619,17 @@ apiKey
 <pre class="highlight tab tab-http"><code><span class="hljs-keyword">GET</span> <span class="hljs-string">https://api.cloud-player.io//history/{id}</span> HTTP/1.1
 <span class="hljs-attribute">Host</span>: api.cloud-player.io
 
-<span class="http">
-<span class="hljs-attribute">Accept</span>: application/json
+<span class="http"><span class="hljs-attribute">Accept</span>: application/json
 
-<span class="undefined">
-</span></span></code></pre>
+<span class="undefined"></span></span></code></pre>
 <pre class="highlight tab tab-javascript"><code><span class="hljs-keyword">var</span> headers = {
   <span class="hljs-string">'Accept'</span>:<span class="hljs-string">'application/json'</span>
 
-
 };
-
 
 $.ajax({
   <span class="hljs-attr">url</span>: <span class="hljs-string">'https://api.cloud-player.io//history/{id}'</span>,
   <span class="hljs-attr">method</span>: <span class="hljs-string">'get'</span>,
-
 
   <span class="hljs-attr">headers</span>: headers,
   <span class="hljs-attr">success</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>) </span>{
@@ -6672,22 +6637,17 @@ $.ajax({
   }
 })
 
-
 </code></pre>
 <pre class="highlight tab tab-python"><code><span class="hljs-keyword">import</span> requests
 headers = {
   <span class="hljs-string">'Accept'</span>: <span class="hljs-string">'application/json'</span>
 }
 
-
 r = requests.get(<span class="hljs-string">'https://api.cloud-player.io//history/{id}'</span>, params={
-
 
 }, headers = headers)
 
-
 <span class="hljs-keyword">print</span> r.json()
-
 
 </code></pre>
 <p><code>GET /history/{id}</code></p>
@@ -6726,8 +6686,8 @@ r = requests.get(<span class="hljs-string">'https://api.cloud-player.io//history
       <span class="hljs-attr">"next"</span>: <span class="hljs-string">"string"</span>,
       <span class="hljs-attr">"progress"</span>: <span class="hljs-number">0</span>,
       <span class="hljs-attr">"status"</span>: <span class="hljs-string">"completed"</span>,
-      <span class="hljs-attr">"created"</span>: <span class="hljs-string">"2018-03-31T14:27:03Z"</span>,
-      <span class="hljs-attr">"updated"</span>: <span class="hljs-string">"2018-03-31T14:27:03Z"</span>
+      <span class="hljs-attr">"created"</span>: <span class="hljs-string">"2018-04-11T19:36:06Z"</span>,
+      <span class="hljs-attr">"updated"</span>: <span class="hljs-string">"2018-04-11T19:36:06Z"</span>
     }
   ]
 }
@@ -6874,22 +6834,17 @@ apiKey
 <pre class="highlight tab tab-http"><code><span class="hljs-keyword">GET</span> <span class="hljs-string">https://api.cloud-player.io//queue/{id}</span> HTTP/1.1
 <span class="hljs-attribute">Host</span>: api.cloud-player.io
 
-<span class="http">
-<span class="hljs-attribute">Accept</span>: application/json
+<span class="http"><span class="hljs-attribute">Accept</span>: application/json
 
-<span class="undefined">
-</span></span></code></pre>
+<span class="undefined"></span></span></code></pre>
 <pre class="highlight tab tab-javascript"><code><span class="hljs-keyword">var</span> headers = {
   <span class="hljs-string">'Accept'</span>:<span class="hljs-string">'application/json'</span>
 
-
 };
-
 
 $.ajax({
   <span class="hljs-attr">url</span>: <span class="hljs-string">'https://api.cloud-player.io//queue/{id}'</span>,
   <span class="hljs-attr">method</span>: <span class="hljs-string">'get'</span>,
-
 
   <span class="hljs-attr">headers</span>: headers,
   <span class="hljs-attr">success</span>: <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">data</span>) </span>{
@@ -6897,22 +6852,17 @@ $.ajax({
   }
 })
 
-
 </code></pre>
 <pre class="highlight tab tab-python"><code><span class="hljs-keyword">import</span> requests
 headers = {
   <span class="hljs-string">'Accept'</span>: <span class="hljs-string">'application/json'</span>
 }
 
-
 r = requests.get(<span class="hljs-string">'https://api.cloud-player.io//queue/{id}'</span>, params={
-
 
 }, headers = headers)
 
-
 <span class="hljs-keyword">print</span> r.json()
-
 
 </code></pre>
 <p><code>GET /queue/{id}</code></p>
@@ -6950,8 +6900,8 @@ r = requests.get(<span class="hljs-string">'https://api.cloud-player.io//queue/{
       <span class="hljs-attr">"next"</span>: <span class="hljs-string">"string"</span>,
       <span class="hljs-attr">"progress"</span>: <span class="hljs-number">0</span>,
       <span class="hljs-attr">"status"</span>: <span class="hljs-string">"completed"</span>,
-      <span class="hljs-attr">"created"</span>: <span class="hljs-string">"2018-03-31T14:27:03Z"</span>,
-      <span class="hljs-attr">"updated"</span>: <span class="hljs-string">"2018-03-31T14:27:03Z"</span>
+      <span class="hljs-attr">"created"</span>: <span class="hljs-string">"2018-04-11T19:36:06Z"</span>,
+      <span class="hljs-attr">"updated"</span>: <span class="hljs-string">"2018-04-11T19:36:06Z"</span>
     }
   ]
 }

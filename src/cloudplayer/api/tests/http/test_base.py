@@ -1,3 +1,5 @@
+import http.cookies
+
 import mock
 import pytest
 import tornado.web
@@ -40,6 +42,17 @@ def test_http_handler_should_set_default_headers(http_client, base_url):
         'Content-Type': 'application/json',
         'Pragma': 'no-cache',
         'Server': 'cloudplayer'}
+
+
+@pytest.mark.gen_test
+def test_http_handler_should_set_new_user_cookie(http_client, base_url):
+    response = yield http_client.fetch('{}/user/me'.format(base_url))
+    headers = dict(response.headers)
+    cookie = http.cookies.SimpleCookie(headers.pop('Set-Cookie'))['tok_v1']
+    assert cookie['domain'] == 'localhost'
+    assert cookie['httponly']
+    assert not cookie['secure']
+    assert cookie['expires']
 
 
 @pytest.mark.gen_test

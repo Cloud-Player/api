@@ -92,6 +92,8 @@ def app(postgresql_proc, redis_proc):
     opt.define('jwt_cookie', default='tok_v1', group='app')
     opt.define('jwt_expiration', default=1, group='app')
     opt.define('jwt_secret', default='secret', group='app')
+    opt.define('public_domain', default='localhost', group='app')
+    opt.define('public_scheme', default='http', group='app')
     opt.define('providers', default=[
         'youtube', 'soundcloud', 'cloudplayer'], group='app')
     opt.define('allowed_origins', default=['*'], group='app')

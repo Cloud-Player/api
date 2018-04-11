@@ -38,6 +38,8 @@ def define_options():  # pragma: no cover
     opt.define('jwt_cookie', default='tok_v1', group='app')
     opt.define('jwt_expiration', default=30, group='app')
     opt.define('jwt_secret', type=str, group='app')
+    opt.define('public_domain', default='api.cloud-player.io', group='app')
+    opt.define('public_scheme', default='https', group='app')
     opt.define('youtube', type=dict, group='app')
     opt.define('soundcloud', type=dict, group='app')
     opt.define('bugsnag', type=dict, group='app')

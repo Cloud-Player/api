@@ -19,6 +19,8 @@ allowed_origins = [
     'http://localhost:8080']
 
 jwt_secret = 'secret'
+public_scheme = 'http'
+public_domain = 'localhost'
 
 youtube = {
     'key': 'key',

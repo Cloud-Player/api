@@ -182,7 +182,9 @@ class YoutubeAuthController(AuthController):
 
         if not headers:
             headers = dict()
-        headers['Referer'] = 'https://api.cloud-player.io'
+
+        headers['Referer'] = '{}://{}'.format(
+            opt.options['public_scheme'], opt.options['public_domain'])
 
         response = yield super().fetch(
             path, params=params, headers=headers, **kw)

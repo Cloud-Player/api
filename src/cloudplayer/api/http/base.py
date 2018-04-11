@@ -72,7 +72,10 @@ class HTTPHandler(HandlerMixin, tornado.web.RequestHandler):
         super().set_cookie(
             self.settings['jwt_cookie'],
             user_jwt,
-            expires_days=self.settings['jwt_expiration'])
+            domain=self.settings['public_domain'],
+            expires_days=self.settings['jwt_expiration'],
+            secure=self.settings['public_scheme'] == 'https',
+            httponly=True)
 
     def clear_user_cookie(self):
         super().clear_cookie(self.settings['jwt_cookie'])

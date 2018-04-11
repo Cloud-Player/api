@@ -290,7 +290,7 @@ def test_youtube_auth_inserst_additional_params_into_fetch(
             ('p2', '2'),
             ('prettyPrint', 'false'),
             ('quotaUser', user_hash)],
-        headers={'Referer': 'https://api.cloud-player.io'},
+        headers={'Referer': 'http://localhost'},
         kw0='kw0')
 
 

@@ -1,9 +1,10 @@
+import mock
 import pytest
 import tornado.httpclient
 
+import cloudplayer.api.app
 import cloudplayer.api.http.base
 import cloudplayer.api.ws.base
-import cloudplayer.api.app
 
 
 @pytest.mark.gen_test
@@ -43,3 +44,20 @@ def test_application_should_connect_to_configured_database(app):
 def test_database_should_create_sessions_bound_to_engine(app):
     session = app.database.create_session()
     assert session.get_bind() is app.database.engine
+
+
+def test_application_shuts_down_database_events_and_redis(
+        monkeypatch, app):
+    event_list = list()
+    dispose_pool = mock.MagicMock()
+    disconnect_redis = mock.MagicMock()
+
+    monkeypatch.setattr(app.event_mapper, 'listeners', event_list)
+    monkeypatch.setattr(app.database.engine.pool, 'dispose', dispose_pool)
+    monkeypatch.setattr(app.redis_pool, 'disconnect', disconnect_redis)
+
+    app.shutdown()
+
+    assert not app.event_mapper.listeners
+    dispose_pool.assert_called_once()
+    disconnect_redis.assert_called_once()

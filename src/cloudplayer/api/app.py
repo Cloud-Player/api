@@ -175,7 +175,7 @@ class Application(tornado.web.Application):
         self.executor = tornado.concurrent.futures.ThreadPoolExecutor(
             settings['num_executors'])
 
-        self.redis_pool = RedisPool.create(
+        self.redis_pool = RedisPool(
             settings['redis_host'],
             settings['redis_port'],
             settings['redis_db'],
@@ -195,24 +195,21 @@ class Application(tornado.web.Application):
     def shutdown(self):
         self.event_mapper.shutdown()
         self.database.shutdown()
-        RedisPool.disconnect(self.redis_pool)
+        self.redis_pool.shutdown()
 
 
-class RedisPool(object):
+class RedisPool(redis.ConnectionPool):
 
-    @staticmethod
-    def create(host, port, db, password):
-        redis_pool = redis.ConnectionPool(
+    def __init__(self, host, port, db, password):
+        super().__init__(
             host=host, port=port, db=db, password=password)
         app_log.info('connecting to {host}:{port}/{db}'.format(
-            **redis_pool.connection_kwargs))
-        return redis_pool
+            **self.connection_kwargs))
 
-    @staticmethod
-    def disconnect(redis_pool):
+    def shutdown(self):
         app_log.info('shutting down {host}:{port}/{db}'.format(
-            **redis_pool.connection_kwargs))
-        redis_pool.disconnect()
+            **self.connection_kwargs))
+        self.disconnect()
 
 
 class Database(object):

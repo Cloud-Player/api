@@ -22,10 +22,17 @@ class Proxy(HTTPHandler):  # pragma: no cover
         response = yield controller.fetch(
             provider, path, method=method, params=self.query_params,
             raise_error=False, **kw)
+        body = response.body
         if response.error:
-            self.set_status(response.error.code)
-        body = response.body.replace(  # Get your TLS on, YouTube!
-            b'http://s.ytimg.com', b'https://s.ytimg.com')
+            code = response.error.code
+            if code == 599:
+                code = 503
+            if not body:
+                body = response.error.message
+            self.set_status(code)
+        else:
+            body = body.replace(  # Get your TLS on, YouTube!
+                b'http://s.ytimg.com', b'https://s.ytimg.com')
         yield self.write_str(body)
 
     def write_str(self, data):

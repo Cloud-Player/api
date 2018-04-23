@@ -9,7 +9,7 @@ import tornado.gen
 
 from cloudplayer.api.access import Available
 from cloudplayer.api.controller import Controller, ControllerException
-from cloudplayer.api.controller.track import create_track_controller
+from cloudplayer.api.controller.track import TrackController
 from cloudplayer.api.model.playlist import Playlist
 from cloudplayer.api.model.playlist_item import PlaylistItem
 
@@ -31,7 +31,7 @@ class PlaylistItemController(Controller):
 
         track_id = kw.get('track_id')
         track_provider_id = kw.get('track_provider_id')
-        track_controller = create_track_controller(
+        track_controller = TrackController.for_provider(
             track_provider_id, self.db, self.current_user)
         track = yield track_controller.read({
             'id': track_id, 'provider_id': track_provider_id})

@@ -39,3 +39,19 @@ class Image(Base):
             small=self.small,
             medium=self.medium,
             large=self.large)
+
+    @classmethod
+    def from_soundcloud(cls, url):
+        if isinstance(url, str):
+            return cls(
+                small=url,
+                medium=url.replace('large', 't300x300'),
+                large=url.replace('large', 't500x500'))
+
+    @classmethod
+    def from_youtube(cls, thumbnails):
+        if isinstance(thumbnails, dict):
+            return cls(
+                small=thumbnails.get('default', {}).get('url'),
+                medium=thumbnails.get('medium', {}).get('url'),
+                large=thumbnails.get('high', {}).get('url'))

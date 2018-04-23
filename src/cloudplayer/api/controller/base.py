@@ -60,8 +60,8 @@ class Controller(object):
     def fetch(self, provider_id, path, params=None, **kw):
         """Convenience method for fetching from an upstream provider."""
         # TODO: Can authed fetching be generalized?
-        from cloudplayer.api.controller.auth import create_auth_controller
-        controller = create_auth_controller(
+        from cloudplayer.api.controller.auth import AuthController
+        controller = AuthController.for_provider(
             provider_id, self.db, self.current_user)
         response = yield controller.fetch(path, params=params, **kw)
         return response

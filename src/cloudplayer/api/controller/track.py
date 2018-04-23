@@ -5,121 +5,119 @@
     :copyright: (c) 2018 by Nicolas Drebenstedt
     :license: GPL-3.0, see LICENSE for details
 """
-import datetime
+import functools
+import urllib.parse
 
-import isodate
 import tornado.escape
 import tornado.gen
 
-from cloudplayer.api.controller import Controller
-from cloudplayer.api.model.account import Account
-from cloudplayer.api.model.image import Image
-from cloudplayer.api.model.track import Track
 from cloudplayer.api.access import Available
+from cloudplayer.api.controller import Controller
+from cloudplayer.api.model.track import Track
+from cloudplayer.api.util import chunk_range
 
 
-def create_track_controller(provider_id, db, current_user=None):
-    if provider_id == 'soundcloud':
-        return SoundcloudTrackController(db, current_user)
-    elif provider_id == 'youtube':
-        return YoutubeTrackController(db, current_user)
-    else:
-        raise ValueError('unsupported provider')
+class TrackController(Controller):
+
+    @staticmethod
+    def for_provider(provider_id, db, current_user=None):
+        if provider_id == 'soundcloud':
+            return SoundcloudTrackController(db, current_user)
+        elif provider_id == 'youtube':
+            return YoutubeTrackController(db, current_user)
+        else:
+            raise ValueError('unsupported provider')
 
 
-class SoundcloudTrackController(Controller):
-
-    DATE_FORMAT = '%Y/%m/%d %H:%M:%S %z'
+class SoundcloudTrackController(TrackController):
 
     @tornado.gen.coroutine
     def read(self, ids, fields=Available):
         response = yield self.fetch(
             ids['provider_id'], '/tracks/{}'.format(ids['id']))
         track = tornado.escape.json_decode(response.body)
-        user = track['user']
-
-        if track.get('artwork_url'):
-            image = Image(
-                small=track['artwork_url'] or None,
-                medium=track['artwork_url'].replace('large', 't300x300'),
-                large=track['artwork_url'].replace('large', 't500x500')
-            )
-        else:
-            image = None
-
-        artist = Account(
-            id=user['id'],
-            provider_id=ids['provider_id'],
-            title=user['username'],
-            image=Image(
-                small=user['avatar_url'],
-                medium=user['avatar_url'].replace('large', 't300x300'),
-                large=user['avatar_url'].replace('large', 't500x500')))
-
-        entity = Track(
-            id=ids['id'],
-            provider_id=ids['provider_id'],
-            account=artist,
-            aspect_ratio=1.0,
-            duration=int(track['duration'] / 1000.0),
-            favourite_count=track.get('favoritings_count', 0),
-            image=image,
-            play_count=track.get('playback_count', 0),
-            title=track['title'],
-            created=datetime.datetime.strptime(
-                track['created_at'], self.DATE_FORMAT))
-
+        entity = Track.from_soundcloud(track)
         account = self.get_account(entity.provider_id)
         self.policy.grant_read(account, entity, fields)
         return entity
 
+    @tornado.gen.coroutine
+    def search(self, ids, fields=Available):
+        pass
 
-class YoutubeTrackController(Controller):
 
-    DATE_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
+class YoutubeTrackController(TrackController):
+
+    MREAD_YOUTUBE_FIELDS = ''.join("""
+        items(
+        id,
+        snippet(
+            channelId,
+            channelTitle,
+            thumbnails(
+                default/url,
+                medium/url,
+                high/url),
+            title,
+            publishedAt),
+        contentDetails/duration,
+        statistics(
+            viewCount,
+            likeCount),
+        player(
+            embedWidth,
+            embedHeight))
+    """.split())
+
+    SEARCH_YOUTUBE_FIELDS = ''.join("""
+        items/id/videoId
+    """.split())
 
     @tornado.gen.coroutine
     def read(self, ids, fields=Available):
+        ids['ids'] = [ids.pop('id')]
+        entities = yield self.mread(ids, fields=fields)
+        if entities:
+            return entities[0]
+
+    @tornado.gen.coroutine
+    def mread(self, ids, fields=Available):
         params = {
-            'id': ids['id'],
-            'part': 'snippet,player,contentDetails,statistics',
+            'id': ','.join(urllib.parse.quote(i, safe='') for i in ids['ids']),
+            'part': 'snippet,contentDetails,player,statistics',
+            'fields': self.MREAD_YOUTUBE_FIELDS,
             'maxWidth': '320'}
         response = yield self.fetch(
             ids['provider_id'], '/videos', params=params)
         track_list = tornado.escape.json_decode(response.body)
-        if not track_list['items']:
-            return
-        track = track_list['items'][0]
-        snippet = track['snippet']
-        player = track['player']
-        statistics = track['statistics']
-        duration = isodate.parse_duration(track['contentDetails']['duration'])
+        entities = []
+        for track in track_list['items']:
+            entity = Track.from_youtube(track)
+            account = self.get_account(entity.provider_id)
+            self.policy.grant_read(account, entity, fields)
+            entities.append(entity)
+        return entities
 
-        image = Image(
-            small=snippet['thumbnails']['default']['url'],
-            medium=snippet['thumbnails']['medium']['url'],
-            large=snippet['thumbnails']['high']['url'])
+    @tornado.gen.coroutine
+    def search(self, ids, kw, fields=Available):
+        params = {
+            'q': kw.get('q'),
+            'part': 'snippet',
+            'type': 'video',
+            'videoEmbeddable': 'true',
+            'videoSyndicated': 'true',
+            'maxResults': 50,
+            'fields': self.SEARCH_YOUTUBE_FIELDS}
+        response = yield self.fetch(
+            ids['provider_id'], '/search', params=params)
+        search_result = tornado.escape.json_decode(response.body)
+        video_ids = [i['id']['videoId'] for i in search_result['items']]
 
-        artist = Account(
-            id=snippet['channelId'],
-            provider_id=ids['provider_id'],
-            image=None,
-            title=snippet['channelTitle'])
+        futures = []
+        for i, j in chunk_range(params['maxResults'], 4):
+            futures.append(self.mread(
+                {'provider_id': ids['provider_id'], 'ids': video_ids[i: j]},
+                fields=fields))
 
-        entity = Track(
-            id=ids['id'],
-            provider_id=ids['provider_id'],
-            account=artist,
-            aspect_ratio=(
-                float(player['embedHeight']) / float(player['embedWidth'])),
-            duration=int(duration.total_seconds()),
-            favourite_count=statistics['likeCount'],
-            image=image,
-            play_count=statistics['viewCount'],
-            title=snippet['title'],
-            created=datetime.datetime.strptime(
-                snippet['publishedAt'], self.DATE_FORMAT))
-
-        account = self.get_account(entity.provider_id)
-        self.policy.grant_read(account, entity, fields)
-        return entity
+        entities = yield futures
+        return entities

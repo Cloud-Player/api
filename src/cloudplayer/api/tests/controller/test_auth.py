@@ -9,8 +9,7 @@ import tornado.gen
 
 from cloudplayer.api.controller import ControllerException
 from cloudplayer.api.controller.auth import (
-    create_auth_controller, AuthController,
-    SoundcloudAuthController, YoutubeAuthController)
+    AuthController, SoundcloudAuthController, YoutubeAuthController)
 from cloudplayer.api.model.account import Account
 from cloudplayer.api.model.image import Image
 
@@ -18,14 +17,14 @@ from cloudplayer.api.model.image import Image
 @pytest.mark.parametrize('id_, class_', [
     ('soundcloud', SoundcloudAuthController),
     ('youtube', YoutubeAuthController)])
-def test_create_controller_should_return_correct_controller(id_, class_):
-    controller = create_auth_controller(id_, mock.Mock())
+def test_controller_for_provider_should_return_correct_controller(id_, class_):
+    controller = AuthController.for_provider(id_, mock.Mock())
     assert isinstance(controller, class_)
 
 
-def test_create_controller_should_reject_invalid_provider_id():
+def test_controller_for_provider_should_reject_invalid_provider_id():
     with pytest.raises(ValueError):
-        create_auth_controller('not-a-provider', mock.Mock())
+        AuthController.for_provider('not-a-provider', mock.Mock())
 
 
 class CloudplayerController(AuthController):

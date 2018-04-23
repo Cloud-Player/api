@@ -61,13 +61,12 @@ def test_base_controller_should_delegate_provider_fetches_to_auth_controllers(
     fetch = mock.MagicMock()
     mock_auth_controller = mock.Mock(
         fetch=tornado.gen.coroutine(fetch))
-    create_auth_controller = mock.MagicMock(return_value=mock_auth_controller)
-    monkeypatch.setattr(cloudplayer.api.controller.auth,
-                        'create_auth_controller',
-                        create_auth_controller)
+    for_provider = mock.MagicMock(return_value=mock_auth_controller)
+    monkeypatch.setattr(cloudplayer.api.controller.auth.AuthController,
+                        'for_provider', for_provider)
     params = [('sort', True)]
     controller.fetch('foo', '/path', params=params)
-    create_auth_controller.assert_called_once_with('foo', db, current_user)
+    for_provider.assert_called_once_with('foo', db, current_user)
     fetch.assert_called_once_with('/path', params=params)
 
 

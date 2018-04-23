@@ -7,18 +7,25 @@
 """
 from cloudplayer.api.controller.track import SoundcloudTrackController
 from cloudplayer.api.controller.track import YoutubeTrackController
-from cloudplayer.api.handler import EntityMixin
+from cloudplayer.api.handler import CollectionMixin, EntityMixin
 from cloudplayer.api.http import HTTPHandler
 
 
-class Soundcloud(EntityMixin, HTTPHandler):
+class SoundcloudEntity(EntityMixin, HTTPHandler):
 
     __controller__ = SoundcloudTrackController
 
     SUPPORTED_METHODS = ('GET', 'OPTIONS')
 
 
-class Youtube(EntityMixin, HTTPHandler):
+class YoutubeEntity(EntityMixin, HTTPHandler):
+
+    __controller__ = YoutubeTrackController
+
+    SUPPORTED_METHODS = ('GET', 'OPTIONS')
+
+
+class YoutubeCollection(CollectionMixin, HTTPHandler):
 
     __controller__ = YoutubeTrackController
 

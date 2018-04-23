@@ -24,15 +24,6 @@ from cloudplayer.api.model.provider import Provider
 from sqlalchemy.orm.session import make_transient_to_detached
 
 
-def create_auth_controller(provider_id, db, current_user=None):
-    if provider_id == 'soundcloud':
-        return SoundcloudAuthController(db, current_user)
-    elif provider_id == 'youtube':
-        return YoutubeAuthController(db, current_user)
-    else:
-        raise ValueError('unsupported provider')
-
-
 class AuthController(object):
 
     def __init__(self, db, current_user=None, pubsub=None):
@@ -47,6 +38,15 @@ class AuthController(object):
             if id:
                 keys = (id, self.PROVIDER_ID)
                 self.account = self.db.query(Account).get(keys)
+
+    @staticmethod
+    def for_provider(provider_id, db, current_user=None):
+        if provider_id == 'soundcloud':
+            return SoundcloudAuthController(db, current_user)
+        elif provider_id == 'youtube':
+            return YoutubeAuthController(db, current_user)
+        else:
+            raise ValueError('unsupported provider')
 
     @property
     def _should_refresh(self):
@@ -153,11 +153,8 @@ class SoundcloudAuthController(AuthController):
     OAUTH_CLIENT_KEY = 'client_id'
 
     def _update_account_profile(self, account_info):
-        image_url = account_info.get('avatar_url')
-        self.account.image = Image(
-            small=image_url,
-            medium=image_url.replace('large', 't300x300'),
-            large=image_url.replace('large', 't500x500'))
+        self.account.image = Image.from_soundcloud(
+            account_info.get('avatar_url'))
         self.account.title = account_info.get('username')
 
 
@@ -192,11 +189,7 @@ class YoutubeAuthController(AuthController):
 
     def _update_account_profile(self, account_info):
         snippet = account_info.get('snippet', {})
-        thumbnails = snippet.get('thumbnails', {})
-        self.account.image = Image(
-            small=thumbnails.get('default', {}).get('url'),
-            medium=thumbnails.get('medium', {}).get('url'),
-            large=thumbnails.get('high', {}).get('url'))
+        self.account.image = Image.from_youtube(snippet.get('thumbnails'))
         self.account.title = snippet.get('title')
 
     def update_account(self, access, account_info):

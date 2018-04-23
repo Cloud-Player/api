@@ -34,10 +34,7 @@ class SoundcloudTrackCommentController(Controller):
                 id=user['id'],
                 provider_id=ids['track_provider_id'],
                 title=user['username'],
-                image=Image(
-                    small=user['avatar_url'],
-                    medium=user['avatar_url'].replace('large', 't300x300'),
-                    large=user['avatar_url'].replace('large', 't500x500')))
+                image=Image.from_soundcloud(user.get('avatar_url')))
             entity = TrackComment(
                 id=comment['id'],
                 provider_id=ids['track_provider_id'],

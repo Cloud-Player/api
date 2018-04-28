@@ -23,7 +23,7 @@ class TokenController(Controller):
         threshold = datetime.datetime.utcnow() - datetime.timedelta(minutes=5)
         query = self.db.query(
             self.__model__).filter_by(**ids).filter(Token.created > threshold)
-        entity = query.one_or_none()
+        entity = query.first()
         if not entity:
             raise ControllerException(404, 'token not found')
         account = self.get_account(entity.provider_id)

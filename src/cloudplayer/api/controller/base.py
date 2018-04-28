@@ -103,7 +103,7 @@ class Controller(object):
 
     @tornado.gen.coroutine
     def read(self, ids, fields=Available):
-        entity = self.db.query(self.__model__).filter_by(**ids).one_or_none()
+        entity = self.db.query(self.__model__).filter_by(**ids).first()
         if not entity:
             raise ControllerException(404, 'entity not found')
         account = self.get_account(entity.provider_id)
@@ -112,7 +112,7 @@ class Controller(object):
 
     @tornado.gen.coroutine
     def update(self, ids, kw, fields=Available):
-        entity = self.db.query(self.__model__).filter_by(**ids).one_or_none()
+        entity = self.db.query(self.__model__).filter_by(**ids).first()
         if not entity:
             raise ControllerException(404, 'updatable not found')
         account = self.get_account(entity.provider_id)
@@ -126,7 +126,7 @@ class Controller(object):
 
     @tornado.gen.coroutine
     def delete(self, ids):
-        entity = self.db.query(self.__model__).filter_by(**ids).one_or_none()
+        entity = self.db.query(self.__model__).filter_by(**ids).first()
         if not entity:
             raise ControllerException(404, 'deletable not found')
         account = self.get_account(entity.provider_id)

@@ -5,6 +5,7 @@
     :copyright: (c) 2018 by Nicolas Drebenstedt
     :license: GPL-3.0, see LICENSE for details
 """
+import math
 import random
 import string
 
@@ -15,9 +16,16 @@ def gen_token(n, alphabet=string.ascii_lowercase + string.digits):
     return ''.join(urand.choice(alphabet) for i in range(n))
 
 
-def chunk_range(size, splits):
-    """Evenly chunk a range of `size` into given number of `splits`."""
-    step = int(size / splits)
-    ranges = list(zip(range(0, size, step), range(step - 1, size, step)))
+def chunk_range(size, chunks):
+    """Evenly chunk a range of `size` into given number of `chunks`."""
+    size = max(size, 1)
+    step = int(math.ceil(size / max(chunks, 1)))
+    ranges = list(zip(range(0, size, step), range(step, size + step, step)))
+    # Inject `None` as a slice operator to catch the last item
     ranges[-1] = (ranges[-1][0], None)
     return ranges
+
+
+def squeeze(string):
+    """Squeezes any whitespaces or linebreaks out of `string`."""
+    return ''.join(string.split())

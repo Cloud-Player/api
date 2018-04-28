@@ -7,6 +7,8 @@ debug = False
 xheaders = True
 static_path = '/srv/cloudplayer/static'
 redirect_state = 'v3'
+websocket_ping_interval = 10
+websocket_ping_timeout = 30
 
 providers = [
     'youtube',

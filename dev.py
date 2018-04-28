@@ -7,6 +7,8 @@ debug = True
 xheaders = False
 static_path = 'static'
 redirect_state = 'dev'
+websocket_ping_interval = 5
+websocket_ping_timeout = 15
 
 providers = [
     'youtube',

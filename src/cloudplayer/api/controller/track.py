@@ -114,7 +114,7 @@ class YoutubeTrackController(TrackController):
         video_ids = [i['id']['videoId'] for i in search_result['items']]
 
         futures = []
-        for i, j in chunk_range(params['maxResults'], 4):
+        for i, j in chunk_range(params['maxResults']):
             futures.append(self.mread(
                 {'provider_id': ids['provider_id'], 'ids': video_ids[i: j]},
                 fields=fields))

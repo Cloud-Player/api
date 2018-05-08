@@ -6,6 +6,7 @@
     :license: GPL-3.0, see LICENSE for details
 """
 import math
+import multiprocessing
 import random
 import string
 
@@ -16,7 +17,7 @@ def gen_token(n, alphabet=string.ascii_lowercase + string.digits):
     return ''.join(urand.choice(alphabet) for i in range(n))
 
 
-def chunk_range(size, chunks):
+def chunk_range(size, chunks=multiprocessing.cpu_count()):
     """Evenly chunk a range of `size` into given number of `chunks`."""
     size = max(size, 1)
     step = int(math.ceil(size / max(chunks, 1)))

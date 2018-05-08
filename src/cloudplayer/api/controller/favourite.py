@@ -7,6 +7,7 @@
 """
 import tornado.gen
 
+from cloudplayer.api.access import Available
 from cloudplayer.api.controller import Controller
 from cloudplayer.api.model.favourite import Favourite
 
@@ -16,9 +17,9 @@ class FavouriteController(Controller):
     __model__ = Favourite
 
     @tornado.gen.coroutine
-    def read(self, ids):
+    def read(self, ids, fields=Available):
         if ids['id'] == 'mine':
             account = self.get_account(ids['provider_id'])
             ids['id'] = account.favourite.id
-        entity = yield super().read(ids)
+        entity = yield super().read(ids, fields=fields)
         return entity

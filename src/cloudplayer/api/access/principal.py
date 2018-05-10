@@ -5,6 +5,7 @@
     :copyright: (c) 2018 by Nicolas Drebenstedt
     :license: GPL-3.0, see LICENSE for details
 """
+import traceback
 
 
 class Principal(object):
@@ -28,12 +29,15 @@ class Principal(object):
 
     def __eq__(self, other):
         if isinstance(other, Principal):
-            return (
-                self.account is not None and
-                other.account is not None and
-                (self.account.id == other.account.id) is True and
-                (self.account.provider_id == other.account.provider_id)
-                is True)
+            try:
+                return (
+                    self.account is not None and
+                    other.account is not None and
+                    (self.account.id == other.account.id) is True and
+                    (self.account.provider_id == other.account.provider_id)
+                    is True)
+            except Exception:
+                traceback.print_exc()
         return False
 
 

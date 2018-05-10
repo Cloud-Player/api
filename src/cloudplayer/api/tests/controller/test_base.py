@@ -1,13 +1,27 @@
 import mock
-import pytest
 import sqlalchemy.orm.util
 import tornado.gen
 
 import cloudplayer.api.controller.auth
+import pytest
 from cloudplayer.api.access import Fields
-from cloudplayer.api.controller.base import Controller, ControllerException
+from cloudplayer.api.controller.base import (Controller, ControllerException,
+                                             ProviderRegistry)
 from cloudplayer.api.model.account import Account
 from cloudplayer.api.model.playlist import Playlist
+
+
+def test_provider_registry_should_register_subclasses_by_provider():
+    class Bar(object, metaclass=ProviderRegistry):
+        def __init__(self, one, two=None):
+            self.one = one
+            self.two = two
+
+    class FooBar(Bar):
+        __provider__ = 'foo'
+
+    foo_bar = Bar.for_provider('foo', 1, 2)
+    assert foo_bar.one, foo_bar.two == (1, 2)
 
 
 def test_controller_should_store_creation_args(db, current_user):

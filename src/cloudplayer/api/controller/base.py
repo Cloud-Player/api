@@ -7,6 +7,7 @@
 """
 import sqlalchemy.exc
 import tornado.gen
+from tornado.log import app_log
 
 from cloudplayer.api import APIException
 from cloudplayer.api.access import Available, Policy
@@ -18,8 +19,38 @@ class ControllerException(APIException):
         super().__init__(status_code, log_message)
 
 
-class Controller(object):
-    """Protocol agnostic base controller to fulfil CRUD on model classes.
+class ProviderRegistry(type):
+    """Metaclass for controllers that registers provider specific
+    implementations on the generic controller under the provider ID.
+
+    It adds a `for_provider` class method to the generic controller,
+    which acts as a instance factory for provider specific controllers.
+    """
+
+    def __init__(cls, name, bases, classdict):
+        if classdict.get('__provider__'):
+            provider = classdict['__provider__']
+            for base in bases:
+                base.__registry__[provider] = cls
+                app_log.debug(
+                    '{} is providing {} for {}'.format(
+                        name, provider, base.__name__))
+        elif '__registry__' not in classdict:
+            def for_provider(cls, provider_id, *args, **kw):
+                """Create a specialized controller for a given `provider_id`.
+                Any further arguments are passed through to the constructor.
+                """
+                if provider_id in cls.__registry__:
+                    return cls.__registry__[provider_id](*args, **kw)
+                raise ValueError('unsupported provider')
+            cls.for_provider = classmethod(for_provider)
+            cls.__registry__ = {}
+            app_log.debug('{} is base controller'.format(name))
+        type.__init__(cls, name, bases, classdict)
+
+
+class Controller(object, metaclass=ProviderRegistry):
+    """Protocol agnostic base controller to fulfill CRUD on model classes.
 
     Implementations provide a model class attribute that allow CRUD methods
     to dynamically adapt to the models field an ACL definitions.

@@ -36,15 +36,15 @@ class AuthHandler(
 
     @property
     def _OAUTH_CLIENT_ID(self):
-        return opt.options[self.PROVIDER_ID]['key']
+        return opt.options[self.__provider__]['key']
 
     @property
     def _OAUTH_CLIENT_SECRET(self):
-        return opt.options[self.PROVIDER_ID]['secret']
+        return opt.options[self.__provider__]['secret']
 
     @property
     def _OAUTH_REDIRECT_URI(self):
-        return opt.options[self.PROVIDER_ID]['redirect_uri']
+        return opt.options[self.__provider__]['redirect_uri']
 
     @tornado.gen.coroutine
     def get(self):
@@ -111,7 +111,7 @@ class Soundcloud(AuthHandler):
 
     __controller__ = SoundcloudAuthController
 
-    PROVIDER_ID = 'soundcloud'
+    __provider__ = 'soundcloud'
     _OAUTH_AUTHORIZE_URL = 'https://soundcloud.com/connect'
     _OAUTH_USERINFO_URL = 'https://api.soundcloud.com/me'
     _OAUTH_SCOPE_LIST = []
@@ -125,7 +125,7 @@ class Youtube(AuthHandler):
 
     __controller__ = YoutubeAuthController
 
-    PROVIDER_ID = 'youtube'
+    __provider__ = 'youtube'
     _OAUTH_AUTHORIZE_URL = 'https://accounts.google.com/o/oauth2/auth'
     _OAUTH_USERINFO_URL = ('https://www.googleapis.com/youtube/v3/channels'
                            '?part=snippet&mine=true')

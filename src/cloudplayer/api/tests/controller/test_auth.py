@@ -28,7 +28,8 @@ def test_controller_for_provider_should_reject_invalid_provider_id():
 
 
 class CloudplayerController(AuthController):
-    PROVIDER_ID = 'cloudplayer'
+
+    __provider__ = 'cloudplayer'
     OAUTH_ACCESS_TOKEN_URL = 'cp://auth'
     API_BASE_URL = 'cp://base-api'
     OAUTH_TOKEN_PARAM = 'token-param'

@@ -16,37 +16,29 @@ import tornado.httputil
 import tornado.options as opt
 import tornado.web
 
-from cloudplayer.api.controller import ControllerException
+from cloudplayer.api.controller import ControllerException, ProviderRegistry
 from cloudplayer.api.model.account import Account
+from cloudplayer.api.model.favourite import Favourite
 from cloudplayer.api.model.image import Image
 from cloudplayer.api.model.provider import Provider
 
 from sqlalchemy.orm.session import make_transient_to_detached
 
 
-class AuthController(object):
+class AuthController(object, metaclass=ProviderRegistry):
 
     def __init__(self, db, current_user=None, pubsub=None):
         self.db = db
         self.pubsub = pubsub
         self.current_user = current_user
         self.http_client = tornado.httpclient.AsyncHTTPClient()
-        self.settings = opt.options[self.PROVIDER_ID]
+        self.settings = opt.options[self.__provider__]
         self.account = None
         if current_user:
-            id = current_user.get(self.PROVIDER_ID)
+            id = current_user.get(self.__provider__)
             if id:
-                keys = (id, self.PROVIDER_ID)
+                keys = (id, self.__provider__)
                 self.account = self.db.query(Account).get(keys)
-
-    @staticmethod
-    def for_provider(provider_id, db, current_user=None):
-        if provider_id == 'soundcloud':
-            return SoundcloudAuthController(db, current_user)
-        elif provider_id == 'youtube':
-            return YoutubeAuthController(db, current_user)
-        else:
-            raise ValueError('unsupported provider')
 
     @property
     def _should_refresh(self):
@@ -90,7 +82,7 @@ class AuthController(object):
             provider = self.account.provider
         else:
             provider = Provider()
-            provider.id = self.PROVIDER_ID
+            provider.id = self.__provider__
             make_transient_to_detached(provider)
             provider = self.db.merge(provider, load=False)
 
@@ -105,7 +97,10 @@ class AuthController(object):
         self.account = Account(
             id=str(account_info['id']),
             user_id=self.current_user['user_id'],
-            provider_id=self.PROVIDER_ID)
+            favourite=Favourite(
+                id=str(account_info['id']),
+                provider_id=self.__provider__),
+            provider_id=self.__provider__)
         self.db.add(self.account)
 
     def _update_access_info(self, access_info):
@@ -135,7 +130,7 @@ class AuthController(object):
 
     def update_account(self, access_info, account_info):
         query = self.db.query(Account)
-        self.account = query.get((str(account_info['id']), self.PROVIDER_ID))
+        self.account = query.get((str(account_info['id']), self.__provider__))
         if not self.account:
             self._create_account(account_info)
         self._update_access_info(access_info)
@@ -146,7 +141,7 @@ class AuthController(object):
 
 class SoundcloudAuthController(AuthController):
 
-    PROVIDER_ID = 'soundcloud'
+    __provider__ = 'soundcloud'
     API_BASE_URL = 'https://api.soundcloud.com'
     OAUTH_ACCESS_TOKEN_URL = 'https://api.soundcloud.com/oauth2/token'
     OAUTH_TOKEN_PARAM = 'oauth_token'
@@ -160,7 +155,7 @@ class SoundcloudAuthController(AuthController):
 
 class YoutubeAuthController(AuthController):
 
-    PROVIDER_ID = 'youtube'
+    __provider__ = 'youtube'
     API_BASE_URL = 'https://www.googleapis.com/youtube/v3'
     OAUTH_ACCESS_TOKEN_URL = 'https://www.googleapis.com/oauth2/v4/token'
     OAUTH_TOKEN_PARAM = 'access_token'

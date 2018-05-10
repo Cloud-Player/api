@@ -18,6 +18,13 @@ class SoundcloudEntity(EntityMixin, HTTPHandler):
     SUPPORTED_METHODS = ('GET', 'OPTIONS')
 
 
+class SoundcloudCollection(CollectionMixin, HTTPHandler):
+
+    __controller__ = SoundcloudTrackController
+
+    SUPPORTED_METHODS = ('GET', 'OPTIONS')
+
+
 class YoutubeEntity(EntityMixin, HTTPHandler):
 
     __controller__ = YoutubeTrackController

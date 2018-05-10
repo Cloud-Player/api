@@ -5,7 +5,8 @@
     :copyright: (c) 2018 by Nicolas Drebenstedt
     :license: GPL-3.0, see LICENSE for details
 """
-import functools
+import datetime
+import traceback
 import urllib.parse
 
 import tornado.escape
@@ -14,22 +15,35 @@ import tornado.gen
 from cloudplayer.api.access import Available
 from cloudplayer.api.controller import Controller
 from cloudplayer.api.model.track import Track
-from cloudplayer.api.util import chunk_range
+from cloudplayer.api.util import chunk_range, squeeze
 
 
 class TrackController(Controller):
 
-    @staticmethod
-    def for_provider(provider_id, db, current_user=None):
-        if provider_id == 'soundcloud':
-            return SoundcloudTrackController(db, current_user)
-        elif provider_id == 'youtube':
-            return YoutubeTrackController(db, current_user)
-        else:
-            raise ValueError('unsupported provider')
+    SEARCH_MAX_SIZE = 50
 
 
 class SoundcloudTrackController(TrackController):
+
+    __provider__ = 'soundcloud'
+
+    SEARCH_YOUTUBE_DURATION = {
+        'any': {},
+        'long': {
+            'duration[from]':
+                int(datetime.timedelta(minutes=20).total_seconds() * 1000) + 1
+            },
+        'medium': {
+            'duration[from]':
+                int(datetime.timedelta(minutes=4).total_seconds() * 1000) + 1,
+            'duration[to]':
+                int(datetime.timedelta(minutes=20).total_seconds() * 1000)
+            },
+        'short': {
+            'duration[to]':
+                int(datetime.timedelta(minutes=4).total_seconds() * 1000)
+        }
+    }
 
     @tornado.gen.coroutine
     def read(self, ids, fields=Available):
@@ -42,13 +56,35 @@ class SoundcloudTrackController(TrackController):
         return entity
 
     @tornado.gen.coroutine
-    def search(self, ids, fields=Available):
-        pass
+    def search(self, ids, kw, fields=Available):
+        params = {
+            'q': kw.get('q'),
+            'filter': 'public',
+            'limit': self.SEARCH_MAX_SIZE}
+        if 'duration' in kw:
+            duration = self.SEARCH_YOUTUBE_DURATION.get(kw['duration'], {})
+            params.update(duration.copy())
+        response = yield self.fetch(
+            ids['provider_id'], '/tracks', params=params)
+        track_list = tornado.escape.json_decode(response.body)
+        entities = []
+        account = self.get_account(ids['provider_id'])
+        for track in track_list:
+            try:
+                entity = Track.from_soundcloud(track)
+            except (KeyError, ValueError):
+                traceback.print_exc()
+                continue
+            self.policy.grant_read(account, entity, fields)
+            entities.append(entity)
+        return entities
 
 
 class YoutubeTrackController(TrackController):
 
-    MREAD_YOUTUBE_FIELDS = ''.join("""
+    __provider__ = 'youtube'
+
+    MREAD_YOUTUBE_FIELDS = squeeze("""
         items(
         id,
         snippet(
@@ -67,11 +103,11 @@ class YoutubeTrackController(TrackController):
         player(
             embedWidth,
             embedHeight))
-    """.split())
+    """)
 
-    SEARCH_YOUTUBE_FIELDS = ''.join("""
+    SEARCH_YOUTUBE_FIELDS = squeeze("""
         items/id/videoId
-    """.split())
+    """)
 
     @tornado.gen.coroutine
     def read(self, ids, fields=Available):
@@ -91,9 +127,13 @@ class YoutubeTrackController(TrackController):
             ids['provider_id'], '/videos', params=params)
         track_list = tornado.escape.json_decode(response.body)
         entities = []
+        account = self.get_account(ids['provider_id'])
         for track in track_list['items']:
-            entity = Track.from_youtube(track)
-            account = self.get_account(entity.provider_id)
+            try:
+                entity = Track.from_youtube(track)
+            except (KeyError, ValueError):
+                traceback.print_exc()
+                continue
             self.policy.grant_read(account, entity, fields)
             entities.append(entity)
         return entities
@@ -106,8 +146,12 @@ class YoutubeTrackController(TrackController):
             'type': 'video',
             'videoEmbeddable': 'true',
             'videoSyndicated': 'true',
-            'maxResults': 50,
+            'maxResults': self.SEARCH_MAX_SIZE,
             'fields': self.SEARCH_YOUTUBE_FIELDS}
+        if 'rating' in kw:
+            params['myRating'] = kw['rating']
+        if kw.get('duration') in ('any', 'long', 'medium', 'short'):
+            params['videoDuration'] = kw['duration']
         response = yield self.fetch(
             ids['provider_id'], '/search', params=params)
         search_result = tornado.escape.json_decode(response.body)

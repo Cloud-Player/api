@@ -17,10 +17,10 @@ def gen_token(n, alphabet=string.ascii_lowercase + string.digits):
     return ''.join(urand.choice(alphabet) for i in range(n))
 
 
-def chunk_range(size, chunks=multiprocessing.cpu_count()):
-    """Evenly chunk a range of `size` into given number of `chunks`."""
+def chunk_range(size, min_step=10, chunks=multiprocessing.cpu_count()):
+    """Evenly chunk a range of `size` into `chunks` with `min_step`."""
     size = max(size, 1)
-    step = int(math.ceil(size / max(chunks, 1)))
+    step = max(int(math.ceil(size / max(chunks, 1))), min_step)
     ranges = list(zip(range(0, size, step), range(step, size + step, step)))
     # Inject `None` as a slice operator to catch the last item
     ranges[-1] = (ranges[-1][0], None)

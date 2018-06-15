@@ -32,7 +32,8 @@ class FavouriteItem(TracklistItemMixin, Base):
         )),
         Allow(Owner, Delete),
         Allow(Parent, Query, Fields(
-            'favourite'
+            'favourite_id',
+            'favourite_provider_id'
         ))
     )
     __table_args__ = (

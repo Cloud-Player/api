@@ -88,15 +88,25 @@ class Application(tornado.web.Application):
          r'/(?P<id>[0-9a-zA-Z]+)$',
          'cloudplayer.api.http.favourite.Entity'),
 
-        ((r'^/favourite/(?P<favourite_provider_id>[a-z]+)'
+        ((r'^/favourite/(?P<favourite_provider_id>cloudplayer)'
           r'/(?P<favourite_id>[0-9a-zA-Z]+)'
           r'/item$'),
-         'cloudplayer.api.http.favourite_item.Collection'),
-        ((r'^/favourite/(?P<favourite_provider_id>[a-z]+)'
+         'cloudplayer.api.http.favourite_item.CloudplayerCollection'),
+        ((r'^/favourite/(?P<favourite_provider_id>cloudplayer)'
           r'/(?P<favourite_id>[0-9a-zA-Z]+)'
           r'/item'
           r'/(?P<id>[0-9]+)$'),
-         'cloudplayer.api.http.favourite_item.Entity'),
+         'cloudplayer.api.http.favourite_item.CloudplayerEntity'),
+
+        ((r'^/favourite/(?P<favourite_provider_id>soundcloud)'
+          r'/(?P<favourite_id>[0-9a-zA-Z]+)'
+          r'/item$'),
+         'cloudplayer.api.http.favourite_item.SoundcloudCollection'),
+
+        ((r'^/favourite/(?P<favourite_provider_id>youtube)'
+          r'/(?P<favourite_id>[0-9a-zA-Z]+)'
+          r'/item$'),
+         'cloudplayer.api.http.favourite_item.YoutubeCollection'),
 
         (r'^/provider$',
          'cloudplayer.api.http.provider.Collection'),

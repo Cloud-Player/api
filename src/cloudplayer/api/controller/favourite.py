@@ -20,6 +20,7 @@ class FavouriteController(Controller):
     def read(self, ids, fields=Available):
         if ids['id'] == 'mine':
             account = self.get_account(ids['provider_id'])
-            ids['id'] = account.favourite.id
+            if account:
+                ids['id'] = account.favourite.id
         entity = yield super().read(ids, fields=fields)
         return entity

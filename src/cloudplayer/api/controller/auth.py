@@ -9,6 +9,7 @@ import datetime
 import hashlib
 import urllib
 
+from tornado.log import app_log
 import tornado.escape
 import tornado.gen
 import tornado.httpclient
@@ -66,6 +67,15 @@ class AuthController(object, metaclass=ProviderRegistry):
         self.db.commit()
 
     @tornado.gen.coroutine
+    def _fetch(self, request, **kw):
+        try:
+            response = yield self.http_client.fetch(request, **kw)
+        except tornado.httpclient.HTTPError as error:
+            app_log.warn(error.response.body.decode('utf-8'))
+            raise
+        return response
+
+    @tornado.gen.coroutine
     def fetch(self, path, params=None, **kw):
         if not params:
             params = list()
@@ -90,7 +100,7 @@ class AuthController(object, metaclass=ProviderRegistry):
 
         url = '{}/{}'.format(self.API_BASE_URL, path.lstrip('/'))
         uri = tornado.httputil.url_concat(url, params)
-        response = yield self.http_client.fetch(uri, **kw)
+        response = yield self._fetch(uri, **kw)
         return response
 
     def _create_account(self, account_info):

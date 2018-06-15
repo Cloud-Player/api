@@ -6,6 +6,7 @@
     :license: GPL-3.0, see LICENSE for details
 """
 import datetime
+import itertools
 import traceback
 import urllib.parse
 
@@ -13,21 +14,21 @@ import tornado.escape
 import tornado.gen
 
 from cloudplayer.api.access import Available
-from cloudplayer.api.controller import Controller
+from cloudplayer.api.controller import Controller, ControllerException
 from cloudplayer.api.model.track import Track
 from cloudplayer.api.util import chunk_range, squeeze
 
 
 class TrackController(Controller):
 
-    SEARCH_MAX_SIZE = 50
+    MAX_RESULTS = 50
 
 
 class SoundcloudTrackController(TrackController):
 
     __provider__ = 'soundcloud'
 
-    SEARCH_YOUTUBE_DURATION = {
+    SEARCH_DURATION = {
         'any': {},
         'long': {
             'duration[from]':
@@ -60,9 +61,9 @@ class SoundcloudTrackController(TrackController):
         params = {
             'q': kw.get('q'),
             'filter': 'public',
-            'limit': self.SEARCH_MAX_SIZE}
+            'limit': self.MAX_RESULTS}
         if 'duration' in kw:
-            duration = self.SEARCH_YOUTUBE_DURATION.get(kw['duration'], {})
+            duration = self.SEARCH_DURATION.get(kw['duration'], {})
             params.update(duration.copy())
         response = yield self.fetch(
             ids['provider_id'], '/tracks', params=params)
@@ -84,7 +85,7 @@ class YoutubeTrackController(TrackController):
 
     __provider__ = 'youtube'
 
-    MREAD_YOUTUBE_FIELDS = squeeze("""
+    MREAD_FIELDS = squeeze("""
         items(
         id,
         snippet(
@@ -105,24 +106,31 @@ class YoutubeTrackController(TrackController):
             embedHeight))
     """)
 
-    SEARCH_YOUTUBE_FIELDS = squeeze("""
+    SEARCH_FIELDS = squeeze("""
         items/id/videoId
     """)
 
     @tornado.gen.coroutine
     def read(self, ids, fields=Available):
-        ids['ids'] = [ids.pop('id')]
-        entities = yield self.mread(ids, fields=fields)
+        kw = {'ids': [ids.pop('id')]}
+        entities = yield self.mread(ids, kw, fields=fields)
         if entities:
             return entities[0]
 
     @tornado.gen.coroutine
-    def mread(self, ids, fields=Available):
+    def mread(self, ids, kw, fields=Available):
         params = {
-            'id': ','.join(urllib.parse.quote(i, safe='') for i in ids['ids']),
             'part': 'snippet,contentDetails,player,statistics',
-            'fields': self.MREAD_YOUTUBE_FIELDS,
+            'fields': self.MREAD_FIELDS,
             'maxWidth': '320'}
+        if 'ids' in kw:
+            params['id'] = ','.join(
+                urllib.parse.quote(i, safe='') for i in kw['ids'])
+        elif 'rating' in kw:
+            params['myRating'] = kw['rating']
+            params['maxResults'] = self.MAX_RESULTS
+        else:
+            raise ControllerException(400, 'missing ids or rating')
         response = yield self.fetch(
             ids['provider_id'], '/videos', params=params)
         track_list = tornado.escape.json_decode(response.body)
@@ -146,10 +154,8 @@ class YoutubeTrackController(TrackController):
             'type': 'video',
             'videoEmbeddable': 'true',
             'videoSyndicated': 'true',
-            'maxResults': self.SEARCH_MAX_SIZE,
-            'fields': self.SEARCH_YOUTUBE_FIELDS}
-        if 'rating' in kw:
-            params['myRating'] = kw['rating']
+            'maxResults': self.MAX_RESULTS,
+            'fields': self.SEARCH_FIELDS}
         if kw.get('duration') in ('any', 'long', 'medium', 'short'):
             params['videoDuration'] = kw['duration']
         response = yield self.fetch(
@@ -158,10 +164,9 @@ class YoutubeTrackController(TrackController):
         video_ids = [i['id']['videoId'] for i in search_result['items']]
 
         futures = []
-        for i, j in chunk_range(params['maxResults']):
-            futures.append(self.mread(
-                {'provider_id': ids['provider_id'], 'ids': video_ids[i: j]},
-                fields=fields))
+        for i, j in chunk_range(len(video_ids)):
+            tracks = self.mread(ids, {'ids': video_ids[i: j]}, fields=fields)
+            futures.append(tracks)
 
         entities = yield futures
-        return entities
+        return list(itertools.chain(*entities))

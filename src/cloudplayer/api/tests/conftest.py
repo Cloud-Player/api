@@ -13,10 +13,12 @@ import pytest_redis.factories as redis_factories
 import tornado.escape
 import tornado.gen
 import tornado.options as opt
-from tornado.httpclient import HTTPRequest
+from tornado.httpclient import HTTPRequest, HTTPResponse, HTTPError
 from tornado.websocket import websocket_connect
 
 import cloudplayer.api.app
+from cloudplayer.api.controller.auth import (
+    AuthController, SoundcloudAuthController, YoutubeAuthController)
 
 
 def which(executable):  # pragma: no cover
@@ -200,6 +202,46 @@ def user_cookie(current_user):
         opt.options['jwt_secret'],
         algorithm='HS256').decode('ascii')
     return '{}={};'.format(opt.options['jwt_cookie'], user_jwt)
+
+
+def raw_data(path):
+    directory = os.path.dirname(__file__)
+    path = '{}/{}.json'.format(directory, path.lstrip('/'))
+    with open(path, 'rb') as fh:
+        return io.BytesIO(fh.read())
+
+
+@pytest.fixture(scope='function')
+def expect():
+    def get_expected_json(path):
+        buffer = raw_data('expected/{}'.format(path))
+        return json.load(buffer)
+    return get_expected_json
+
+
+def mock_fetch(provider_id):
+    @tornado.gen.coroutine
+    def fetch(self, request, callback=None, raise_error=True, **kw):
+        if not isinstance(request, HTTPRequest):
+            request = HTTPRequest(url=request, **kw)
+        controller = AuthController.for_provider(provider_id, None, None)
+        request_url = request.url.replace(controller.API_BASE_URL, '')
+        filename = urllib.parse.urlparse(request_url).path.lstrip('/')
+        path = 'upstream/{}/{}'.format(provider_id, filename)
+        try:
+            buffer = raw_data(path)
+        except FileNotFoundError as error:
+            raise HTTPError(404, error.filename)
+        return HTTPResponse(request, 200, buffer=buffer)
+    return fetch
+
+
+@pytest.fixture(scope='function')
+def patch_provider(monkeypatch):
+    sc_fetch = mock_fetch('soundcloud')
+    monkeypatch.setattr(SoundcloudAuthController, '_fetch', sc_fetch)
+    yt_fetch = mock_fetch('youtube')
+    monkeypatch.setattr(YoutubeAuthController, '_fetch', yt_fetch)
 
 
 @pytest.fixture(scope='function')

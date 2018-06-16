@@ -121,6 +121,9 @@ class Application(tornado.web.Application):
         (r'^/token/(?P<id>[0-9a-z]+)$',
          'cloudplayer.api.http.token.Entity'),
 
+        (r'^/track$',
+         'cloudplayer.api.http.track.Collection'),
+
         (r'^/track/(?P<provider_id>soundcloud)$',
          'cloudplayer.api.http.track.SoundcloudCollection'),
         (r'^/track/(?P<provider_id>soundcloud)'

@@ -7,11 +7,13 @@
 """
 import datetime
 import itertools
+import random
 import traceback
 import urllib.parse
 
 import tornado.escape
 import tornado.gen
+import tornado.options as opt
 
 from cloudplayer.api.access import Available
 from cloudplayer.api.controller import Controller, ControllerException
@@ -22,6 +24,23 @@ from cloudplayer.api.util import chunk_range, squeeze
 class TrackController(Controller):
 
     MAX_RESULTS = 50
+
+    async def search(self, ids, kw, fields=Available):
+        futures = []
+        for provider_id in opt.options.providers:
+            try:
+                controller = self.for_provider(
+                    provider_id, self.db, self.current_user)
+            except ValueError:
+                continue
+            local_ids = kw.copy()
+            local_ids['provider_id'] = provider_id
+            future = controller.search(local_ids, kw, fields=fields)
+            futures.append(future)
+        entities = await tornado.gen.multi(futures)
+        tracks = list(itertools.chain(*entities))
+        random.Random(kw.get('q', '')).shuffle(tracks)
+        return tracks
 
 
 class SoundcloudTrackController(TrackController):

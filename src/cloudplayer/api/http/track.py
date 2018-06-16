@@ -6,9 +6,17 @@
     :license: GPL-3.0, see LICENSE for details
 """
 from cloudplayer.api.controller.track import SoundcloudTrackController
+from cloudplayer.api.controller.track import TrackController
 from cloudplayer.api.controller.track import YoutubeTrackController
 from cloudplayer.api.handler import CollectionMixin, EntityMixin
 from cloudplayer.api.http import HTTPHandler
+
+
+class Collection(CollectionMixin, HTTPHandler):
+
+    __controller__ = TrackController
+
+    SUPPORTED_METHODS = ('GET', 'OPTIONS')
 
 
 class SoundcloudEntity(EntityMixin, HTTPHandler):

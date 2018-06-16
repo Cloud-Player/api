@@ -33,7 +33,7 @@ setup(
             'pylint',
             'pytest-cov',
             'pytest-pep8',
-            'pytest-postgresql',
+            'pytest-postgresql==1.3.3',
             'pytest-redis',
             'pytest-remove-stale-bytecode',
             'pytest-timeout',

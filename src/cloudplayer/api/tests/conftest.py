@@ -308,7 +308,8 @@ def user_push(user_ws):
             await conn.write_message(json.dumps(message))
             response = None
             if await_reply is None:
-                response = await conn.read_message()
+                future = conn.read_message()
+                response = await tornado.gen.convert_yielded(future)
                 if response:
                     response = json.loads(response)
                     responses.append(response)

@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='cloudplayer.api',
-    version='0.4.0.dev0',
+    version='0.5.0.dev0',
     author='Nicolas Drebenstedt',
     author_email='hello@cloud-player.io',
     url='https://cloud-player.io',
@@ -24,13 +24,14 @@ setup(
         'redis',
         'setuptools',
         'sqlalchemy',
-        'tornado<5.0'
+        'tornado'
     ],
     extras_require={
         'test': [
+            'asynctest',
             'codecov',
-            'mock',
             'pylint',
+            'pytest-asyncio',
             'pytest-cov',
             'pytest-pep8',
             'pytest-postgresql',

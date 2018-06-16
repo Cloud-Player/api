@@ -1,4 +1,4 @@
-import mock
+from unittest import mock
 
 from cloudplayer.api.access import (Anything, Create, Delete, Query, Read,
                                     Update)

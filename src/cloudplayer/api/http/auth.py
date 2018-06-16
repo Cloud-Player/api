@@ -46,25 +46,23 @@ class AuthHandler(
     def _OAUTH_REDIRECT_URI(self):
         return opt.options[self.__provider__]['redirect_uri']
 
-    @tornado.gen.coroutine
-    def get(self):
+    async def get(self):
         if self.get_argument('code', None) is not None:
             try:
-                yield self.provider_callback()
+                await self.provider_callback()
             except:  # NOQA
                 traceback.print_exc()
             finally:
                 self.redirect('/static/close.html')
         else:
-            yield self.authorize_redirect(
+            await self.authorize_redirect(
                 redirect_uri=self._OAUTH_REDIRECT_URI,
                 client_id=self._OAUTH_CLIENT_ID,
                 scope=self._OAUTH_SCOPE_LIST,
                 response_type=self._OAUTH_RESPONSE_TYPE,
                 extra_params=self._OAUTH_EXTRA_PARAMS)
 
-    @tornado.gen.coroutine
-    def fetch_access(self):
+    async def fetch_access(self):
         """Fetches the authenticated user data upon redirect"""
         body = urllib.parse.urlencode({
             'client_id': self._OAUTH_CLIENT_ID,
@@ -73,28 +71,26 @@ class AuthHandler(
             'grant_type': self._OAUTH_GRANT_TYPE,
             'redirect_uri': self._OAUTH_REDIRECT_URI})
 
-        response = yield self.http_client.fetch(
+        response = await self._fetch(
             self.controller.OAUTH_ACCESS_TOKEN_URL,
             headers={'Content-Type': 'application/x-www-form-urlencoded'},
             method='POST',
             body=body)
         return tornado.escape.json_decode(response.body)
 
-    @tornado.gen.coroutine
-    def fetch_account(self, access_info):
+    async def fetch_account(self, access_info):
         uri = tornado.httputil.url_concat(
             self._OAUTH_USERINFO_URL,
             {'access_token': True,
              self.controller.OAUTH_TOKEN_PARAM: access_info['access_token']})
-        response = yield self.http_client.fetch(uri)
+        response = await self._fetch(uri)
         return tornado.escape.json_decode(response.body)
 
-    @tornado.gen.coroutine
-    def provider_callback(self):
+    async def provider_callback(self):
         # exchange oauth code for access_token
-        access_info = yield self.fetch_access()
+        access_info = await self.fetch_access()
         # retrieve account info using access_token
-        account_info = yield self.fetch_account(access_info)
+        account_info = await self.fetch_account(access_info)
         # update or create a new account for this provider
         self.controller.update_account(access_info, account_info)
 

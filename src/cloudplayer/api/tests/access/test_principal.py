@@ -1,4 +1,4 @@
-import mock
+from unittest import mock
 
 from cloudplayer.api.model.account import Account
 from cloudplayer.api.access.principal import (Child, Everyone, Owner, Parent,

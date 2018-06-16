@@ -8,7 +8,6 @@
 import redis
 import tornado.auth
 import tornado.escape
-import tornado.gen
 import tornado.httputil
 import tornado.web
 from tornado.log import app_log, gen_log
@@ -90,36 +89,30 @@ class EntityMixin(ControllerHandlerMixin):
 
     SUPPORTED_METHODS = ('GET', 'PUT', 'PATCH', 'DELETE', 'SUB', 'UNSUB')
 
-    @tornado.gen.coroutine
-    def get(self, **ids):
-        entity = yield self.controller.read(ids)
-        yield self.write(entity)
+    async def get(self, **ids):
+        entity = await self.controller.read(ids)
+        self.write(entity)
 
-    @tornado.gen.coroutine
-    def put(self, **ids):
-        entity = yield self.controller.update(ids, self.body)
-        yield self.write(entity)
+    async def put(self, **ids):
+        entity = await self.controller.update(ids, self.body)
+        self.write(entity)
 
-    @tornado.gen.coroutine
-    def patch(self, **ids):
-        entity = yield self.controller.update(ids, self.body)
-        yield self.write(entity)
+    async def patch(self, **ids):
+        entity = await self.controller.update(ids, self.body)
+        self.write(entity)
 
-    @tornado.gen.coroutine
-    def delete(self, **ids):
-        yield self.controller.delete(ids)
+    async def delete(self, **ids):
+        await self.controller.delete(ids)
         self.set_status(204)
         self.finish()
 
-    @tornado.gen.coroutine
-    def sub(self, **ids):
-        yield self.controller.sub(ids, {self.request.channel: self.forward})
+    async def sub(self, **ids):
+        await self.controller.sub(ids, {self.request.channel: self.forward})
         self.set_status(204)
         self.finish()
 
-    @tornado.gen.coroutine
-    def unsub(self, **ids):
-        yield self.controller.unsub(ids, {self.request.channel: None})
+    async def unsub(self, **ids):
+        await self.controller.unsub(ids, {self.request.channel: None})
         self.set_status(204)
         self.finish()
 
@@ -128,13 +121,11 @@ class CollectionMixin(ControllerHandlerMixin):
 
     SUPPORTED_METHODS = ('GET', 'POST')
 
-    @tornado.gen.coroutine
-    def get(self, **ids):
+    async def get(self, **ids):
         query = dict(self.query_params)
-        entities = yield self.controller.search(ids, query)
-        yield self.write(entities)
+        entities = await self.controller.search(ids, query)
+        self.write(entities)
 
-    @tornado.gen.coroutine
-    def post(self, **ids):
-        entity = yield self.controller.create(ids, self.body)
-        yield self.write(entity)
+    async def post(self, **ids):
+        entity = await self.controller.create(ids, self.body)
+        self.write(entity)

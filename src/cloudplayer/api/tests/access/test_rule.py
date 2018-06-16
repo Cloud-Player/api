@@ -1,6 +1,6 @@
+from unittest import mock
 import itertools
 
-import mock
 import pytest
 
 from cloudplayer.api.access.action import Anything

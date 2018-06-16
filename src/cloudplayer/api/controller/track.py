@@ -46,9 +46,8 @@ class SoundcloudTrackController(TrackController):
         }
     }
 
-    @tornado.gen.coroutine
-    def read(self, ids, fields=Available):
-        response = yield self.fetch(
+    async def read(self, ids, fields=Available):
+        response = await self.fetch(
             ids['provider_id'], '/tracks/{}'.format(ids['id']))
         track = tornado.escape.json_decode(response.body)
         entity = Track.from_soundcloud(track)
@@ -56,8 +55,7 @@ class SoundcloudTrackController(TrackController):
         self.policy.grant_read(account, entity, fields)
         return entity
 
-    @tornado.gen.coroutine
-    def search(self, ids, kw, fields=Available):
+    async def search(self, ids, kw, fields=Available):
         params = {
             'q': kw.get('q'),
             'filter': 'public',
@@ -65,7 +63,7 @@ class SoundcloudTrackController(TrackController):
         if 'duration' in kw:
             duration = self.SEARCH_DURATION.get(kw['duration'], {})
             params.update(duration.copy())
-        response = yield self.fetch(
+        response = await self.fetch(
             ids['provider_id'], '/tracks', params=params)
         track_list = tornado.escape.json_decode(response.body)
         entities = []
@@ -110,15 +108,13 @@ class YoutubeTrackController(TrackController):
         items/id/videoId
     """)
 
-    @tornado.gen.coroutine
-    def read(self, ids, fields=Available):
+    async def read(self, ids, fields=Available):
         kw = {'ids': [ids.pop('id')]}
-        entities = yield self.mread(ids, kw, fields=fields)
+        entities = await self.mread(ids, kw, fields=fields)
         if entities:
             return entities[0]
 
-    @tornado.gen.coroutine
-    def mread(self, ids, kw, fields=Available):
+    async def mread(self, ids, kw, fields=Available):
         params = {
             'part': 'snippet,contentDetails,player,statistics',
             'fields': self.MREAD_FIELDS,
@@ -131,7 +127,7 @@ class YoutubeTrackController(TrackController):
             params['maxResults'] = self.MAX_RESULTS
         else:
             raise ControllerException(400, 'missing ids or rating')
-        response = yield self.fetch(
+        response = await self.fetch(
             ids['provider_id'], '/videos', params=params)
         track_list = tornado.escape.json_decode(response.body)
         entities = []
@@ -146,8 +142,7 @@ class YoutubeTrackController(TrackController):
             entities.append(entity)
         return entities
 
-    @tornado.gen.coroutine
-    def search(self, ids, kw, fields=Available):
+    async def search(self, ids, kw, fields=Available):
         params = {
             'q': kw.get('q'),
             'part': 'snippet',
@@ -158,7 +153,7 @@ class YoutubeTrackController(TrackController):
             'fields': self.SEARCH_FIELDS}
         if kw.get('duration') in ('any', 'long', 'medium', 'short'):
             params['videoDuration'] = kw['duration']
-        response = yield self.fetch(
+        response = await self.fetch(
             ids['provider_id'], '/search', params=params)
         search_result = tornado.escape.json_decode(response.body)
         video_ids = [i['id']['videoId'] for i in search_result['items']]
@@ -168,5 +163,5 @@ class YoutubeTrackController(TrackController):
             tracks = self.mread(ids, {'ids': video_ids[i: j]}, fields=fields)
             futures.append(tracks)
 
-        entities = yield futures
+        entities = await tornado.gen.multi(futures)
         return list(itertools.chain(*entities))

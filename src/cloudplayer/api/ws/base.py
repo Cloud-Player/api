@@ -12,7 +12,6 @@ import time
 from tornado.log import app_log
 from tornado.escape import _unicode
 import tornado.concurrent
-import tornado.gen
 import tornado.websocket
 import tornado.httputil
 import tornado.routing
@@ -95,15 +94,14 @@ class WSBase(object):
         self._status_code = 200
         self._reason = None
 
-    @tornado.gen.coroutine
-    def __call__(self):
+    async def __call__(self):
         if self.request.method.upper() not in self.SUPPORTED_METHODS:
             raise WSException(405, 'method not allowed')
 
         method = getattr(self, self.request.method.lower())
-        result = yield method(*self.path_args, **self.path_kwargs)
+        result = await method(*self.path_args, **self.path_kwargs)
         if result is not None:
-            result = yield result
+            result = await result
 
     def decode_argument(self, value, name=None):
         try:
@@ -169,6 +167,5 @@ class WSHandler(HandlerMixin, WSBase):
 
 class WSFallback(WSHandler):
 
-    @tornado.gen.coroutine
-    def get(self, **kw):
+    async def get(self, **kw):
         raise WSException(404, 'channel not found')

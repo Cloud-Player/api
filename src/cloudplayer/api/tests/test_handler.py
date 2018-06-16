@@ -1,9 +1,9 @@
+from unittest import mock
 import sys
 
-import mock
+import asynctest
 import pytest
 import tornado.httpclient
-import tornado.gen
 
 import cloudplayer.api.handler
 from cloudplayer.api import APIException
@@ -52,7 +52,7 @@ def test_handler_mixin_should_close_db_on_finish(app):
 
 def test_handler_should_write_errors_to_out_proto():
     class Handler(HandlerMixin):
-        write = mock.MagicMock()
+        write = asynctest.MagicMock()
         _reason = 'we-are-not-gonna-take-it'
 
     Handler().write_error(418)
@@ -60,8 +60,8 @@ def test_handler_should_write_errors_to_out_proto():
         {'status_code': 418, 'reason': Handler._reason})
 
 
-@pytest.mark.gen_test
-def test_handler_should_log_api_exceptions(req, monkeypatch, base_url):
+@pytest.mark.asyncio
+async def test_handler_should_log_api_exceptions(req, monkeypatch, base_url):
     class Handler(HandlerMixin):
         request = req
 
@@ -78,8 +78,9 @@ def test_handler_should_log_api_exceptions(req, monkeypatch, base_url):
     assert expected == (cargs[0] % cargs[1:])
 
 
-@pytest.mark.gen_test
-def test_handler_should_log_arbitrary_exceptions(req, monkeypatch, base_url):
+@pytest.mark.asyncio
+async def test_handler_should_log_arbitrary_exceptions(
+        req, monkeypatch, base_url):
     class Handler(HandlerMixin):
         request = req
 
@@ -125,7 +126,6 @@ class DummyHandler(object):
         self.pubsub = None
         self.current_user = None
 
-    @tornado.gen.coroutine
     def write(self, chunk):
         self.written = chunk
 
@@ -143,44 +143,43 @@ class DummyController(object):
         self.pubsub = pubsub
         self.current_user = current_user
 
-    @tornado.gen.coroutine
-    def mirror(self, ids, body=None):
+    async def mirror(self, ids, body=None):
         return {'ids': ids, 'body': body}
 
     create = read = update = delete = search = mirror
 
 
-@pytest.mark.gen_test
-def test_entity_mixin_reads_ids_from_controller():
+@pytest.mark.asyncio
+async def test_entity_mixin_reads_ids_from_controller():
     handler = type('Reader', (EntityMixin, DummyHandler), {})(DummyController)
     ids = {'pkey': 'foo', 'fkey': 'bar'}
-    yield handler.get(**ids)
+    await handler.get(**ids)
     assert handler.written['ids'] == ids
 
 
-@pytest.mark.gen_test
-def test_entity_mixin_updates_body_for_ids_on_controller():
+@pytest.mark.asyncio
+async def test_entity_mixin_updates_body_for_ids_on_controller():
     handler = type('Updater', (EntityMixin, DummyHandler), {
         'body': '42'})(DummyController)
     ids = {'pkey': 'foo', 'fkey': 'bar'}
-    yield handler.put(**ids)
+    await handler.put(**ids)
     assert handler.written['ids'] == ids
 
 
-@pytest.mark.gen_test
-def test_entity_mixin_patches_body_for_ids_on_controller():
+@pytest.mark.asyncio
+async def test_entity_mixin_patches_body_for_ids_on_controller():
     handler = type('Patcher', (EntityMixin, DummyHandler), {
         'body': '42'})(DummyController)
     ids = {'pkey': 'foo', 'fkey': 'bar'}
-    yield handler.patch(**ids)
+    await handler.patch(**ids)
     assert handler.written['ids'] == ids
 
 
-@pytest.mark.gen_test
-def test_entity_mixin_deletes_entity_by_ids():
+@pytest.mark.asyncio
+async def test_entity_mixin_deletes_entity_by_ids():
     handler = type('Deleter', (EntityMixin, DummyHandler), {})(DummyController)
     ids = {'pkey': 'foo', 'fkey': 'bar'}
-    yield handler.delete(**ids)
+    await handler.delete(**ids)
     assert handler.status == 204
     assert handler.finished
 
@@ -190,21 +189,21 @@ def test_collection_mixin_supports_only_valid_methods():
     assert set(CollectionMixin.SUPPORTED_METHODS) == methods
 
 
-@pytest.mark.gen_test
-def test_collection_mixin_creates_new_entities():
+@pytest.mark.asyncio
+async def test_collection_mixin_creates_new_entities():
     handler = type('Creator', (CollectionMixin, DummyHandler), {
         'body': {'attrib': '73'}})(DummyController)
     ids = {'fkey': 'foo'}
-    yield handler.post(**ids)
+    await handler.post(**ids)
     assert handler.written['ids'] == ids
     assert handler.written['body'] == {'attrib': '73'}
 
 
-@pytest.mark.gen_test
-def test_collection_mixin_searches_controller():
+@pytest.mark.asyncio
+async def test_collection_mixin_searches_controller():
     handler = type('Searcher', (CollectionMixin, DummyHandler), {
         'query_params': {'q': '42'}})(DummyController)
     ids = {'fkey': 'foo'}
-    yield handler.get(**ids)
+    await handler.get(**ids)
     assert handler.written['ids'] == ids
     assert handler.written['body'] == {'q': '42'}

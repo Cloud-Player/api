@@ -1,14 +1,13 @@
+from unittest import mock
 import json
 
-import mock
 import pytest
-import tornado.gen
 
 from cloudplayer.api.controller import Controller
 
 
-@pytest.mark.gen_test
-def test_track_comment_http_handler_should_transform_and_output_comments(
+@pytest.mark.asyncio
+async def test_track_comment_http_handler_should_convert_and_output_comments(
         user_fetch, monkeypatch):
     response = [{
         'id': 412581320,
@@ -38,13 +37,12 @@ def test_track_comment_http_handler_should_transform_and_output_comments(
             'avatar_url': 'https://host.img/92-large.jpg'}
     }]
 
-    @tornado.gen.coroutine
-    def fetch(self, *args, **kw):
+    async def fetch(self, *args, **kw):
         return mock.Mock(body=json.dumps(response))
 
     monkeypatch.setattr(Controller, 'fetch', fetch)
 
-    response = yield user_fetch('/track/soundcloud/28907786/comment')
+    response = await user_fetch('/track/soundcloud/28907786/comment')
     assert response.json() == [{
         'account': {
             'id': '1580910',

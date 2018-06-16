@@ -4,10 +4,10 @@ from cloudplayer.api.model.playlist import Playlist
 from cloudplayer.api.model.playlist_item import PlaylistItem
 
 
-@pytest.mark.gen_test
-def test_playlist_can_be_created(user_fetch, account):
+@pytest.mark.asyncio
+async def test_playlist_can_be_created(user_fetch, account):
     body = {'title': 'test playlist'}
-    response = yield user_fetch(
+    response = await user_fetch(
         '/playlist/cloudplayer', method='POST', body=body)
     result = response.json()
     assert result['account_id'] == account.id
@@ -16,18 +16,18 @@ def test_playlist_can_be_created(user_fetch, account):
     assert result['description'] is None
 
 
-@pytest.mark.gen_test
-def test_playlist_can_be_deleted_without_tracks(user_fetch):
+@pytest.mark.asyncio
+async def test_playlist_can_be_deleted_without_tracks(user_fetch):
     body = {'title': 'test playlist'}
-    response = yield user_fetch(
+    response = await user_fetch(
         '/playlist/cloudplayer', method='POST', body=body)
-    response = yield user_fetch('/playlist/cloudplayer/{}'.format(
+    response = await user_fetch('/playlist/cloudplayer/{}'.format(
         response.json()['id']), method='DELETE')
     assert response.code == 204
 
 
-@pytest.mark.gen_test
-def test_playlist_can_be_deleted_with_cascading_tracks(
+@pytest.mark.asyncio
+async def test_playlist_can_be_deleted_with_cascading_tracks(
         db, user_fetch, account):
     item = PlaylistItem(
         account=account,
@@ -45,7 +45,7 @@ def test_playlist_can_be_deleted_with_cascading_tracks(
     item_ids = (item.id,)
     playlist_ids = (playlist.id, playlist.provider_id)
 
-    response = yield user_fetch(
+    response = await user_fetch(
         '/playlist/cloudplayer/{}'.format(playlist.id), method='DELETE')
     assert response.code == 204
 

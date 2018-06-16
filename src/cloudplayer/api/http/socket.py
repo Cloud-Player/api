@@ -7,7 +7,6 @@
 """
 import json
 
-import tornado.gen
 import tornado.ioloop
 from tornado.websocket import WebSocketHandler
 
@@ -25,8 +24,7 @@ class Handler(HTTPHandler, WebSocketHandler):
         self.listener = tornado.ioloop.PeriodicCallback(self.listen, 100)
         self.listener.start()
 
-    @tornado.gen.coroutine
-    def on_message(self, message):
+    async def on_message(self, message):
         try:
             message = json.loads(message)
             assert isinstance(message, dict)
@@ -42,7 +40,7 @@ class Handler(HTTPHandler, WebSocketHandler):
         delegate = self.application.find_handler(request)
         handler = delegate.request_callback(self.application, request)
         try:
-            yield handler()
+            await handler()
         except Exception as exception:
             handler._handle_request_exception(exception)
         else:

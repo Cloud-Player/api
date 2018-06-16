@@ -7,7 +7,7 @@
 """
 import datetime
 
-import tornado.gen
+import tornado.escape
 
 from cloudplayer.api.access import Available
 from cloudplayer.api.controller import Controller
@@ -20,9 +20,8 @@ class SoundcloudTrackCommentController(Controller):
 
     DATE_FORMAT = '%Y/%m/%d %H:%M:%S %z'
 
-    @tornado.gen.coroutine
-    def search(self, ids, kw, fields=Available):
-        response = yield self.fetch(
+    async def search(self, ids, kw, fields=Available):
+        response = await self.fetch(
             ids['track_provider_id'],
             '/tracks/{}/comments'.format(ids['track_id']))
         comments = tornado.escape.json_decode(response.body)

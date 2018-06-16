@@ -46,15 +46,14 @@ class AuthController(object, metaclass=ProviderRegistry):
         now = datetime.datetime.utcnow()
         return self.account.token_expiration - now < datetime.timedelta(0)
 
-    @tornado.gen.coroutine
-    def _refresh_access(self):
+    async def _refresh_access(self):
         body = urllib.parse.urlencode({
             'client_id': self.settings['key'],
             'client_secret': self.settings['secret'],
             'grant_type': 'refresh_token',
             'refresh_token': self.account.refresh_token})
 
-        response = yield self.http_client.fetch(
+        response = await self._fetch(
             self.OAUTH_ACCESS_TOKEN_URL,
             method='POST', body=body, raise_error=False)
         if response.error:
@@ -66,17 +65,16 @@ class AuthController(object, metaclass=ProviderRegistry):
         self.db.add(self.account)
         self.db.commit()
 
-    @tornado.gen.coroutine
-    def _fetch(self, request, **kw):
+    async def _fetch(self, request, **kw):
         try:
-            response = yield self.http_client.fetch(request, **kw)
+            future = self.http_client.fetch(request, **kw)
+            response = await tornado.gen.convert_yielded(future)
         except tornado.httpclient.HTTPError as error:
             app_log.warn(error.response.body.decode('utf-8'))
             raise
         return response
 
-    @tornado.gen.coroutine
-    def fetch(self, path, params=None, **kw):
+    async def fetch(self, path, params=None, **kw):
         if not params:
             params = list()
         elif isinstance(params, dict):
@@ -84,7 +82,7 @@ class AuthController(object, metaclass=ProviderRegistry):
 
         if self.account:
             if self._should_refresh:
-                yield self._refresh_access()
+                await self._refresh_access()
 
             if self.account.access_token:
                 params.append(
@@ -100,7 +98,7 @@ class AuthController(object, metaclass=ProviderRegistry):
 
         url = '{}/{}'.format(self.API_BASE_URL, path.lstrip('/'))
         uri = tornado.httputil.url_concat(url, params)
-        response = yield self._fetch(uri, **kw)
+        response = await self._fetch(uri, **kw)
         return response
 
     def _create_account(self, account_info):
@@ -171,8 +169,7 @@ class YoutubeAuthController(AuthController):
     OAUTH_TOKEN_PARAM = 'access_token'
     OAUTH_CLIENT_KEY = 'key'
 
-    @tornado.gen.coroutine
-    def fetch(self, path, params=None, headers=None, **kw):
+    async def fetch(self, path, params=None, headers=None, **kw):
         if not params:
             params = list()
         elif isinstance(params, dict):
@@ -188,7 +185,7 @@ class YoutubeAuthController(AuthController):
         headers['Referer'] = '{}://{}'.format(
             opt.options['public_scheme'], opt.options['public_domain'])
 
-        response = yield super().fetch(
+        response = await super().fetch(
             path, params=params, headers=headers, **kw)
         return response
 

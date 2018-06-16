@@ -7,8 +7,6 @@
 """
 import datetime
 
-import tornado.gen
-
 from cloudplayer.api.access import Available
 from cloudplayer.api.controller import Controller, ControllerException
 from cloudplayer.api.model.token import Token
@@ -18,8 +16,7 @@ class TokenController(Controller):
 
     __model__ = Token
 
-    @tornado.gen.coroutine
-    def read(self, ids, fields=Available):
+    async def read(self, ids, fields=Available):
         threshold = datetime.datetime.utcnow() - datetime.timedelta(minutes=5)
         query = self.db.query(
             self.__model__).filter_by(**ids).filter(Token.created > threshold)
@@ -38,8 +35,7 @@ class TokenController(Controller):
             self.db.commit()
         return entity
 
-    @tornado.gen.coroutine
-    def update(self, ids, kw, fields=Available):
+    async def update(self, ids, kw, fields=Available):
         token = {
             'id': ids['id'],
             'claimed': True,
@@ -47,5 +43,4 @@ class TokenController(Controller):
             'account_provider_id': 'cloudplayer'}
         if kw != token:
             raise ControllerException(404, 'invalid update')
-        entity = yield super().update(ids, kw, fields=fields)
-        return entity
+        return await super().update(ids, kw, fields=fields)

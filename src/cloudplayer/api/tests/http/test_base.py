@@ -1,6 +1,6 @@
+from unittest import mock
 import http.cookies
 
-import mock
 import pytest
 import tornado.web
 
@@ -22,9 +22,9 @@ def test_http_handler_stores_init_vars(app, req):
     assert handler.original_user is None
 
 
-@pytest.mark.gen_test
-def test_http_handler_should_set_default_headers(http_client, base_url):
-    response = yield http_client.fetch('{}/health_check'.format(base_url))
+@pytest.mark.asyncio
+async def test_http_handler_should_set_default_headers(http_client, base_url):
+    response = await http_client.fetch('{}/health_check'.format(base_url))
     headers = dict(response.headers)
     headers.pop('X-Http-Reason', None)
     assert headers.pop('Date')
@@ -44,9 +44,9 @@ def test_http_handler_should_set_default_headers(http_client, base_url):
         'Server': 'cloudplayer'}
 
 
-@pytest.mark.gen_test
-def test_http_handler_should_set_new_user_cookie(http_client, base_url):
-    response = yield http_client.fetch('{}/user/me'.format(base_url))
+@pytest.mark.asyncio
+async def test_http_handler_should_set_new_user_cookie(http_client, base_url):
+    response = await http_client.fetch('{}/user/me'.format(base_url))
     headers = dict(response.headers)
     cookie = http.cookies.SimpleCookie(headers.pop('Set-Cookie'))['tok_v1']
     assert cookie['domain'] == 'localhost'
@@ -55,26 +55,27 @@ def test_http_handler_should_set_new_user_cookie(http_client, base_url):
     assert cookie['expires']
 
 
-@pytest.mark.gen_test
-def test_http_fallback_throws_404_for_get_405_for_others(app, req):
+@pytest.mark.asyncio
+async def test_http_fallback_throws_404_for_get_405_for_others(app, req):
     handler = HTTPFallback(app, req)
     with pytest.raises(tornado.web.HTTPError) as error:
-        yield handler.get()
+        await handler.get()
     assert error.value.status_code == 404
 
     with pytest.raises(tornado.web.HTTPError) as error:
-        yield handler.post()
+        await handler.post()
     assert error.value.status_code == 405
 
 
-@pytest.mark.gen_test
-def test_http_health_should_query_redis_and_postgres(app, req, monkeypatch):
+@pytest.mark.asyncio
+async def test_http_health_should_query_redis_and_postgres(
+        app, req, monkeypatch):
     handler = HTTPHealth(app, req)
     info = mock.MagicMock()
     monkeypatch.setattr(handler.cache, 'info', info)
     execute = mock.MagicMock()
     monkeypatch.setattr(handler.db, 'execute', execute)
     handler._transforms = []
-    yield handler.get()
+    await handler.get()
     info.assert_called_once_with('server')
     execute.assert_called_once_with('SELECT 1 = 1;')

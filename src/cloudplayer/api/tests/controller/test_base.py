@@ -1,9 +1,10 @@
-import mock
+from unittest import mock
+
+import asynctest
+import pytest
 import sqlalchemy.orm.util
-import tornado.gen
 
 import cloudplayer.api.controller.auth
-import pytest
 from cloudplayer.api.access import Fields
 from cloudplayer.api.controller.base import (Controller, ControllerException,
                                              ProviderRegistry)
@@ -69,28 +70,29 @@ class MyController(Controller):
         self.policy = policy
 
 
-def test_base_controller_should_delegate_provider_fetches_to_auth_controllers(
+@pytest.mark.asyncio
+async def test_base_controller_should_delegate_provider_fetches_to_auth_ctrls(
         db, current_user, monkeypatch):
-    controller = MyController(db, current_user, mock.Mock(), mock.Mock())
-    fetch = mock.MagicMock()
-    mock_auth_controller = mock.Mock(
-        fetch=tornado.gen.coroutine(fetch))
+    controller = MyController(
+        db, current_user, mock.Mock(), mock.Mock())
+    fetch = asynctest.CoroutineMock()
+    mock_auth_controller = mock.Mock(fetch=fetch)
     for_provider = mock.MagicMock(return_value=mock_auth_controller)
     monkeypatch.setattr(cloudplayer.api.controller.auth.AuthController,
                         'for_provider', for_provider)
     params = [('sort', True)]
-    controller.fetch('foo', '/path', params=params)
+    await controller.fetch('foo', '/path', params=params)
     for_provider.assert_called_once_with('foo', db, current_user)
     fetch.assert_called_once_with('/path', params=params)
 
 
-@pytest.mark.gen_test
-def test_controller_should_create_entity_and_read_result(
+@pytest.mark.asyncio
+async def test_controller_should_create_entity_and_read_result(
         db, current_user, account, user):
     controller = MyController(db, current_user, Account, mock.Mock())
     ids = {'id': '1234', 'provider_id': 'cloudplayer'}
     kw = {'title': 'foo', 'access_token': 'bar', 'user_id': user.id}
-    entity = yield controller.create(ids, kw, Fields('id', 'title'))
+    entity = await controller.create(ids, kw, Fields('id', 'title'))
     assert entity.id == '1234'
     assert entity.provider_id == 'cloudplayer'
     assert entity.title == 'foo'
@@ -108,19 +110,19 @@ def test_controller_should_create_entity_and_read_result(
         'id', 'title'}
 
 
-@pytest.mark.gen_test
-def test_controller_should_raise_bad_request_on_unknown_fields(
+@pytest.mark.asyncio
+async def test_controller_should_raise_bad_request_on_unknown_fields(
         db, current_user, user):
     controller = MyController(db, current_user, Account, mock.Mock())
     ids = {'id': '1234', 'provider_id': 'cloudplayer'}
     kw = {'title': 'is-good', 'foo': 'type-error', 'user_id': user.id}
     with pytest.raises(ControllerException) as error:
-        yield controller.create(ids, kw)
+        await controller.create(ids, kw)
     assert error.value.status_code == 400
 
 
-@pytest.mark.gen_test
-def test_controller_should_raise_bad_request_on_missing_not_null(
+@pytest.mark.asyncio
+async def test_controller_should_raise_bad_request_on_missing_not_null(
         db, current_user, monkeypatch):
     from sqlalchemy.sql import crud  # Silence warnings
     monkeypatch.setattr(crud.util, 'warn', mock.MagicMock())
@@ -128,37 +130,37 @@ def test_controller_should_raise_bad_request_on_missing_not_null(
     ids = {'provider_id': 'cloudplayer', 'id': '3456'}
     kw = {'title': 'is-good'}
     with pytest.raises(ControllerException) as error:
-        yield controller.create(ids, kw)
+        await controller.create(ids, kw)
     assert error.value.status_code == 400
 
 
-@pytest.mark.gen_test
-def test_controller_should_raise_bad_request_on_mismatching_account_info(
+@pytest.mark.asyncio
+async def test_controller_should_raise_bad_request_on_mismatching_account_info(
         db, current_user, user, monkeypatch):
     controller = MyController(db, current_user, Playlist, mock.Mock())
     ids = {'provider_id': 'cloudplayer'}
     kw = {'title': 'is-good', 'user_id': current_user['user_id']}
     with pytest.raises(ControllerException) as error:
-        yield controller.create(ids, kw)
+        await controller.create(ids, kw)
     assert error.value.status_code == 400
 
 
-@pytest.mark.gen_test
-def test_controller_should_raise_not_found_on_failed_read(
+@pytest.mark.asyncio
+async def test_controller_should_raise_not_found_on_failed_read(
         db, current_user):
     controller = MyController(db, current_user, Account, mock.Mock())
     ids = {'id': 'does-not-exist', 'provider_id': 'unheard-of'}
     with pytest.raises(ControllerException) as error:
-        yield controller.read(ids)
+        await controller.read(ids)
     assert error.value.status_code == 404
 
 
-@pytest.mark.gen_test
-def test_controller_should_read_entity_by_the_books(
+@pytest.mark.asyncio
+async def test_controller_should_read_entity_by_the_books(
         db, current_user, account):
     controller = MyController(db, current_user, Account, mock.Mock())
     ids = {'id': account.id, 'provider_id': account.provider_id}
-    entity = yield controller.read(ids, Fields('title', 'provider_id'))
+    entity = await controller.read(ids, Fields('title', 'provider_id'))
     assert entity is account
 
     assert controller.policy.grant_read.call_args[0][:-1] == (
@@ -167,24 +169,24 @@ def test_controller_should_read_entity_by_the_books(
         'provider_id', 'title'}
 
 
-@pytest.mark.gen_test
-def test_controller_should_raise_not_found_on_failed_update(
+@pytest.mark.asyncio
+async def test_controller_should_raise_not_found_on_failed_update(
         db, current_user):
     controller = MyController(db, current_user, Account, mock.Mock())
     ids = {'id': 'does-not-exist', 'provider_id': 'unheard-of'}
     kw = {'title': 'foo', 'refresh_token': 'bar'}
     with pytest.raises(ControllerException) as error:
-        yield controller.update(ids, kw, Fields('user_id', 'title'))
+        await controller.update(ids, kw, Fields('user_id', 'title'))
     assert error.value.status_code == 404
 
 
-@pytest.mark.gen_test
-def test_controller_should_update_entity_and_read_result(
+@pytest.mark.asyncio
+async def test_controller_should_update_entity_and_read_result(
         db, current_user, account):
     controller = MyController(db, current_user, Account, mock.Mock())
     ids = {'id': account.id, 'provider_id': account.provider_id}
     kw = {'title': 'foo', 'refresh_token': 'bar'}
-    entity = yield controller.update(ids, kw, Fields('user_id', 'title'))
+    entity = await controller.update(ids, kw, Fields('user_id', 'title'))
     assert entity is account
     assert sqlalchemy.orm.util.object_state(entity).persistent
 
@@ -199,22 +201,22 @@ def test_controller_should_update_entity_and_read_result(
         'user_id', 'title'}
 
 
-@pytest.mark.gen_test
-def test_controller_should_raise_not_found_on_failed_delete(
+@pytest.mark.asyncio
+async def test_controller_should_raise_not_found_on_failed_delete(
         db, current_user):
     controller = MyController(db, current_user, Account, mock.Mock())
     ids = {'id': 'does-not-exist', 'provider_id': 'unheard-of'}
     with pytest.raises(ControllerException) as error:
-        yield controller.delete(ids)
+        await controller.delete(ids)
     assert error.value.status_code == 404
 
 
-@pytest.mark.gen_test
-def test_controller_should_delete_entity_and_not_return_anything(
+@pytest.mark.asyncio
+async def test_controller_should_delete_entity_and_not_return_anything(
         db, current_user, account):
     controller = MyController(db, current_user, Account, mock.Mock())
     ids = {'id': account.id, 'provider_id': account.provider_id}
-    result = yield controller.delete(ids)
+    result = await controller.delete(ids)
     assert result is None
     assert sqlalchemy.orm.util.object_state(account).was_deleted
 
@@ -222,13 +224,13 @@ def test_controller_should_delete_entity_and_not_return_anything(
         account, account)
 
 
-@pytest.mark.gen_test
-def test_controller_should_produce_model_query_with_arguments(
+@pytest.mark.asyncio
+async def test_controller_should_produce_model_query_with_arguments(
         db, current_user, account):
     controller = MyController(db, current_user, Account, mock.Mock())
     ids = {'provider_id': 'cloudplayer'}
     kw = {'title': 'foo'}
-    query = yield controller.query(ids, kw)
+    query = await controller.query(ids, kw)
     assert query.statement.froms[0].name == 'account'
     assert str(query.whereclause) == (
         'account.title = :title_1 AND account.provider_id = :provider_id_1')
@@ -239,12 +241,12 @@ def test_controller_should_produce_model_query_with_arguments(
         'title', 'provider_id'}
 
 
-@pytest.mark.gen_test
-def test_controller_should_search_using_query_and_read_all_entities(
+@pytest.mark.asyncio
+async def test_controller_should_search_using_query_and_read_all_entities(
         db, current_user, account):
     controller = MyController(db, current_user, Account, mock.Mock())
     ids = {'id': account.id, 'provider_id': account.provider_id}
-    entities = yield controller.search(ids, {}, Fields('id'))
+    entities = await controller.search(ids, {}, Fields('id'))
 
     assert controller.policy.grant_read.call_args[0][:-1] == (
         account, entities)

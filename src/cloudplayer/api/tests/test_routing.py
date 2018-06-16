@@ -1,9 +1,8 @@
+from unittest import mock
 import re
 
-import mock
 import pytest
 import tornado.web
-import tornado.gen
 
 from cloudplayer.api.routing import ProtocolMatches
 
@@ -18,19 +17,16 @@ def test_protocol_matcher_should_allow_regex_as_pattern():
     assert matcher.protocol_pattern.pattern == '^reg.*ex$'
 
 
-@pytest.mark.gen_test
-def test_protocol_matcher_should_route_requests_based_on_protocol():
+@pytest.mark.asyncio
+async def test_protocol_matcher_should_route_requests_based_on_protocol():
 
-    @tornado.gen.coroutine
-    def app_one(*_):
+    async def app_one(*_):
         return 'ONE'
 
-    @tornado.gen.coroutine
-    def app_two(*_):
+    async def app_two(*_):
         return 'TWO'
 
-    @tornado.gen.coroutine
-    def catch_all(*_):
+    async def catch_all(*_):
         return 'ALL'
 
     request = mock.Mock()
@@ -40,14 +36,13 @@ def test_protocol_matcher_should_route_requests_based_on_protocol():
         (ProtocolMatches('.*'), catch_all)]
     base_app = tornado.web.Application(routes)
 
-    @tornado.gen.coroutine
-    def assert_route(proto, expected):
+    async def assert_route(proto, expected):
         request.protocol = proto
         delegate = base_app.find_handler(request)
-        response = yield delegate.request_callback(base_app, request)
+        response = await delegate.request_callback(base_app, request)
         assert response == expected
 
-    assert_route('ones', 'ONE')
-    assert_route('one', 'ONE')
-    assert_route('two', 'TWO')
-    assert_route('three', 'ALL')
+    await assert_route('ones', 'ONE')
+    await assert_route('one', 'ONE')
+    await assert_route('two', 'TWO')
+    await assert_route('three', 'ALL')

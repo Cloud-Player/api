@@ -11,7 +11,6 @@ import jwt
 import jwt.exceptions
 import tornado.auth
 import tornado.escape
-import tornado.gen
 import tornado.httputil
 import tornado.web
 
@@ -126,8 +125,7 @@ class HTTPHandler(HandlerMixin, tornado.web.RequestHandler):
                 params.append((name, v.decode('utf-8')))
         return params
 
-    @tornado.gen.coroutine
-    def options(self, *args, **kw):
+    async def options(self, *args, **kw):
         self.finish()
 
     @property
@@ -146,7 +144,7 @@ class HTTPFallback(HTTPHandler):
 
     SUPPORTED_METHODS = ('GET',)
 
-    def get(self, *args, **kwargs):
+    async def get(self, *args, **kwargs):
         raise HTTPException(404, 'endpoint not found')
 
 
@@ -154,7 +152,7 @@ class HTTPHealth(HTTPHandler):
 
     SUPPORTED_METHODS = ('GET',)
 
-    def get(self, *args, **kwargs):
+    async def get(self, *args, **kwargs):
         self.cache.info('server')
         self.db.execute('SELECT 1 = 1;').first()
         self.write({'status_code': 200, 'reason': 'OK'})

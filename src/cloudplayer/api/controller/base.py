@@ -6,7 +6,6 @@
     :license: GPL-3.0, see LICENSE for details
 """
 import sqlalchemy.exc
-import tornado.gen
 from tornado.log import app_log
 
 from cloudplayer.api import APIException
@@ -87,14 +86,13 @@ class Controller(object, metaclass=ProviderRegistry):
                         400, 'mismatch on {}'.format(field))
         return params
 
-    @tornado.gen.coroutine
-    def fetch(self, provider_id, path, params=None, **kw):
+    async def fetch(self, provider_id, path, params=None, **kw):
         """Convenience method for fetching from an upstream provider."""
         # TODO: Can authed fetching be generalized?
         from cloudplayer.api.controller.auth import AuthController
         controller = AuthController.for_provider(
             provider_id, self.db, self.current_user)
-        response = yield controller.fetch(path, params=params, **kw)
+        response = await controller.fetch(path, params=params, **kw)
         return response
 
     def get_account(self, provider_id):
@@ -108,8 +106,7 @@ class Controller(object, metaclass=ProviderRegistry):
             self._accounts[provider_id] = account
         return self._accounts[provider_id]
 
-    @tornado.gen.coroutine
-    def create(self, ids, kw, fields=Available):
+    async def create(self, ids, kw, fields=Available):
         provider_id = ids.get('provider_id', 'cloudplayer')
         account = self.get_account(provider_id)
 
@@ -132,8 +129,7 @@ class Controller(object, metaclass=ProviderRegistry):
         self.policy.grant_read(account, entity, fields)
         return entity
 
-    @tornado.gen.coroutine
-    def read(self, ids, fields=Available):
+    async def read(self, ids, fields=Available):
         entity = self.db.query(self.__model__).filter_by(**ids).first()
         if not entity:
             raise ControllerException(404, 'entity not found')
@@ -141,8 +137,7 @@ class Controller(object, metaclass=ProviderRegistry):
         self.policy.grant_read(account, entity, fields)
         return entity
 
-    @tornado.gen.coroutine
-    def update(self, ids, kw, fields=Available):
+    async def update(self, ids, kw, fields=Available):
         entity = self.db.query(self.__model__).filter_by(**ids).first()
         if not entity:
             raise ControllerException(404, 'updatable not found')
@@ -155,8 +150,7 @@ class Controller(object, metaclass=ProviderRegistry):
         self.db.commit()
         return entity
 
-    @tornado.gen.coroutine
-    def delete(self, ids):
+    async def delete(self, ids):
         entity = self.db.query(self.__model__).filter_by(**ids).first()
         if not entity:
             raise ControllerException(404, 'deletable not found')
@@ -165,8 +159,7 @@ class Controller(object, metaclass=ProviderRegistry):
         self.db.delete(entity)
         self.db.commit()
 
-    @tornado.gen.coroutine
-    def query(self, ids, kw):
+    async def query(self, ids, kw):
         provider_id = ids.get('provider_id', 'cloudplayer')
         account = self.get_account(provider_id)
         if 'account_id' in kw:
@@ -179,17 +172,15 @@ class Controller(object, metaclass=ProviderRegistry):
             query = query.filter(expression)
         return query
 
-    @tornado.gen.coroutine
-    def search(self, ids, kw, fields=Available):
-        query = yield self.query(ids, kw)
+    async def search(self, ids, kw, fields=Available):
+        query = await self.query(ids, kw)
         entities = query.all()
         provider_id = ids.get('provider_id', 'cloudplayer')
         account = self.get_account(provider_id)
         self.policy.grant_read(account, entities, fields)
         return entities
 
-    @tornado.gen.coroutine
-    def sub(self, ids, registry):
+    async def sub(self, ids, registry):
         provider_id = ids.get('provider_id', 'cloudplayer')
         account = self.get_account(provider_id)
         kw = {}
@@ -200,7 +191,6 @@ class Controller(object, metaclass=ProviderRegistry):
         self.policy.grant_query(account, self.__model__, params)
         self.pubsub.subscribe(**registry)
 
-    @tornado.gen.coroutine
-    def unsub(self, ids, registry):
+    async def unsub(self, ids, registry):
         for channel in registry:
             self.pubsub.subscribe(channel)

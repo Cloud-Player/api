@@ -1,3 +1,4 @@
+from unittest import mock
 import functools
 import io
 import json
@@ -7,11 +8,9 @@ import sys
 import urllib.parse
 
 import jwt
-import mock
 import pytest
 import pytest_redis.factories as redis_factories
 import tornado.escape
-import tornado.gen
 import tornado.options as opt
 from tornado.httpclient import HTTPRequest, HTTPResponse, HTTPError
 from tornado.websocket import websocket_connect
@@ -220,8 +219,7 @@ def expect():
 
 
 def mock_fetch(provider_id):
-    @tornado.gen.coroutine
-    def fetch(self, request, callback=None, raise_error=True, **kw):
+    async def fetch(self, request, callback=None, raise_error=True, **kw):
         if not isinstance(request, HTTPRequest):
             request = HTTPRequest(url=request, **kw)
         controller = AuthController.for_provider(provider_id, None, None)
@@ -252,8 +250,7 @@ def http_client(http_client, db):
 @pytest.fixture(scope='function')
 def user_fetch(user_cookie, http_client, base_url):
 
-    @tornado.gen.coroutine
-    def fetch(req, body=None, **kw):  # pragma: no cover
+    async def fetch(req, body=None, **kw):  # pragma: no cover
         if isinstance(req, str):
             if not req.startswith(base_url):
                 req = '{}/{}'.format(base_url, req.lstrip('/'))
@@ -267,7 +264,7 @@ def user_fetch(user_cookie, http_client, base_url):
         cookies = '{};{}'.format(cookies.rstrip(';'), user_cookie)
         headers['Cookie'] = cookies
         kw['headers'] = headers
-        response = yield http_client.fetch(req, body=body, **kw)
+        response = await http_client.fetch(req, body=body, **kw)
         decode = functools.partial(tornado.escape.json_decode, response.body)
         object.__setattr__(response, 'json', decode)
         return response
@@ -277,12 +274,11 @@ def user_fetch(user_cookie, http_client, base_url):
 @pytest.fixture(scope='function')
 def user_ws(user_cookie, http_client, base_url):
 
-    @tornado.gen.coroutine
-    def connect(**kw):
+    async def connect(**kw):
         request = HTTPRequest(
             '{}/websocket'.format(base_url.replace('http', 'ws')),
             headers={'Cookie': user_cookie}, **kw)
-        conn = yield websocket_connect(request)
+        conn = await websocket_connect(request)
         return conn
     yield connect
 
@@ -302,18 +298,17 @@ class WSResponse(object):
 @pytest.fixture(scope='function')
 def user_push(user_ws):
 
-    @tornado.gen.coroutine
-    def push(messages, keep_alive=False, await_reply=None):
-        conn = yield user_ws()
+    async def push(messages, keep_alive=False, await_reply=None):
+        conn = await user_ws()
         single_message = not isinstance(messages, list)
         if single_message:
             messages = [messages]
         responses = []
         for message in messages:
-            yield conn.write_message(json.dumps(message))
+            await conn.write_message(json.dumps(message))
             response = None
             if await_reply is None:
-                response = yield conn.read_message()
+                response = await conn.read_message()
                 if response:
                     response = json.loads(response)
                     responses.append(response)

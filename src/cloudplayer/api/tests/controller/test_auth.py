@@ -1,15 +1,16 @@
 import datetime
 import hashlib
 import json
+from unittest import mock
 
-import mock
+import asynctest
 import pytest
 import sqlalchemy.orm.util
-import tornado.gen
-
+import tornado.escape
 from cloudplayer.api.controller import ControllerException
-from cloudplayer.api.controller.auth import (
-    AuthController, SoundcloudAuthController, YoutubeAuthController)
+from cloudplayer.api.controller.auth import (AuthController,
+                                             SoundcloudAuthController,
+                                             YoutubeAuthController)
 from cloudplayer.api.model.account import Account
 from cloudplayer.api.model.image import Image
 
@@ -63,8 +64,8 @@ def test_auth_controller_should_check_token_expiration_before_refresh(
     assert controller._should_refresh is False
 
 
-@pytest.mark.gen_test
-def test_auth_controller_should_raise_403_on_refresh_error(
+@pytest.mark.asyncio
+async def test_auth_controller_should_raise_403_on_refresh_error(
         db, current_user):
 
     ages_ago = datetime.datetime(2015, 7, 14, 12, 30)
@@ -74,15 +75,14 @@ def test_auth_controller_should_raise_403_on_refresh_error(
     account.refresh_token = 'stale-refresh-token'
     account.token_expiration = ages_ago
 
-    @tornado.gen.coroutine
-    def fetch(*_, **kw):
+    async def fetch(*_, **kw):
         response = mock.Mock()
         response.error = True
         return response
 
     with mock.patch.object(controller.http_client, 'fetch', fetch):
         with pytest.raises(ControllerException) as error:
-            yield controller._refresh_access()
+            await controller._refresh_access()
     assert error.value.status_code == 403
 
 
@@ -113,8 +113,8 @@ def test_auth_controller_should_raise_403_on_refresh_error(
             datetime.datetime.utcnow() + datetime.timedelta(seconds=300))
     })
 ])
-@pytest.mark.gen_test
-def test_auth_controller_should_refresh_access_token(
+@pytest.mark.asyncio
+async def test_auth_controller_should_refresh_access_token(
         db, current_user, body, expect):
 
     controller = CloudplayerController(db, current_user)
@@ -123,15 +123,14 @@ def test_auth_controller_should_refresh_access_token(
     account.refresh_token = 'old-refresh-token'
     account.token_expiration = datetime.datetime(2015, 7, 14, 12, 30)
 
-    @tornado.gen.coroutine
-    def fetch(*_, **kw):
+    async def fetch(*_, **kw):
         response = mock.Mock()
         response.error = None
         response.body = json.dumps(body)
         return response
 
     with mock.patch.object(controller.http_client, 'fetch', fetch):
-        yield controller._refresh_access()
+        await controller._refresh_access()
 
     assert account.access_token == expect.get('access_token')
     assert account.refresh_token == expect.get('refresh_token')
@@ -139,14 +138,13 @@ def test_auth_controller_should_refresh_access_token(
         datetime.timedelta(seconds=10))
 
 
-@pytest.mark.gen_test
-def test_auth_controller_should_fetch_with_refresh(db, current_user):
+@pytest.mark.asyncio
+async def test_auth_controller_should_fetch_with_refresh(db, current_user):
     controller = CloudplayerController(db, current_user)
     account = controller.account
     account.token_expiration = datetime.datetime(2015, 7, 14, 12, 30)
 
-    @tornado.gen.coroutine
-    def fetch(path, method=None, **kw):
+    async def fetch(path, method=None, **kw):
         response = mock.Mock()
         response.error = None
         if method:
@@ -156,7 +154,7 @@ def test_auth_controller_should_fetch_with_refresh(db, current_user):
         return response
 
     with mock.patch.object(controller.http_client, 'fetch', fetch):
-        response = yield controller.fetch('/path')
+        response = await controller.fetch('/path')
 
     fetched = tornado.escape.json_decode(response.body)
     assert fetched.get('path') == (
@@ -164,19 +162,18 @@ def test_auth_controller_should_fetch_with_refresh(db, current_user):
         '/path?token-param=access-token&client-key=cp-api-key')
 
 
-@pytest.mark.gen_test
-def test_auth_controller_should_fetch_anonymously(db):
+@pytest.mark.asyncio
+async def test_auth_controller_should_fetch_anonymously(db):
     controller = CloudplayerController(db, {})
 
-    @tornado.gen.coroutine
-    def fetch(path, **kw):
+    async def fetch(path, **kw):
         response = mock.Mock()
         response.error = None
         response.body = json.dumps({'path': path})
         return response
 
     with mock.patch.object(controller.http_client, 'fetch', fetch):
-        response = yield controller.fetch('/path')
+        response = await controller.fetch('/path')
 
     fetched = tornado.escape.json_decode(response.body)
     assert fetched.get('path') == (
@@ -271,19 +268,17 @@ def test_soundcloud_auth_updates_account_profile(db, current_user):
     assert controller.account.image.large == 'img.co/t500x500.jpg'
 
 
-@pytest.mark.gen_test
-def test_youtube_auth_inserst_additional_params_into_fetch(
+@pytest.mark.asyncio
+async def test_youtube_auth_inserts_additional_params_into_fetch(
         db, current_user, monkeypatch):
-    fetch = mock.MagicMock()
-    monkeypatch.setattr(
-        AuthController, 'fetch', tornado.gen.coroutine((fetch)))
+    fetch = asynctest.CoroutineMock()
+    monkeypatch.setattr(AuthController, 'fetch', fetch)
     controller = YoutubeAuthController(db, current_user)
     user_hash = hashlib.md5(current_user['cloudplayer'].encode()).hexdigest()
 
-    yield controller.fetch('/path', [('p1', '1'), ('p2', '2')], kw0='kw0')
+    await controller.fetch('/path', [('p1', '1'), ('p2', '2')], kw0='kw0')
 
     fetch.assert_called_once_with(
-        controller,
         '/path',
         params=[
             ('p1', '1'),

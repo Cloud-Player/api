@@ -5,8 +5,8 @@ from cloudplayer.api.controller.playlist import PlaylistController
 from cloudplayer.api.model.playlist import Playlist
 
 
-@pytest.mark.gen_test
-def test_playlist_controller_should_resolve_random_id(db, current_user):
+@pytest.mark.asyncio
+async def test_playlist_controller_should_resolve_random_id(db, current_user):
     playlist = Playlist(
         account_id=current_user['cloudplayer'],
         account_provider_id='cloudplayer',
@@ -19,18 +19,18 @@ def test_playlist_controller_should_resolve_random_id(db, current_user):
     db.expunge(playlist)
     controller = PlaylistController(db, current_user)
     ids = {'id': 'random', 'provider_id': 'cloudplayer'}
-    playlist = yield controller.read(ids)
+    playlist = await controller.read(ids)
     assert playlist.id == playlist_id
 
 
-@pytest.mark.gen_test
-def test_playlist_controller_should_create_entity_and_read_result(
+@pytest.mark.asyncio
+async def test_playlist_controller_should_create_entity_and_read_result(
         db, current_user, account, user):
     controller = PlaylistController(db, current_user)
     ids = {'provider_id': 'cloudplayer'}
     kw = {'title': 'foo', 'account_id': account.id,
           'account_provider_id': account.provider_id}
-    entity = yield controller.create(ids, kw)
+    entity = await controller.create(ids, kw)
     assert isinstance(entity.id, str)
     assert entity.provider_id == 'cloudplayer'
     assert entity.title == 'foo'

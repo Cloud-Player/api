@@ -1,0 +1,26 @@
+stages:
+  - prep
+  - test
+
+services:
+  - postgres:10.4
+  - redis:4.0
+
+variables:
+  POSTGRES_DB: cloudplayer
+  POSTGRES_USER: api
+  POSTGRES_PASSWORD: password
+
+prep:
+  stage: prep
+  script:
+    - apt-get install software-properties-common python-software-properties
+    - add-apt-repository -y ppa:jonathonf/python-3.6
+    - apt-get update
+    - apt-get install python3.6
+
+test:
+  stage: test
+  script:
+    - make install
+    - pytest

@@ -62,6 +62,9 @@ class AuthHandler(
                 response_type=self._OAUTH_RESPONSE_TYPE,
                 extra_params=self._OAUTH_EXTRA_PARAMS)
 
+    async def fetch_async(self, url, **kw):
+        return await self.controller.fetch_async(url, **kw)
+
     async def fetch_access(self):
         """Fetches the authenticated user data upon redirect"""
         body = urllib.parse.urlencode({
@@ -71,7 +74,7 @@ class AuthHandler(
             'grant_type': self._OAUTH_GRANT_TYPE,
             'redirect_uri': self._OAUTH_REDIRECT_URI})
 
-        response = await self._fetch(
+        response = await self.fetch_async(
             self.controller.OAUTH_ACCESS_TOKEN_URL,
             headers={'Content-Type': 'application/x-www-form-urlencoded'},
             method='POST',
@@ -83,7 +86,7 @@ class AuthHandler(
             self._OAUTH_USERINFO_URL,
             {'access_token': True,
              self.controller.OAUTH_TOKEN_PARAM: access_info['access_token']})
-        response = await self._fetch(uri)
+        response = await self.fetch_async(uri)
         return tornado.escape.json_decode(response.body)
 
     async def provider_callback(self):

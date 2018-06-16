@@ -3,7 +3,6 @@ import sys
 
 import asynctest
 import pytest
-import tornado.httpclient
 
 import cloudplayer.api.handler
 from cloudplayer.api import APIException
@@ -17,12 +16,6 @@ def test_handler_mixin_should_connect_redis_pool(app):
 
     handler = Handler()
     assert handler.cache.info()
-
-
-def test_handler_mixin_should_provide_async_http_client():
-    handler = HandlerMixin()
-    base = handler.http_client.configurable_base()
-    assert base is tornado.httpclient.AsyncHTTPClient
 
 
 def test_handler_mixin_should_create_db_session(app):

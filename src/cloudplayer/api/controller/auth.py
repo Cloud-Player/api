@@ -53,7 +53,7 @@ class AuthController(object, metaclass=ProviderRegistry):
             'grant_type': 'refresh_token',
             'refresh_token': self.account.refresh_token})
 
-        response = await self._fetch(
+        response = await self.fetch_async(
             self.OAUTH_ACCESS_TOKEN_URL,
             method='POST', body=body, raise_error=False)
         if response.error:
@@ -65,11 +65,14 @@ class AuthController(object, metaclass=ProviderRegistry):
         self.db.add(self.account)
         self.db.commit()
 
-    async def _fetch(self, request, **kw):
+    async def fetch_async(self, request, **kw):
         try:
             response = await self.http_client.fetch(request, **kw)
         except tornado.httpclient.HTTPError as error:
-            app_log.warn(error.response.body.decode('utf-8'))
+            if error.response:
+                app_log.error(error.response.body.decode('utf-8'))
+            else:
+                app_log.error(error)
             raise
         return response
 
@@ -97,7 +100,7 @@ class AuthController(object, metaclass=ProviderRegistry):
 
         url = '{}/{}'.format(self.API_BASE_URL, path.lstrip('/'))
         uri = tornado.httputil.url_concat(url, params)
-        response = await self._fetch(uri, **kw)
+        response = await self.fetch_async(uri, **kw)
         return response
 
     def _create_account(self, account_info):

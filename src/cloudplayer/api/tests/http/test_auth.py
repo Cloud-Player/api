@@ -84,8 +84,7 @@ async def test_auth_handler_should_fetch_soundcloud_user_with_body(
         response.body = json.dumps(responses.pop(0))
         return response
 
-    mock_client = mock.MagicMock(fetch=fetch)
-    monkeypatch.setattr(Soundcloud, 'http_client', mock_client)
+    monkeypatch.setattr(Soundcloud, 'fetch_async', fetch)
 
     response = await http_client.fetch(
         '{}/soundcloud?code=42'.format(base_url),
@@ -118,8 +117,7 @@ async def test_auth_handler_should_fetch_youtube_user_with_body(
         response.body = json.dumps(responses.pop(0))
         return response
 
-    mock_client = mock.MagicMock(fetch=fetch)
-    monkeypatch.setattr(Youtube, 'http_client', mock_client)
+    monkeypatch.setattr(Youtube, 'fetch_async', fetch)
 
     response = await http_client.fetch(
         '{}/youtube?code=42'.format(base_url),

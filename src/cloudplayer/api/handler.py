@@ -37,12 +37,6 @@ class HandlerMixin(object):
         self._pubsub.subscribe(keep_alive=lambda _: True)
 
     @property
-    def http_client(self):
-        if not hasattr(self, '_http_client'):
-            self._http_client = tornado.httpclient.AsyncHTTPClient()
-        return self._http_client
-
-    @property
     def db(self):
         if not hasattr(self, '_db'):
             self._db = self.application.database.create_session()

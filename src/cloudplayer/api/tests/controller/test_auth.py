@@ -31,7 +31,7 @@ def test_controller_for_provider_should_reject_invalid_provider_id():
 class CloudplayerController(AuthController):
 
     __provider__ = 'cloudplayer'
-    OAUTH_ACCESS_TOKEN_URL = 'cp://auth'
+    OAUTH_ACCESS_TOKEN_URL = 'cp://base-api/auth'
     API_BASE_URL = 'cp://base-api'
     OAUTH_TOKEN_PARAM = 'token-param'
     OAUTH_CLIENT_KEY = 'client-key'
@@ -67,7 +67,6 @@ def test_auth_controller_should_check_token_expiration_before_refresh(
 @pytest.mark.gen_test
 async def test_auth_controller_should_raise_403_on_refresh_error(
         db, current_user):
-
     ages_ago = datetime.datetime(2015, 7, 14, 12, 30)
     controller = CloudplayerController(db, current_user)
     account = controller.account
@@ -80,7 +79,7 @@ async def test_auth_controller_should_raise_403_on_refresh_error(
         response.error = True
         return response
 
-    with mock.patch.object(controller.http_client, 'fetch', fetch):
+    with mock.patch.object(controller, 'fetch_async', fetch):
         with pytest.raises(ControllerException) as error:
             await controller._refresh_access()
     assert error.value.status_code == 403
@@ -116,7 +115,6 @@ async def test_auth_controller_should_raise_403_on_refresh_error(
 @pytest.mark.gen_test
 async def test_auth_controller_should_refresh_access_token(
         db, current_user, body, expect):
-
     controller = CloudplayerController(db, current_user)
     account = controller.account
     account.access_token = 'old-access-token'
@@ -129,7 +127,7 @@ async def test_auth_controller_should_refresh_access_token(
         response.body = json.dumps(body)
         return response
 
-    with mock.patch.object(controller.http_client, 'fetch', fetch):
+    with mock.patch.object(controller, 'fetch_async', fetch):
         await controller._refresh_access()
 
     assert account.access_token == expect.get('access_token')
@@ -153,7 +151,7 @@ async def test_auth_controller_should_fetch_with_refresh(db, current_user):
             response.body = json.dumps({'path': path})
         return response
 
-    with mock.patch.object(controller.http_client, 'fetch', fetch):
+    with mock.patch.object(controller, 'fetch_async', fetch):
         response = await controller.fetch('/path')
 
     fetched = tornado.escape.json_decode(response.body)
@@ -172,7 +170,7 @@ async def test_auth_controller_should_fetch_anonymously(db):
         response.body = json.dumps({'path': path})
         return response
 
-    with mock.patch.object(controller.http_client, 'fetch', fetch):
+    with mock.patch.object(controller, 'fetch_async', fetch):
         response = await controller.fetch('/path')
 
     fetched = tornado.escape.json_decode(response.body)

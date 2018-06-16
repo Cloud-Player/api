@@ -218,14 +218,13 @@ def expect():
     return get_expected_json
 
 
-def mock_fetch(provider_id):
+def mock_fetch(controller):
     async def fetch(self, request, callback=None, raise_error=True, **kw):
         if not isinstance(request, HTTPRequest):
             request = HTTPRequest(url=request, **kw)
-        controller = AuthController.for_provider(provider_id, None, None)
         request_url = request.url.replace(controller.API_BASE_URL, '')
         filename = urllib.parse.urlparse(request_url).path.lstrip('/')
-        path = 'upstream/{}/{}'.format(provider_id, filename)
+        path = 'upstream/{}/{}'.format(controller.__provider__, filename)
         try:
             buffer = raw_data(path)
         except FileNotFoundError as error:
@@ -234,12 +233,13 @@ def mock_fetch(provider_id):
     return fetch
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(autouse=True)
 def patch_provider(monkeypatch):
-    sc_fetch = mock_fetch('soundcloud')
-    monkeypatch.setattr(SoundcloudAuthController, '_fetch', sc_fetch)
-    yt_fetch = mock_fetch('youtube')
-    monkeypatch.setattr(YoutubeAuthController, '_fetch', yt_fetch)
+    for provider_id in opt.options.providers:
+        controller = AuthController.for_provider(provider_id, None, None)
+        if controller:
+            monkeypatch.setattr(
+                type(controller), 'fetch_async', mock_fetch(controller))
 
 
 @pytest.fixture(scope='function')

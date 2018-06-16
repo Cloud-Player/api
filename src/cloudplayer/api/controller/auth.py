@@ -67,8 +67,7 @@ class AuthController(object, metaclass=ProviderRegistry):
 
     async def _fetch(self, request, **kw):
         try:
-            future = self.http_client.fetch(request, **kw)
-            response = await tornado.gen.convert_yielded(future)
+            response = await self.http_client.fetch(request, **kw)
         except tornado.httpclient.HTTPError as error:
             app_log.warn(error.response.body.decode('utf-8'))
             raise

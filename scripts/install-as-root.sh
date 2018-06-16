@@ -23,5 +23,14 @@ libcurl4-openssl-dev \
 libssl-dev \
 postgresql
 
-# disable default nginx site
+# enable nginx site
 rm /etc/nginx/sites-enabled/default &> /dev/null || echo "default disabled"
+cp cloudplayer.conf /etc/nginx/sites-enabled/cloudplayer.conf
+
+# copy supervisor config
+cp api.conf /etc/supervisor/conf.d/api.conf
+
+# copy current app distribution
+mkdir -p /srv/cloudplayer
+cp -r . /srv/cloudplayer
+chown -R cloudplayer:cloudplayer /srv/cloudplayer

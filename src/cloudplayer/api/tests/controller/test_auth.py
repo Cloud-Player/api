@@ -64,7 +64,7 @@ def test_auth_controller_should_check_token_expiration_before_refresh(
     assert controller._should_refresh is False
 
 
-@pytest.mark.asyncio
+@pytest.mark.gen_test
 async def test_auth_controller_should_raise_403_on_refresh_error(
         db, current_user):
 
@@ -113,7 +113,7 @@ async def test_auth_controller_should_raise_403_on_refresh_error(
             datetime.datetime.utcnow() + datetime.timedelta(seconds=300))
     })
 ])
-@pytest.mark.asyncio
+@pytest.mark.gen_test
 async def test_auth_controller_should_refresh_access_token(
         db, current_user, body, expect):
 
@@ -138,7 +138,7 @@ async def test_auth_controller_should_refresh_access_token(
         datetime.timedelta(seconds=10))
 
 
-@pytest.mark.asyncio
+@pytest.mark.gen_test
 async def test_auth_controller_should_fetch_with_refresh(db, current_user):
     controller = CloudplayerController(db, current_user)
     account = controller.account
@@ -162,7 +162,7 @@ async def test_auth_controller_should_fetch_with_refresh(db, current_user):
         '/path?token-param=access-token&client-key=cp-api-key')
 
 
-@pytest.mark.asyncio
+@pytest.mark.gen_test
 async def test_auth_controller_should_fetch_anonymously(db):
     controller = CloudplayerController(db, {})
 
@@ -268,7 +268,7 @@ def test_soundcloud_auth_updates_account_profile(db, current_user):
     assert controller.account.image.large == 'img.co/t500x500.jpg'
 
 
-@pytest.mark.asyncio
+@pytest.mark.gen_test
 async def test_youtube_auth_inserts_additional_params_into_fetch(
         db, current_user, monkeypatch):
     fetch = asynctest.CoroutineMock()

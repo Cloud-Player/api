@@ -70,7 +70,7 @@ class MyController(Controller):
         self.policy = policy
 
 
-@pytest.mark.asyncio
+@pytest.mark.gen_test
 async def test_base_controller_should_delegate_provider_fetches_to_auth_ctrls(
         db, current_user, monkeypatch):
     controller = MyController(
@@ -86,7 +86,7 @@ async def test_base_controller_should_delegate_provider_fetches_to_auth_ctrls(
     fetch.assert_called_once_with('/path', params=params)
 
 
-@pytest.mark.asyncio
+@pytest.mark.gen_test
 async def test_controller_should_create_entity_and_read_result(
         db, current_user, account, user):
     controller = MyController(db, current_user, Account, mock.Mock())
@@ -110,7 +110,7 @@ async def test_controller_should_create_entity_and_read_result(
         'id', 'title'}
 
 
-@pytest.mark.asyncio
+@pytest.mark.gen_test
 async def test_controller_should_raise_bad_request_on_unknown_fields(
         db, current_user, user):
     controller = MyController(db, current_user, Account, mock.Mock())
@@ -121,7 +121,7 @@ async def test_controller_should_raise_bad_request_on_unknown_fields(
     assert error.value.status_code == 400
 
 
-@pytest.mark.asyncio
+@pytest.mark.gen_test
 async def test_controller_should_raise_bad_request_on_missing_not_null(
         db, current_user, monkeypatch):
     from sqlalchemy.sql import crud  # Silence warnings
@@ -134,7 +134,7 @@ async def test_controller_should_raise_bad_request_on_missing_not_null(
     assert error.value.status_code == 400
 
 
-@pytest.mark.asyncio
+@pytest.mark.gen_test
 async def test_controller_should_raise_bad_request_on_mismatching_account_info(
         db, current_user, user, monkeypatch):
     controller = MyController(db, current_user, Playlist, mock.Mock())
@@ -145,7 +145,7 @@ async def test_controller_should_raise_bad_request_on_mismatching_account_info(
     assert error.value.status_code == 400
 
 
-@pytest.mark.asyncio
+@pytest.mark.gen_test
 async def test_controller_should_raise_not_found_on_failed_read(
         db, current_user):
     controller = MyController(db, current_user, Account, mock.Mock())
@@ -155,7 +155,7 @@ async def test_controller_should_raise_not_found_on_failed_read(
     assert error.value.status_code == 404
 
 
-@pytest.mark.asyncio
+@pytest.mark.gen_test
 async def test_controller_should_read_entity_by_the_books(
         db, current_user, account):
     controller = MyController(db, current_user, Account, mock.Mock())
@@ -169,7 +169,7 @@ async def test_controller_should_read_entity_by_the_books(
         'provider_id', 'title'}
 
 
-@pytest.mark.asyncio
+@pytest.mark.gen_test
 async def test_controller_should_raise_not_found_on_failed_update(
         db, current_user):
     controller = MyController(db, current_user, Account, mock.Mock())
@@ -180,7 +180,7 @@ async def test_controller_should_raise_not_found_on_failed_update(
     assert error.value.status_code == 404
 
 
-@pytest.mark.asyncio
+@pytest.mark.gen_test
 async def test_controller_should_update_entity_and_read_result(
         db, current_user, account):
     controller = MyController(db, current_user, Account, mock.Mock())
@@ -201,7 +201,7 @@ async def test_controller_should_update_entity_and_read_result(
         'user_id', 'title'}
 
 
-@pytest.mark.asyncio
+@pytest.mark.gen_test
 async def test_controller_should_raise_not_found_on_failed_delete(
         db, current_user):
     controller = MyController(db, current_user, Account, mock.Mock())
@@ -211,7 +211,7 @@ async def test_controller_should_raise_not_found_on_failed_delete(
     assert error.value.status_code == 404
 
 
-@pytest.mark.asyncio
+@pytest.mark.gen_test
 async def test_controller_should_delete_entity_and_not_return_anything(
         db, current_user, account):
     controller = MyController(db, current_user, Account, mock.Mock())
@@ -224,7 +224,7 @@ async def test_controller_should_delete_entity_and_not_return_anything(
         account, account)
 
 
-@pytest.mark.asyncio
+@pytest.mark.gen_test
 async def test_controller_should_produce_model_query_with_arguments(
         db, current_user, account):
     controller = MyController(db, current_user, Account, mock.Mock())
@@ -241,7 +241,7 @@ async def test_controller_should_produce_model_query_with_arguments(
         'title', 'provider_id'}
 
 
-@pytest.mark.asyncio
+@pytest.mark.gen_test
 async def test_controller_should_search_using_query_and_read_all_entities(
         db, current_user, account):
     controller = MyController(db, current_user, Account, mock.Mock())

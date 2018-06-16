@@ -1,7 +1,7 @@
 import pytest
 
 
-@pytest.mark.asyncio
+@pytest.mark.gen_test
 async def test_favourite_id_should_be_referenced_in_account(
         account, user_fetch):
     response = await user_fetch(

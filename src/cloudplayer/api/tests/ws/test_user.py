@@ -1,7 +1,7 @@
 import pytest
 
 
-@pytest.mark.asyncio
+@pytest.mark.gen_test
 async def test_user_entity_should_be_available_over_websocket(
         user_push, user):
     response = await user_push({'channel': 'user.me'})

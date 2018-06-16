@@ -8,7 +8,7 @@ import tornado.web
 from cloudplayer.api.http.auth import AuthHandler, Soundcloud, Youtube
 
 
-@pytest.mark.asyncio
+@pytest.mark.gen_test
 async def test_soundcloud_auth_redirects_with_arguments(
         base_url, http_client):
     future = http_client.fetch(
@@ -24,7 +24,7 @@ async def test_soundcloud_auth_redirects_with_arguments(
         'state=testing')
 
 
-@pytest.mark.asyncio
+@pytest.mark.gen_test
 async def test_youtube_auth_redirects_with_arguments(base_url, http_client):
     response = await http_client.fetch(
         '{}/youtube'.format(base_url),
@@ -65,7 +65,7 @@ async def test_auth_handler_closes_with_html_even_on_callback_failure(
     callback.assert_called_once()
 
 
-@pytest.mark.asyncio
+@pytest.mark.gen_test
 async def test_auth_handler_should_fetch_soundcloud_user_with_body(
         base_url, http_client, monkeypatch):
     responses = [{
@@ -93,7 +93,7 @@ async def test_auth_handler_should_fetch_soundcloud_user_with_body(
     assert 'tok_v1' in response.headers['Set-Cookie']
 
 
-@pytest.mark.asyncio
+@pytest.mark.gen_test
 async def test_auth_handler_should_fetch_youtube_user_with_body(
         base_url, http_client, monkeypatch):
     responses = [{

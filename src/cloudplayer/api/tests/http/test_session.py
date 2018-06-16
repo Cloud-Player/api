@@ -1,7 +1,7 @@
 import pytest
 
 
-@pytest.mark.asyncio
+@pytest.mark.gen_test
 async def test_account_session_can_be_created_with_fingerprint(
         user_fetch, account, db):
     assert not account.sessions

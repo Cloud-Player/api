@@ -3,7 +3,7 @@ import pytest
 from cloudplayer.api.controller.favourite import FavouriteController
 
 
-@pytest.mark.asyncio
+@pytest.mark.gen_test
 async def test_favourite_controller_should_redirect_mine_alias(
         db, current_user):
     controller = FavouriteController(db, current_user)

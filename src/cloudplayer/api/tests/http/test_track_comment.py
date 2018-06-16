@@ -6,7 +6,7 @@ import pytest
 from cloudplayer.api.controller import Controller
 
 
-@pytest.mark.asyncio
+@pytest.mark.gen_test
 async def test_track_comment_http_handler_should_convert_and_output_comments(
         user_fetch, monkeypatch):
     response = [{

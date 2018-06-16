@@ -22,7 +22,7 @@ def test_http_handler_stores_init_vars(app, req):
     assert handler.original_user is None
 
 
-@pytest.mark.asyncio
+@pytest.mark.gen_test
 async def test_http_handler_should_set_default_headers(http_client, base_url):
     response = await http_client.fetch('{}/health_check'.format(base_url))
     headers = dict(response.headers)
@@ -44,7 +44,7 @@ async def test_http_handler_should_set_default_headers(http_client, base_url):
         'Server': 'cloudplayer'}
 
 
-@pytest.mark.asyncio
+@pytest.mark.gen_test
 async def test_http_handler_should_set_new_user_cookie(http_client, base_url):
     response = await http_client.fetch('{}/user/me'.format(base_url))
     headers = dict(response.headers)
@@ -55,7 +55,7 @@ async def test_http_handler_should_set_new_user_cookie(http_client, base_url):
     assert cookie['expires']
 
 
-@pytest.mark.asyncio
+@pytest.mark.gen_test
 async def test_http_fallback_throws_404_for_get_405_for_others(app, req):
     handler = HTTPFallback(app, req)
     with pytest.raises(tornado.web.HTTPError) as error:
@@ -67,7 +67,7 @@ async def test_http_fallback_throws_404_for_get_405_for_others(app, req):
     assert error.value.status_code == 405
 
 
-@pytest.mark.asyncio
+@pytest.mark.gen_test
 async def test_http_health_should_query_redis_and_postgres(
         app, req, monkeypatch):
     handler = HTTPHealth(app, req)

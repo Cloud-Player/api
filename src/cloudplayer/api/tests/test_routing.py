@@ -17,7 +17,7 @@ def test_protocol_matcher_should_allow_regex_as_pattern():
     assert matcher.protocol_pattern.pattern == '^reg.*ex$'
 
 
-@pytest.mark.asyncio
+@pytest.mark.gen_test
 async def test_protocol_matcher_should_route_requests_based_on_protocol():
 
     async def app_one(*_):

@@ -4,7 +4,7 @@ from cloudplayer.api.controller import ControllerException
 from cloudplayer.api.controller.playlist_item import PlaylistItemController
 
 
-@pytest.mark.asyncio
+@pytest.mark.gen_test
 async def test_playlist_item_controller_should_404_if_playlist_is_missing(
         db, current_user):
     controller = PlaylistItemController(db, current_user)

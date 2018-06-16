@@ -5,7 +5,7 @@ from cloudplayer.api.controller.playlist import PlaylistController
 from cloudplayer.api.model.playlist import Playlist
 
 
-@pytest.mark.asyncio
+@pytest.mark.gen_test
 async def test_playlist_controller_should_resolve_random_id(db, current_user):
     playlist = Playlist(
         account_id=current_user['cloudplayer'],
@@ -23,7 +23,7 @@ async def test_playlist_controller_should_resolve_random_id(db, current_user):
     assert playlist.id == playlist_id
 
 
-@pytest.mark.asyncio
+@pytest.mark.gen_test
 async def test_playlist_controller_should_create_entity_and_read_result(
         db, current_user, account, user):
     controller = PlaylistController(db, current_user)

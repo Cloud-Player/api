@@ -31,7 +31,6 @@ setup(
             'asynctest',
             'codecov',
             'pylint',
-            'pytest-asyncio',
             'pytest-cov',
             'pytest-pep8',
             'pytest-postgresql',

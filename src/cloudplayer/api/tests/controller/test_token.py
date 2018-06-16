@@ -10,7 +10,7 @@ from cloudplayer.api.model.token import Token
 from cloudplayer.api.model.user import User
 
 
-@pytest.mark.asyncio
+@pytest.mark.gen_test
 async def test_controller_should_create_new_token_anonymously(
         db, current_user):
     controller = TokenController(db, current_user)
@@ -21,14 +21,14 @@ async def test_controller_should_create_new_token_anonymously(
     assert token.claimed is False
 
 
-@pytest.mark.asyncio
+@pytest.mark.gen_test
 async def test_controller_should_not_create_token_with_kw(db, current_user):
     controller = TokenController(db, current_user)
     with pytest.raises(PolicyViolation):
         await controller.create({}, {'account_id': '1234'})
 
 
-@pytest.mark.asyncio
+@pytest.mark.gen_test
 async def test_controller_should_not_find_non_existent_entities(
         db, current_user):
     controller = TokenController(db, current_user)
@@ -36,7 +36,7 @@ async def test_controller_should_not_find_non_existent_entities(
         await controller.read({'id': 'not-an-id'})
 
 
-@pytest.mark.asyncio
+@pytest.mark.gen_test
 async def test_controller_should_not_find_expired_entities(db, current_user):
     entity = Token()
     db.add(entity)
@@ -48,7 +48,7 @@ async def test_controller_should_not_find_expired_entities(db, current_user):
         await controller.read({'id': entity.id})
 
 
-@pytest.mark.asyncio
+@pytest.mark.gen_test
 async def test_controller_should_find_unclaimed_entites(db, current_user):
     entity = Token()
     db.add(entity)
@@ -59,7 +59,7 @@ async def test_controller_should_find_unclaimed_entites(db, current_user):
     assert token.id == entity.id
 
 
-@pytest.mark.asyncio
+@pytest.mark.gen_test
 async def test_controller_should_set_current_user_on_claimed_token(
         db, current_user):
     entity = Token()
@@ -83,7 +83,7 @@ async def test_controller_should_set_current_user_on_claimed_token(
     assert entity.account_provider_id is None
 
 
-@pytest.mark.asyncio
+@pytest.mark.gen_test
 async def test_token_entity_should_update_claimed_attribute(db, current_user):
     entity = Token()
     db.add(entity)
@@ -103,7 +103,7 @@ async def test_token_entity_should_update_claimed_attribute(db, current_user):
     assert entity.account_provider_id == 'cloudplayer'
 
 
-@pytest.mark.asyncio
+@pytest.mark.gen_test
 async def test_controller_should_expect_full_update_not_patch(
         db, current_user):
     entity = Token()

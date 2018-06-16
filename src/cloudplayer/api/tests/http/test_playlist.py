@@ -4,7 +4,7 @@ from cloudplayer.api.model.playlist import Playlist
 from cloudplayer.api.model.playlist_item import PlaylistItem
 
 
-@pytest.mark.asyncio
+@pytest.mark.gen_test
 async def test_playlist_can_be_created(user_fetch, account):
     body = {'title': 'test playlist'}
     response = await user_fetch(
@@ -16,7 +16,7 @@ async def test_playlist_can_be_created(user_fetch, account):
     assert result['description'] is None
 
 
-@pytest.mark.asyncio
+@pytest.mark.gen_test
 async def test_playlist_can_be_deleted_without_tracks(user_fetch):
     body = {'title': 'test playlist'}
     response = await user_fetch(
@@ -26,7 +26,7 @@ async def test_playlist_can_be_deleted_without_tracks(user_fetch):
     assert response.code == 204
 
 
-@pytest.mark.asyncio
+@pytest.mark.gen_test
 async def test_playlist_can_be_deleted_with_cascading_tracks(
         db, user_fetch, account):
     item = PlaylistItem(

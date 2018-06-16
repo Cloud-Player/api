@@ -6,7 +6,7 @@ import tornado.ioloop
 from cloudplayer.api.http.account import Entity
 
 
-@pytest.mark.asyncio
+@pytest.mark.gen_test
 async def test_account_entity_should_be_available_over_websocket(
         user_push, account):
     message = {'channel': 'account.cloudplayer.me'}
@@ -17,7 +17,7 @@ async def test_account_entity_should_be_available_over_websocket(
     assert result['body']['provider_id'] == account.provider_id
 
 
-@pytest.mark.asyncio
+@pytest.mark.gen_test
 async def test_account_entity_should_be_subscribable_over_websocket(
         user_push, user_fetch, db, account, monkeypatch):
     monkeypatch.setattr(Entity, 'SUPPORTED_METHODS', ('GET', 'PATCH'))
@@ -38,7 +38,7 @@ async def test_account_entity_should_be_subscribable_over_websocket(
 
 
 @pytest.mark.xfail(strict=True, raises=tornado.ioloop.TimeoutError)
-@pytest.mark.asyncio(timeout=3)
+@pytest.mark.gen_test(timeout=3)
 async def test_account_entity_should_be_unsubscribable_over_websocket(
         user_push, user_fetch, db, account, monkeypatch):
     monkeypatch.setattr(Entity, 'SUPPORTED_METHODS', ('GET', 'PATCH'))

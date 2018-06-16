@@ -4,7 +4,7 @@ from cloudplayer.api.controller import ControllerException
 from cloudplayer.api.controller.favourite_item import FavouriteItemController
 
 
-@pytest.mark.asyncio
+@pytest.mark.gen_test
 async def test_favourite_item_controller_should_404_if_favourite_is_missing(
         db, current_user):
     controller = FavouriteItemController(db, current_user)

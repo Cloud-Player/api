@@ -1,7 +1,7 @@
 import pytest
 
 
-@pytest.mark.asyncio
+@pytest.mark.gen_test
 async def test_websocket_connection_responds_with_fallback(user_push):
     not_found = await user_push({'channel': 'cannot.be.found'})
     assert not_found.json() == {

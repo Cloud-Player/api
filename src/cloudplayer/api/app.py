@@ -155,6 +155,8 @@ class Application(tornado.web.Application):
         (r'^/proxy/(soundcloud|youtube)/(.*)',
          'cloudplayer.api.http.proxy.Proxy'),
 
+        (r'^/migration$',
+         'cloudplayer.api.http.base.Migration'),
         (r'^/health_check$',
          'cloudplayer.api.http.base.HTTPHealth'),
         (r'^/.*',

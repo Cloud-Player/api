@@ -140,6 +140,22 @@ class HTTPHandler(HandlerMixin, tornado.web.RequestHandler):
         return ', '.join(self.SUPPORTED_METHODS)
 
 
+class Migration(HTTPHandler):
+
+    SUPPORTED_METHODS = ('OPTIONS', 'POST',)
+
+    async def post(self, *args, **kwargs):
+        if self.body.get('user_id') != self.current_user['user_id']:
+            raise HTTPException(400, 'bad request')
+        claim = self.current_user.copy()
+        claim['auxapp'] = claim.pop('cloudplayer')
+        token = jwt.encode(
+            claim,
+            self.settings['jwt_secret'],
+            algorithm='HS256')
+        self.write({'migration': token.decode('utf-8')})
+
+
 class HTTPFallback(HTTPHandler):
 
     SUPPORTED_METHODS = ('GET',)
